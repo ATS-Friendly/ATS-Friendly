@@ -76,11 +76,11 @@ const translations = {
         modal_theme_title: "Tasarım Ayarları",
         lbl_color: "Vurgu Rengi",
         lbl_font: "Yazı Tipi",
-        btn_save_close: "Kaydet & Kapat",
+        btn_save_close: "Kapat",
         ai_analyzing: "CV'niz Analiz Ediliyor...",
         ai_desc: "Yapay zeka verilerinizi ayıklayıp yerleştiriyor.",
         ai_success: "CV'niz başarıyla dönüştürüldü!",
-        ai_error: "CV okunamadı. Lütfen PDF veya Resim yükleyin."
+        ai_error: "CV okunamadı. Dosya formatı bozuk veya içerik algılanamadı."
     },
     en: {
         auth_title: "Login",
@@ -114,11 +114,11 @@ const translations = {
         modal_theme_title: "Design Settings",
         lbl_color: "Accent Color",
         lbl_font: "Font Family",
-        btn_save_close: "Save & Close",
+        btn_save_close: "Close",
         ai_analyzing: "Analyzing Your CV...",
         ai_desc: "AI is extracting and formatting your data.",
         ai_success: "CV successfully converted!",
-        ai_error: "Could not read CV. Please upload PDF or Image."
+        ai_error: "Could not read CV. File format is corrupt or content unreadable."
     }
 };
 
@@ -158,15 +158,59 @@ function showView(viewId) {
     if (target) target.classList.add('active');
 }
 
-// --- TEMA YÖNETİMİ ---
+// --- TEMA YÖNETİMİ VE DRAGGABLE MODAL ---
 window.openThemeModal = () => {
-    document.getElementById('theme-modal').classList.add('active');
+    const modal = document.getElementById('theme-modal');
+    modal.classList.add('active');
+    
+    // Reset position if off-screen or first open, center-ish but draggable
+    if (!modal.style.top || !modal.style.left) {
+        modal.style.top = "100px";
+        modal.style.left = "calc(50% - 160px)";
+    }
+    
+    initDragElement(modal.querySelector('.modal-content'));
 };
 
 window.closeThemeModal = () => {
     document.getElementById('theme-modal').classList.remove('active');
     saveToCloud(); // Modal kapanırken kaydet
 };
+
+// Sürükleme Mantığı
+function initDragElement(elmnt) {
+    let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+    const header = elmnt.querySelector(".modal-header");
+    
+    if (header) {
+        header.onmousedown = dragMouseDown;
+    }
+
+    function dragMouseDown(e) {
+        e = e || window.event;
+        e.preventDefault();
+        pos3 = e.clientX;
+        pos4 = e.clientY;
+        document.onmouseup = closeDragElement;
+        document.onmousemove = elementDrag;
+    }
+
+    function elementDrag(e) {
+        e = e || window.event;
+        e.preventDefault();
+        pos1 = pos3 - e.clientX;
+        pos2 = pos4 - e.clientY;
+        pos3 = e.clientX;
+        pos4 = e.clientY;
+        elmnt.parentElement.style.top = (elmnt.parentElement.offsetTop - pos2) + "px";
+        elmnt.parentElement.style.left = (elmnt.parentElement.offsetLeft - pos1) + "px";
+    }
+
+    function closeDragElement() {
+        document.onmouseup = null;
+        document.onmousemove = null;
+    }
+}
 
 window.applyColor = (color) => {
     currentTheme.color = color;
@@ -387,6 +431,7 @@ window.handleFileUpload = async (input) => {
         } catch (error) {
             console.error("AI Error:", error);
             alert(translations[currentLang].ai_error);
+        } finally {
             document.getElementById('ai-loading').classList.remove('active');
         }
     };
@@ -403,7 +448,7 @@ async function analyzeCVWithGemini(base64Data, mimeType) {
     Extract the following information and return it in a strict JSON format matching this schema:
     {
         "fullName": "Name Surname",
-        "title": "Professional Title",
+        "title": "Professional Title (if extracted)",
         "contact": { 
             "location": "City, Country", 
             "phone": "Phone Number", 
@@ -429,9 +474,16 @@ async function analyzeCVWithGemini(base64Data, mimeType) {
                 "degree": "Degree Name",
                 "school": "University/School Name"
             }
+        ],
+        "certifications": [
+            {
+                "name": "Certification Name",
+                "provider": "Provider/Institution (if available)"
+            }
         ]
     }
-    If a field is missing, use an empty string. The language of the response should match the language of the CV (Turkish or English).`;
+    If a field is missing, use an empty string. The language of the response should match the language of the CV (Turkish or English). 
+    IMPORTANT: Return ONLY valid JSON. Do not include markdown code blocks.`;
 
     const response = await ai.models.generateContent({
         model: 'gemini-1.5-flash',
@@ -446,35 +498,54 @@ async function analyzeCVWithGemini(base64Data, mimeType) {
         }
     });
 
-    const text = response.text;
-    const cvData = JSON.parse(text);
+    let jsonStr = response.text;
+    
+    // Safety Cleanup: Remove Markdown code blocks if GenAI adds them despite instructions
+    jsonStr = jsonStr.replace(/```json/g, '').replace(/```/g, '');
+    // Ensure we only have the JSON part (find first { and last })
+    const firstOpen = jsonStr.indexOf('{');
+    const lastClose = jsonStr.lastIndexOf('}');
+    if (firstOpen !== -1 && lastClose !== -1) {
+        jsonStr = jsonStr.substring(firstOpen, lastClose + 1);
+    }
+
+    const cvData = JSON.parse(jsonStr);
     
     populateCVFromJSON(cvData);
-    document.getElementById('ai-loading').classList.remove('active');
     showToast(translations[currentLang].ai_success);
 }
 
 function populateCVFromJSON(data) {
     // Generate HTML String based on extracted JSON
-    // We reuse the structure from resetAll/loadATSExample but inject data
     
     // Map experience to HTML
-    const expHTML = data.experience.map(exp => `
+    const expHTML = data.experience && data.experience.length > 0 ? data.experience.map(exp => `
         <div class="section">
             <div class="section-actions"><button class="action-btn" onclick="moveUp(this)">▲</button><button class="action-btn" onclick="moveDown(this)">▼</button><button class="action-btn delete" onclick="removeSection(this)">×</button></div>
             <div class="section-header"><span class="section-title" contenteditable="true">${currentLang === 'tr' ? 'İŞ DENEYİMİ' : 'EMPLOYMENT HISTORY'}</span></div>
             <div class="entry"><button class="btn-delete-item" onclick="removeEntry(this)">×</button><div class="left-col" contenteditable="true">${exp.date || ''}</div><div class="right-col"><h3 contenteditable="true">${exp.title || ''}, ${exp.company || ''}</h3><p contenteditable="true">${exp.description || ''}</p></div></div>
         </div>
-    `).join('');
+    `).join('') : '';
 
     // Map education to HTML
-    const eduHTML = data.education.map(edu => `
+    const eduHTML = data.education && data.education.length > 0 ? data.education.map(edu => `
         <div class="section">
             <div class="section-actions"><button class="action-btn" onclick="moveUp(this)">▲</button><button class="action-btn" onclick="moveDown(this)">▼</button><button class="action-btn delete" onclick="removeSection(this)">×</button></div>
             <div class="section-header"><span class="section-title" contenteditable="true">${currentLang === 'tr' ? 'EĞİTİM' : 'EDUCATION'}</span></div>
             <div class="entry"><button class="btn-delete-item" onclick="removeEntry(this)">×</button><div class="left-col" contenteditable="true">${edu.date || ''}</div><div class="right-col"><h3 contenteditable="true">${edu.degree || ''}</h3><p contenteditable="true">${edu.school || ''}</p></div></div>
         </div>
-    `).join('');
+    `).join('') : '';
+
+    // Map certifications to HTML (Added support)
+    const certHTML = data.certifications && data.certifications.length > 0 ? `
+        <div class="section">
+            <div class="section-actions"><button class="action-btn" onclick="moveUp(this)">▲</button><button class="action-btn" onclick="moveDown(this)">▼</button><button class="action-btn delete" onclick="removeSection(this)">×</button></div>
+            <div class="section-header"><span class="section-title" contenteditable="true">${currentLang === 'tr' ? 'SERTİFİKALAR' : 'CERTIFICATIONS'}</span></div>
+            ${data.certifications.map(cert => `
+                <div class="entry"><button class="btn-delete-item" onclick="removeEntry(this)">×</button><div class="left-col" contenteditable="true"></div><div class="right-col"><h3 contenteditable="true">${cert.name}</h3><p contenteditable="true">${cert.provider || ''}</p></div></div>
+            `).join('')}
+        </div>
+    ` : '';
 
     // Combine Profile
     const profileHTML = data.profile ? `
@@ -488,7 +559,7 @@ function populateCVFromJSON(data) {
     const newContent = `
     <header>
         <h1 contenteditable="true">${data.fullName || 'ADINIZ SOYADINIZ'}</h1>
-        <div class="subtitle" contenteditable="true">${data.title || 'Unvanınız'}</div>
+        <div class="subtitle" contenteditable="true">${data.title || ''}</div>
         <div class="contact-info" contenteditable="true"><span>📍 ${data.contact.location || ''}</span> | <span>📞 ${data.contact.phone || ''}</span> | <span>✉️ ${data.contact.email || ''}</span></div>
         <div class="address-line" contenteditable="true">${data.contact.fullAddress || data.contact.location || ''}</div>
         <div class="contact-row"><span contenteditable="true">${data.contact.phone || ''}</span><span contenteditable="true">${data.contact.email || ''}</span></div>
@@ -502,6 +573,7 @@ function populateCVFromJSON(data) {
         ${profileHTML}
         ${expHTML}
         ${eduHTML}
+        ${certHTML}
     </div>`;
 
     document.getElementById('cv-root').innerHTML = newContent;
@@ -543,77 +615,6 @@ window.loadATSExample = async () => {
                     <div class="section-actions"><button class="action-btn" onclick="moveUp(this)">▲</button><button class="action-btn" onclick="moveDown(this)">▼</button><button class="action-btn delete" onclick="removeSection(this)">×</button></div>
                     <div class="section-header"><span class="section-title" contenteditable="true">EĞİTİM</span></div>
                     <div class="entry"><button class="btn-delete-item" onclick="removeEntry(this)">×</button><div class="left-col" contenteditable="true">2015 - 2019</div><div class="right-col"><h3 contenteditable="true">İşletme Yönetimi Lisans</h3><p contenteditable="true">Boğaziçi Üniversitesi</p></div></div>
-                </div>
-            </div>`;
-        } else {
-            // ENGLISH CONTENT (Layney Spencer)
-            content = `
-            <header>
-                <h1 contenteditable="true">LAYNEY SPENCER</h1>
-                <div class="subtitle" contenteditable="true">Assistant Director</div>
-                <div class="contact-info" contenteditable="true"><span>📍 Los Angeles, CA</span> | <span>📞 386-868-3442</span> | <span>✉️ email@email.com</span></div>
-                <div class="address-line" contenteditable="true">1515 Pacific Ave, Los Angeles, CA 90291, United States</div>
-                <div class="contact-row"><span contenteditable="true">386-868-3442</span><span contenteditable="true">email@email.com</span></div>
-                <div class="compact-separator"></div>
-                <div class="personal-details">
-                    <div class="detail-item"><span class="lbl" contenteditable="true" data-cv-label="birth">Place of birth</span><span class="dots"></span><span class="val" contenteditable="true">San Antonio</span></div>
-                    <div class="detail-item"><span class="lbl" contenteditable="true" data-cv-label="license">Driving license</span><span class="dots"></span><span class="val" contenteditable="true">Full</span></div>
-                </div>
-            </header>
-            <div id="main-content">
-                <div class="section">
-                    <div class="section-actions"><button class="action-btn" onclick="moveUp(this)">▲</button><button class="action-btn" onclick="moveDown(this)">▼</button><button class="action-btn delete" onclick="removeSection(this)">×</button></div>
-                    <div class="section-header"><span class="section-title" contenteditable="true">PROFILE</span></div>
-                    <div class="entry"><button class="btn-delete-item" onclick="removeEntry(this)">×</button><div class="right-col" contenteditable="true">Astute Assistant Director with over 14 years of experience dealing with complex macro issues that have threatened the company's profitability and longevity by providing innovative solutions resulting in significant expenditure savings of up to 35%.</div></div>
-                </div>
-                <div class="section">
-                    <div class="section-actions"><button class="action-btn" onclick="moveUp(this)">▲</button><button class="action-btn" onclick="moveDown(this)">▼</button><button class="action-btn delete" onclick="removeSection(this)">×</button></div>
-                    <div class="section-header"><span class="section-title" contenteditable="true">EMPLOYMENT HISTORY</span></div>
-                    <div class="entry"><button class="btn-delete-item" onclick="removeEntry(this)">×</button><div class="left-col" contenteditable="true">Jan 2019 — May 2021</div><div class="right-col"><h3 contenteditable="true">Assistant Director, John Ward Emergency Facility</h3><p contenteditable="true">Supported the successful transition from T-System EMR to Meditech EMR. Supported changes during the flow processes to align best clinical practices with new EMR functions.</p></div></div>
-                </div>
-                <div class="section">
-                    <div class="section-actions"><button class="action-btn" onclick="moveUp(this)">▲</button><button class="action-btn" onclick="moveDown(this)">▼</button><button class="action-btn delete" onclick="removeSection(this)">×</button></div>
-                    <div class="section-header"><span class="section-title" contenteditable="true">EDUCATION</span></div>
-                    <div class="entry"><button class="btn-delete-item" onclick="removeEntry(this)">×</button><div class="left-col" contenteditable="true">2021</div><div class="right-col"><h3 contenteditable="true">Doctorate in Strategic Management</h3><p contenteditable="true">Cambridge University</p></div></div>
-                </div>
-            </div>`;
-        }
-        
-        document.getElementById('cv-root').innerHTML = content;
-        await saveToCloud();
-        showToast(translations[currentLang].toast_sample);
-    }
-};
-
-// Sıfırla (Dile Göre)
-window.resetAll = async () => {
-    if(confirm(translations[currentLang].confirm_reset)) {
-        let content = "";
-        
-        if (currentLang === 'tr') {
-            content = `
-            <header>
-                <h1 contenteditable="true">ADINIZ SOYADINIZ</h1>
-                <div class="subtitle" contenteditable="true">Unvanınız</div>
-                <div class="contact-info" contenteditable="true"><span>📍 Şehir, Ülke</span> | <span>📞 Telefon</span> | <span>✉️ E-posta</span></div>
-                <div class="address-line" contenteditable="true">Adres Bilgisi</div>
-                <div class="contact-row"><span contenteditable="true">Telefon</span><span contenteditable="true">E-posta</span></div>
-                <div class="compact-separator"></div>
-                <div class="personal-details">
-                    <div class="detail-item"><span class="lbl" contenteditable="true" data-cv-label="birth">Doğum Yeri</span><span class="dots"></span><span class="val" contenteditable="true">Şehir</span></div>
-                    <div class="detail-item"><span class="lbl" contenteditable="true" data-cv-label="license">Ehliyet</span><span class="dots"></span><span class="val" contenteditable="true">Sınıf</span></div>
-                </div>
-            </header>
-            <div id="main-content">
-                <div class="section">
-                    <div class="section-actions"><button class="action-btn" onclick="moveUp(this)">▲</button><button class="action-btn" onclick="moveDown(this)">▼</button><button class="action-btn delete" onclick="removeSection(this)">🗑️</button></div>
-                    <div class="section-header"><span class="section-title" contenteditable="true">PROFİL</span></div>
-                    <div class="entry"><button class="btn-delete-item" onclick="removeEntry(this)">×</button><div class="right-col" contenteditable="true">Profesyonel özetinizi buraya yazın.</div></div>
-                </div>
-                <div class="section">
-                    <div class="section-actions"><button class="action-btn" onclick="moveUp(this)">▲</button><button class="action-btn" onclick="moveDown(this)">▼</button><button class="action-btn delete" onclick="removeSection(this)">🗑️</button></div>
-                    <div class="section-header"><span class="section-title" contenteditable="true">İŞ DENEYİMİ</span></div>
-                    <div class="entry"><button class="btn-delete-item" onclick="removeEntry(this)">×</button><div class="left-col" contenteditable="true">Tarih</div><div class="right-col"><h3 contenteditable="true">Pozisyon, Şirket</h3><p contenteditable="true">Detaylar...</p></div></div>
                 </div>
             </div>`;
         } else {
