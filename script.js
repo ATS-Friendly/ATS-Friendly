@@ -1,0 +1,219 @@
+import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+import { 
+    getAuth, 
+    signInWithEmailAndPassword, 
+    createUserWithEmailAndPassword, 
+    onAuthStateChanged, 
+    signOut,
+    GoogleAuthProvider,
+    signInWithPopup 
+} from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+// --- FIREBASE YAPILANDIRMASI ---
+const firebaseConfig = {
+    apiKey: "AIzaSyBbxgCMw5dO5T-kt7Njapo5ST04MRp7JKU",
+    authDomain: "ats-friendly-93377.firebaseapp.com",
+    projectId: "ats-friendly-93377",
+    storageBucket: "ats-friendly-93377.firebasestorage.app",
+    messagingSenderId: "542738169697",
+    appId: "1:542738169697:web:a999680a273fdd90ab4f20",
+    measurementId: "G-MCW4JWYYN4"
+};
+
+// Uygulamayı Başlat
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+const googleProvider = new GoogleAuthProvider();
+const appId = "mono-cv-app";
+
+let isLoginMode = true;
+let currentUser = null;
+let isSyncing = false;
+
+// --- EKRAN YÖNETİMİ ---
+function showView(viewId) {
+    document.querySelectorAll('.view-section').forEach(v => v.classList.remove('active'));
+    const target = document.getElementById(viewId);
+    if (target) target.classList.add('active');
+}
+
+// --- KİMLİK DOĞRULAMA (AUTH) ---
+
+// Google ile Giriş Yapma Fonksiyonu
+window.loginWithGoogle = async () => {
+    try {
+        updateStatus('syncing'); // Bağlanıyor durumunu göster
+        await signInWithPopup(auth, googleProvider);
+        // onAuthStateChanged otomatik olarak tetiklenecek
+    } catch (e) {
+        alert("Google Giriş Hatası: " + e.message);
+        updateStatus('error');
+    }
+};
+
+window.toggleAuthMode = () => {
+    isLoginMode = !isLoginMode;
+    document.getElementById('auth-title').innerText = isLoginMode ? 'Login' : 'Sign Up';
+    document.getElementById('auth-toggle-text').innerText = isLoginMode ? "Don't have an account? Sign Up" : 'Already have an account? Login';
+};
+
+window.handleAuth = async () => {
+    const email = document.getElementById('auth-email').value;
+    const password = document.getElementById('auth-password').value;
+    if (!email || !password) return alert("Please fill in all fields.");
+
+    try {
+        if (isLoginMode) await signInWithEmailAndPassword(auth, email, password);
+        else await createUserWithEmailAndPassword(auth, email, password);
+    } catch (e) { 
+        alert("Error: " + e.message); 
+    }
+};
+
+window.logout = () => signOut(auth).then(() => {
+    localStorage.removeItem('monoCvData_v2');
+    location.reload();
+});
+
+// Kullanıcı durumu değişikliğini izle
+onAuthStateChanged(auth, async (user) => {
+    if (user) {
+        currentUser = user;
+        const docRef = doc(db, 'artifacts', appId, 'users', user.uid, 'data', 'cvContent');
+        const snap = await getDoc(docRef);
+        
+        if (snap.exists()) {
+            document.getElementById('cv-root').innerHTML = snap.data().html;
+            document.body.className = snap.data().template || '';
+            showView('editor-view');
+            updateStatus('online');
+        } else {
+            showView('template-view');
+        }
+    } else {
+        showView('auth-view');
+    }
+});
+
+// --- ŞABLON VE EDİTÖR MANTIĞI ---
+window.selectTemplate = (tpl) => {
+    document.body.className = tpl;
+    showView('editor-view');
+    saveToCloud(); 
+};
+
+window.createNewSection = () => {
+    const mainContent = document.getElementById('main-content');
+    const newSection = document.createElement('div');
+    newSection.className = 'section';
+    newSection.innerHTML = `
+        <div class="section-actions">
+            <button class="action-btn btn-move" onclick="moveUp(this)">▲</button>
+            <button class="action-btn btn-move" onclick="moveDown(this)">▼</button>
+            <button class="action-btn btn-remove-sec" onclick="removeSection(this)">×</button>
+        </div>
+        <div class="section-header"><span class="section-title" contenteditable="true">NEW SECTION</span></div>
+        <div class="content-list">
+            <div class="entry">
+                <button class="btn-delete-item" onclick="removeEntry(this)">×</button>
+                <div class="left-col" contenteditable="true">Date</div>
+                <div class="right-col"><h3 contenteditable="true">Title</h3><p contenteditable="true">Description...</p></div>
+            </div>
+        </div>
+        <div style="text-align: center;"><button class="btn-add-item" onclick="addEntry(this)">+ Add Entry</button></div>`;
+    mainContent.appendChild(newSection);
+    saveToCloud();
+};
+
+window.addEntry = (btn) => {
+    const list = btn.closest('.section').querySelector('.content-list') || btn.closest('.section');
+    const newEntry = document.createElement('div');
+    newEntry.className = 'entry';
+    newEntry.innerHTML = `
+        <button class="btn-delete-item" onclick="removeEntry(this)">×</button>
+        <div class="left-col" contenteditable="true">Date</div>
+        <div class="right-col"><h3 contenteditable="true">New Entry</h3><p contenteditable="true">Detail...</p></div>`;
+    list.appendChild(newEntry);
+    saveToCloud();
+};
+
+window.removeSection = (btn) => { if(confirm("Delete this section?")) { btn.closest('.section').remove(); saveToCloud(); } };
+window.removeEntry = (btn) => { btn.closest('.entry').remove(); saveToCloud(); };
+window.moveUp = (btn) => { const s = btn.closest('.section'); if(s.previousElementSibling) { s.parentNode.insertBefore(s, s.previousElementSibling); saveToCloud(); } };
+window.moveDown = (btn) => { const s = btn.closest('.section'); if(s.nextElementSibling) { s.parentNode.insertBefore(s.nextElementSibling, s); saveToCloud(); } };
+
+// --- BULUT SENKRONİZASYONU ---
+async function saveToCloud() {
+    if (!currentUser || isSyncing) return;
+    isSyncing = true;
+    updateStatus('syncing');
+    
+    const content = document.getElementById('cv-root').innerHTML;
+    const tpl = document.body.className;
+    const docRef = doc(db, 'artifacts', appId, 'users', currentUser.uid, 'data', 'cvContent');
+    
+    try {
+        await setDoc(docRef, { 
+            html: content, 
+            template: tpl,
+            updatedAt: new Date().toISOString() 
+        }, { merge: true });
+        updateStatus('online');
+    } catch (e) { 
+        updateStatus('error'); 
+        console.error("Save failed:", e);
+    } finally {
+        isSyncing = false;
+    }
+}
+
+function updateStatus(state) {
+    const dot = document.getElementById('status-dot');
+    const text = document.getElementById('status-text');
+    if (!dot || !text) return;
+
+    dot.className = 'status-dot';
+    if (state === 'online') {
+        dot.classList.add('status-online');
+        text.innerText = 'Cloud Sync Active';
+    } else if (state === 'syncing') {
+        dot.classList.add('status-syncing');
+        text.innerText = 'Syncing...';
+    } else {
+        text.innerText = 'Offline';
+    }
+}
+
+// --- DIŞA AKTARMA & YEDEKLEME ---
+window.exportData = () => {
+    const content = document.getElementById('cv-root').innerHTML;
+    const blob = new Blob([JSON.stringify({html: content, template: document.body.className})], {type: "application/json"});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `monocv-backup.json`;
+    a.click();
+};
+
+window.resetAll = () => {
+    if(confirm("This will reset all your data. Are you sure?")) {
+        localStorage.clear();
+        location.reload();
+    }
+};
+
+// Otomatik kaydetme tetikleyicisi
+let saveTimeout;
+document.addEventListener('input', () => {
+    clearTimeout(saveTimeout);
+    saveTimeout = setTimeout(saveToCloud, 1500);
+});
+
+// Toast mesajı gösterme fonksiyonu (Opsiyonel)
+function showToast(msg) {
+    const toast = document.getElementById('toast');
+    toast.innerText = msg;
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 3000);
+}
