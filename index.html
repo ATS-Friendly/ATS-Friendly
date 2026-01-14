@@ -68,7 +68,6 @@
             </div>
 
             <button class="btn btn-secondary" onclick="createNewSection()">+ Bölüm Ekle</button>
-            <!-- Şablon Değiştir Butonu Düzeltildi -->
             <button class="btn btn-warning" onclick="backToTemplates()">🎨 Şablonu Değiştir</button>
             <button class="btn btn-primary" onclick="window.print()">🖨️ PDF İndir</button>
             <button class="btn btn-dark" onclick="exportData()">⬇️ Yedek Al</button>
@@ -88,8 +87,16 @@
                 </header>
                 <div id="main-content">
                     <div class="section">
+                        <div class="section-actions">
+                            <button class="action-btn" onclick="moveUp(this)" title="Yukarı">▲</button>
+                            <button class="action-btn" onclick="moveDown(this)" title="Aşağı">▼</button>
+                            <button class="action-btn delete" onclick="removeSection(this)" title="Sil">×</button>
+                        </div>
                         <div class="section-header"><span class="section-title" contenteditable="true">ÖZET</span></div>
-                        <div class="entry"><div class="right-col" contenteditable="true">Profilinizi buraya yazın...</div></div>
+                        <div class="entry">
+                             <button class="btn-delete-item" onclick="removeEntry(this)">×</button>
+                            <div class="right-col" contenteditable="true">Profilinizi buraya yazın...</div>
+                        </div>
                     </div>
                 </div>
             </div>
