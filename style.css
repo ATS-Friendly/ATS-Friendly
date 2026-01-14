@@ -264,12 +264,6 @@ body {
     line-height: 1.6; 
 }
 
-/* Template Themes */
-body.tpl-modern .page { border-top: 10px solid var(--primary-color); }
-body.tpl-modern h1 { color: var(--primary-color); }
-body.tpl-compact .page { padding: 12mm; }
-body.tpl-compact .cv-content { font-size: 12px; }
-
 header { text-align: center; margin-bottom: 30px; border-bottom: 2px solid #2d3436; padding-bottom: 25px; }
 h1 { text-transform: uppercase; letter-spacing: 3px; font-size: 32px; font-weight: 700; margin: 0; }
 
@@ -424,6 +418,129 @@ h1 { text-transform: uppercase; letter-spacing: 3px; font-size: 32px; font-weigh
 
 @keyframes fadein { from {bottom: 30px; opacity: 0;} to {bottom: 50px; opacity: 1;} }
 @keyframes pulse { 0% { opacity: 0.5; } 50% { opacity: 1; } 100% { opacity: 0.5; } }
+
+/* --- TEMPLATE THEMES --- */
+
+/* 1. MODERN THEME */
+body.tpl-modern .page { 
+    border-top: 15px solid var(--primary-color); 
+}
+body.tpl-modern h1 { 
+    color: var(--primary-color); 
+}
+body.tpl-modern .section-header {
+    border-color: var(--primary-color);
+}
+body.tpl-modern .section-title {
+    color: var(--primary-color);
+}
+
+/* 2. COMPACT THEME (Redesigned) */
+body.tpl-compact .page { 
+    padding: 15mm 20mm; 
+    font-family: 'PT Serif', serif;
+}
+
+/* Compact Header */
+body.tpl-compact header { 
+    border-bottom: none; 
+    margin-bottom: 20px; 
+    padding-bottom: 0;
+}
+body.tpl-compact h1 { 
+    font-size: 28px; 
+    letter-spacing: 2px; 
+    margin-bottom: 5px; 
+    color: #000;
+}
+body.tpl-compact .subtitle { 
+    font-size: 14px; 
+    font-style: italic; 
+    margin-bottom: 10px;
+    color: #444;
+}
+body.tpl-compact .contact-info { 
+    font-size: 11px; 
+    color: #000; 
+    border-top: 1px solid #000; 
+    border-bottom: 1px solid #000; 
+    padding: 6px 0; 
+    margin-top: 10px;
+    display: inline-block;
+    width: 100%;
+}
+
+/* Compact Sections */
+body.tpl-compact .section-header { 
+    border-bottom: none; 
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    margin: 25px 0 15px 0; 
+    text-align: center;
+}
+body.tpl-compact .section-header::before,
+body.tpl-compact .section-header::after {
+    content: ""; 
+    flex: 1; 
+    border-bottom: 1px solid #000; 
+    margin: 0 15px; 
+    opacity: 0.3;
+}
+body.tpl-compact .section-title { 
+    font-size: 13px; 
+    font-weight: 700; 
+    letter-spacing: 1.5px; 
+    color: #000;
+}
+
+/* Compact Entries (Single Line Title/Date) */
+body.tpl-compact .entry { 
+    display: block; 
+    position: relative; 
+    margin-bottom: 15px; 
+    padding-left: 0; 
+}
+body.tpl-compact .entry .left-col { 
+    position: absolute; 
+    top: 0; 
+    right: 0; 
+    width: auto; 
+    text-align: right; 
+    font-weight: 600; 
+    font-size: 12px; 
+    color: #000; 
+    font-family: var(--font-ui);
+}
+body.tpl-compact .entry .right-col { 
+    width: 100%; 
+    padding-right: 130px; /* Space for date */
+    box-sizing: border-box;
+}
+body.tpl-compact .entry h3 { 
+    font-size: 14px; 
+    font-weight: 700; 
+    color: #000; 
+    margin: 0 0 5px 0; 
+}
+body.tpl-compact .entry p { 
+    font-size: 12px; 
+    line-height: 1.5; 
+    color: #333; 
+    text-align: justify;
+}
+
+/* Fix delete buttons in compact mode */
+body.tpl-compact .btn-delete-item {
+    left: -20px;
+    top: 0;
+}
+body.tpl-compact .section-actions {
+    right: 0;
+    top: -20px;
+    background: white;
+    border: 1px solid #ddd;
+}
 
 /* --- PRINT --- */
 @media print {
