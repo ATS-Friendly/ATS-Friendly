@@ -113,88 +113,9 @@
         </div>
     </section>
 
-    <!-- 3. VERİ GİRİŞ EKRANI (ONBOARDING FORM) -->
-    <section id="onboarding-view" class="view-section">
-        <div class="form-container">
-            <div class="form-header">
-                <h2 data-i18n="form_title">Bilgilerinizi Girin</h2>
-                <p data-i18n="form_desc">CV'nizi oluşturmak için aşağıdaki alanları doldurun.</p>
-            </div>
-            
-            <div class="form-body">
-                <!-- Kişisel Bilgiler -->
-                <div class="form-block">
-                    <h3 data-i18n="form_personal">Kişisel Bilgiler</h3>
-                    <div class="input-grid">
-                        <div class="input-group">
-                            <label data-i18n="form_lbl_fullname">Ad Soyad</label>
-                            <input type="text" id="inp-fullname" class="form-input" placeholder="Örn: Hüseyin Yaşar">
-                        </div>
-                        <div class="input-group">
-                            <label data-i18n="form_lbl_title">Unvan / Hedef Pozisyon</label>
-                            <input type="text" id="inp-title" class="form-input" placeholder="Örn: Yazılım Mühendisi">
-                        </div>
-                        <div class="input-group">
-                            <label data-i18n="form_lbl_email">E-posta</label>
-                            <input type="email" id="inp-email" class="form-input" placeholder="email@ornek.com">
-                        </div>
-                        <div class="input-group">
-                            <label data-i18n="form_lbl_phone">Telefon</label>
-                            <input type="text" id="inp-phone" class="form-input" placeholder="0555 123 45 67">
-                        </div>
-                        <div class="input-group full-width">
-                            <label data-i18n="form_lbl_address">Adres / Konum</label>
-                            <input type="text" id="inp-address" class="form-input" placeholder="Ankara, Türkiye">
-                        </div>
-                        <!-- Kompakt şablon detayları -->
-                        <div class="input-group">
-                            <label data-i18n="cv_label_birth">Doğum Yeri</label>
-                            <input type="text" id="inp-birthplace" class="form-input" placeholder="İstanbul">
-                        </div>
-                        <div class="input-group">
-                            <label data-i18n="cv_label_license">Ehliyet</label>
-                            <input type="text" id="inp-license" class="form-input" placeholder="B Sınıfı">
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Profil Özeti -->
-                <div class="form-block">
-                    <h3 data-i18n="form_profile">Profil Özeti</h3>
-                    <textarea id="inp-summary" class="form-input" rows="4" placeholder="Kendinizden ve kariyer hedeflerinizden kısaca bahsedin..."></textarea>
-                </div>
-
-                <!-- İş Deneyimi -->
-                <div class="form-block">
-                    <h3 data-i18n="form_experience">İş Deneyimi</h3>
-                    <div id="form-experiences-list">
-                        <!-- JS ile doldurulacak -->
-                    </div>
-                    <button class="btn-secondary-dashed" onclick="addFormExperience()">+ <span data-i18n="btn_add_job">İş Ekle</span></button>
-                </div>
-
-                <!-- Eğitim -->
-                <div class="form-block">
-                    <h3 data-i18n="form_education">Eğitim</h3>
-                    <div id="form-education-list">
-                        <!-- JS ile doldurulacak -->
-                    </div>
-                    <button class="btn-secondary-dashed" onclick="addFormEducation()">+ <span data-i18n="btn_add_edu">Okul Ekle</span></button>
-                </div>
-
-            </div>
-
-            <div class="form-footer">
-                <button class="btn-text" onclick="skipToEditor()" data-i18n="btn_skip">Atla ve Düzenleyiciye Git</button>
-                <button class="btn-primary-lg" onclick="generateCVFromForm()" data-i18n="btn_generate">CV OLUŞTUR ✨</button>
-            </div>
-        </div>
-    </section>
-
-
-    <!-- 4. EDİTÖR -->
+    <!-- 3. SPLIT EDİTÖR (FORM + PREVIEW) -->
     <section id="editor-view" class="view-section">
-        <!-- Dashboard Sidebar -->
+        <!-- Sidebar Navigation -->
         <aside class="sidebar">
             <div class="brand-container">
                 <div class="brand-logo">M</div>
@@ -207,13 +128,6 @@
             </div>
 
             <nav class="nav-menu">
-                <div class="nav-group">
-                    <span class="nav-label" data-i18n="nav_content">İÇERİK</span>
-                    <button class="nav-item" onclick="createNewSection()">
-                        <span class="icon">➕</span> <span data-i18n="btn_add_section">Bölüm Ekle</span>
-                    </button>
-                </div>
-
                 <div class="nav-group">
                     <span class="nav-label" data-i18n="nav_design">TASARIM & ŞABLON</span>
                     <button class="nav-item" onclick="openThemeModal()">
@@ -242,11 +156,79 @@
             </div>
         </aside>
 
-        <main>
-            <div class="page cv-content" id="cv-root">
-                <!-- Content will be injected by script or resetAll() -->
+        <!-- SPLIT CONTAINER -->
+        <div class="editor-layout">
+            <!-- LEFT PANEL: DATA ENTRY FORM -->
+            <div class="editor-panel-form">
+                <div class="form-header-mini">
+                    <h2 data-i18n="form_title">Bilgilerinizi Düzenleyin</h2>
+                </div>
+                
+                <div class="form-body">
+                    <!-- Kişisel Bilgiler -->
+                    <div class="form-block">
+                        <h3 data-i18n="form_personal">Kişisel Bilgiler</h3>
+                        <div class="input-grid">
+                            <div class="input-group">
+                                <label data-i18n="form_lbl_fullname">Ad Soyad</label>
+                                <input type="text" id="inp-fullname" class="form-input" placeholder="Ad Soyad" oninput="generateCVFromForm()">
+                            </div>
+                            <div class="input-group">
+                                <label data-i18n="form_lbl_title">Unvan</label>
+                                <input type="text" id="inp-title" class="form-input" placeholder="Unvan" oninput="generateCVFromForm()">
+                            </div>
+                            <div class="input-group">
+                                <label data-i18n="form_lbl_email">E-posta</label>
+                                <input type="email" id="inp-email" class="form-input" placeholder="Email" oninput="generateCVFromForm()">
+                            </div>
+                            <div class="input-group">
+                                <label data-i18n="form_lbl_phone">Telefon</label>
+                                <input type="text" id="inp-phone" class="form-input" placeholder="Tel" oninput="generateCVFromForm()">
+                            </div>
+                            <div class="input-group full-width">
+                                <label data-i18n="form_lbl_address">Adres</label>
+                                <input type="text" id="inp-address" class="form-input" placeholder="Adres" oninput="generateCVFromForm()">
+                            </div>
+                            <div class="input-group">
+                                <label data-i18n="cv_label_birth">Doğum Yeri</label>
+                                <input type="text" id="inp-birthplace" class="form-input" placeholder="Şehir" oninput="generateCVFromForm()">
+                            </div>
+                            <div class="input-group">
+                                <label data-i18n="cv_label_license">Ehliyet</label>
+                                <input type="text" id="inp-license" class="form-input" placeholder="Sınıf" oninput="generateCVFromForm()">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Profil -->
+                    <div class="form-block">
+                        <h3 data-i18n="form_profile">Profil Özeti</h3>
+                        <textarea id="inp-summary" class="form-input" rows="4" placeholder="Kısa özet..." oninput="generateCVFromForm()"></textarea>
+                    </div>
+
+                    <!-- İş Deneyimi -->
+                    <div class="form-block">
+                        <h3 data-i18n="form_experience">İş Deneyimi</h3>
+                        <div id="form-experiences-list"></div>
+                        <button class="btn-secondary-dashed" onclick="addFormExperience()">+ <span data-i18n="btn_add_job">İş Ekle</span></button>
+                    </div>
+
+                    <!-- Eğitim -->
+                    <div class="form-block">
+                        <h3 data-i18n="form_education">Eğitim</h3>
+                        <div id="form-education-list"></div>
+                        <button class="btn-secondary-dashed" onclick="addFormEducation()">+ <span data-i18n="btn_add_edu">Okul Ekle</span></button>
+                    </div>
+                </div>
             </div>
-        </main>
+
+            <!-- RIGHT PANEL: PREVIEW -->
+            <div class="editor-panel-preview">
+                <div class="page cv-content" id="cv-root">
+                    <!-- CV Content generated here -->
+                </div>
+            </div>
+        </div>
     </section>
 
     <script type="module" src="script.js"></script>

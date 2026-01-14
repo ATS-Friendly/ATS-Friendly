@@ -52,13 +52,11 @@ const translations = {
         tpl_classic_desc: "🏛️ Geleneksel & Akademik",
         tpl_compact: "Kompakt",
         tpl_compact_desc: "📄 Minimal & Tek Sayfa",
-        btn_add_section: "Bölüm Ekle",
         btn_design: "Tasarım Ayarları",
         btn_change_tpl: "Şablonu Değiştir",
         btn_download_pdf: "PDF İndir",
         btn_reset: "Sıfırla / Temizle",
         btn_logout: "Çıkış Yap",
-        nav_content: "İÇERİK",
         nav_design: "TASARIM",
         nav_actions: "İŞLEMLER",
         status_connecting: "Bağlanıyor...",
@@ -74,8 +72,7 @@ const translations = {
         lbl_font: "Yazı Tipi",
         btn_save_close: "Kapat",
         // Form Translations
-        form_title: "Bilgilerinizi Girin",
-        form_desc: "CV'nizi oluşturmak için aşağıdaki alanları doldurun.",
+        form_title: "Bilgilerinizi Düzenleyin",
         form_personal: "Kişisel Bilgiler",
         form_profile: "Profil Özeti",
         form_experience: "İş Deneyimi",
@@ -87,11 +84,9 @@ const translations = {
         form_lbl_address: "Adres",
         btn_add_job: "İş Ekle",
         btn_add_edu: "Okul Ekle",
-        btn_generate: "CV OLUŞTUR ✨",
-        btn_skip: "Mevcut İçeriği Koru (Atla)",
         lbl_job_title: "Pozisyon Adı",
         lbl_company: "Şirket",
-        lbl_date: "Tarih (Örn: 2020 - 2022)",
+        lbl_date: "Tarih",
         lbl_desc: "Açıklama",
         lbl_school: "Okul / Üniversite",
         lbl_degree: "Bölüm / Derece"
@@ -107,13 +102,11 @@ const translations = {
         tpl_classic_desc: "🏛️ Traditional & Academic",
         tpl_compact: "Compact",
         tpl_compact_desc: "📄 Minimal & Single Page",
-        btn_add_section: "Add Section",
         btn_design: "Design Settings",
         btn_change_tpl: "Change Template",
         btn_download_pdf: "Download PDF",
         btn_reset: "Reset / Clear",
         btn_logout: "Logout",
-        nav_content: "CONTENT",
         nav_design: "DESIGN",
         nav_actions: "ACTIONS",
         status_connecting: "Connecting...",
@@ -129,8 +122,7 @@ const translations = {
         lbl_font: "Font Family",
         btn_save_close: "Close",
         // Form Translations
-        form_title: "Enter Your Details",
-        form_desc: "Fill in the fields below to generate your CV.",
+        form_title: "Edit Your Details",
         form_personal: "Personal Details",
         form_profile: "Professional Summary",
         form_experience: "Work Experience",
@@ -142,11 +134,9 @@ const translations = {
         form_lbl_address: "Address",
         btn_add_job: "Add Job",
         btn_add_edu: "Add Education",
-        btn_generate: "GENERATE CV ✨",
-        btn_skip: "Keep Existing Content (Skip)",
         lbl_job_title: "Job Title",
         lbl_company: "Company",
-        lbl_date: "Date (e.g., 2020 - 2022)",
+        lbl_date: "Date",
         lbl_desc: "Description",
         lbl_school: "School / University",
         lbl_degree: "Degree / Field"
@@ -168,18 +158,11 @@ window.setLanguage = (lang) => {
     document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
     document.querySelector(`.lang-btn[onclick="setLanguage('${lang}')"]`).classList.add('active');
 
-    // Kompakt Şablon Etiketlerini Güncelle (Eğer DOM'da varsa)
-    const birthLbl = document.querySelector('[data-cv-label="birth"]');
-    if (birthLbl) birthLbl.innerText = translations[lang].cv_label_birth;
+    // Update Form Labels that might be dynamic
+    document.getElementById('auth-toggle-text').innerText = isLoginMode ? translations[lang].auth_toggle_signup : translations[lang].auth_toggle_login;
     
-    const licenseLbl = document.querySelector('[data-cv-label="license"]');
-    if (licenseLbl) licenseLbl.innerText = translations[lang].cv_label_license;
-
-    // Login Toggle Text Güncellemesi
-    const authToggle = document.getElementById('auth-toggle-text');
-    if (authToggle) {
-        authToggle.innerText = isLoginMode ? translations[lang].auth_toggle_signup : translations[lang].auth_toggle_login;
-    }
+    // Refresh CV Preview to apply language changes (e.g. section headers)
+    generateCVFromForm();
 };
 
 // --- EKRAN YÖNETİMİ ---
@@ -189,12 +172,11 @@ function showView(viewId) {
     if (target) target.classList.add('active');
 }
 
-// --- TEMA YÖNETİMİ VE DRAGGABLE MODAL ---
+// --- TEMA YÖNETİMİ ---
 window.openThemeModal = () => {
     const modal = document.getElementById('theme-modal');
     modal.classList.add('active');
     
-    // User Friendly Positioning
     if (!modal.style.top || !modal.style.left) {
         modal.style.top = "100px";
         const initialLeft = Math.max(20, window.innerWidth - 360);
@@ -206,17 +188,13 @@ window.openThemeModal = () => {
 
 window.closeThemeModal = () => {
     document.getElementById('theme-modal').classList.remove('active');
-    saveToCloud(); // Modal kapanırken kaydet
+    saveToCloud(); 
 };
 
-// Sürükleme Mantığı
 function initDragElement(elmnt) {
     let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
     const header = elmnt.querySelector(".modal-header");
-    
-    if (header) {
-        header.onmousedown = dragMouseDown;
-    }
+    if (header) header.onmousedown = dragMouseDown;
 
     function dragMouseDown(e) {
         e = e || window.event;
@@ -226,7 +204,6 @@ function initDragElement(elmnt) {
         document.onmouseup = closeDragElement;
         document.onmousemove = elementDrag;
     }
-
     function elementDrag(e) {
         e = e || window.event;
         e.preventDefault();
@@ -237,7 +214,6 @@ function initDragElement(elmnt) {
         elmnt.parentElement.style.top = (elmnt.parentElement.offsetTop - pos2) + "px";
         elmnt.parentElement.style.left = (elmnt.parentElement.offsetLeft - pos1) + "px";
     }
-
     function closeDragElement() {
         document.onmouseup = null;
         document.onmousemove = null;
@@ -252,7 +228,6 @@ window.applyColor = (color) => {
 window.applyFont = (fontType) => {
     currentTheme.font = fontType;
     let fontVal = "'PT Serif', serif";
-    
     switch(fontType) {
         case 'roboto': fontVal = "'Roboto', sans-serif"; break;
         case 'opensans': fontVal = "'Open Sans', sans-serif"; break;
@@ -264,12 +239,10 @@ window.applyFont = (fontType) => {
         case 'merriweather': fontVal = "'Merriweather', serif"; break;
         case 'ptserif': default: fontVal = "'PT Serif', serif"; break;
     }
-
     document.documentElement.style.setProperty('--font-cv', fontVal);
 };
 
-// --- KİMLİK DOĞRULAMA (AUTH) ---
-
+// --- AUTH ---
 window.loginWithGoogle = async () => {
     try {
         updateStatus('syncing'); 
@@ -291,13 +264,10 @@ window.handleAuth = async () => {
     const email = document.getElementById('auth-email').value;
     const password = document.getElementById('auth-password').value;
     if (!email || !password) return alert("Please fill in all fields.");
-
     try {
         if (isLoginMode) await signInWithEmailAndPassword(auth, email, password);
         else await createUserWithEmailAndPassword(auth, email, password);
-    } catch (e) { 
-        alert("Error: " + e.message); 
-    }
+    } catch (e) { alert("Error: " + e.message); }
 };
 
 window.logout = () => signOut(auth).then(() => {
@@ -305,7 +275,6 @@ window.logout = () => signOut(auth).then(() => {
     location.reload();
 });
 
-// Kullanıcı durumu değişikliğini izle
 onAuthStateChanged(auth, async (user) => {
     if (user) {
         currentUser = user;
@@ -314,10 +283,12 @@ onAuthStateChanged(auth, async (user) => {
         
         if (snap.exists()) {
             const data = snap.data();
-            document.getElementById('cv-root').innerHTML = data.html;
-            document.body.className = data.template || '';
+            // Load saved data into form inputs
+            if (data.formData) {
+                loadUserDataIntoForm(data.formData);
+            }
             
-            // Temayı Yükle
+            document.body.className = data.template || '';
             if (data.theme) {
                 currentTheme = data.theme;
                 window.applyColor(currentTheme.color);
@@ -325,6 +296,7 @@ onAuthStateChanged(auth, async (user) => {
             }
             
             showView('editor-view');
+            generateCVFromForm(); // Render CV based on form data
             updateStatus('online');
         } else {
             showView('template-view');
@@ -334,12 +306,11 @@ onAuthStateChanged(auth, async (user) => {
     }
 });
 
-// --- ŞABLON VE EDİTÖR MANTIĞI ---
+// --- EDITOR LOGIC ---
 window.selectTemplate = (tpl) => {
     document.body.className = tpl;
-    // CRITICAL FIX: Always show onboarding view first!
-    // The user can choose to skip it if they want to keep existing data.
-    showView('onboarding-view');
+    showView('editor-view');
+    generateCVFromForm();
 };
 
 window.backToTemplates = () => {
@@ -347,89 +318,86 @@ window.backToTemplates = () => {
     showView('template-view');
 };
 
-// --- ONBOARDING FORM LOGIC ---
-window.addFormExperience = () => {
+// --- DYNAMIC FORM HANDLERS ---
+window.addFormExperience = (data = null) => {
     const container = document.getElementById('form-experiences-list');
     const div = document.createElement('div');
     div.className = 'dynamic-item';
     const t = translations[currentLang];
     
     div.innerHTML = `
-        <button class="remove-dynamic-btn" onclick="this.parentElement.remove()">×</button>
+        <button class="remove-dynamic-btn" onclick="removeItemAndRefresh(this)">×</button>
         <div class="input-grid">
             <div class="input-group">
                 <label>${t.lbl_job_title}</label>
-                <input type="text" class="form-input job-title" placeholder="Ex: Manager">
+                <input type="text" class="form-input job-title" placeholder="Ex: Manager" value="${data ? data.title : ''}" oninput="generateCVFromForm()">
             </div>
             <div class="input-group">
                 <label>${t.lbl_company}</label>
-                <input type="text" class="form-input job-company" placeholder="Ex: Google">
+                <input type="text" class="form-input job-company" placeholder="Ex: Google" value="${data ? data.company : ''}" oninput="generateCVFromForm()">
             </div>
             <div class="input-group full-width">
                 <label>${t.lbl_date}</label>
-                <input type="text" class="form-input job-date" placeholder="Ex: Jan 2020 - Present">
+                <input type="text" class="form-input job-date" placeholder="Ex: Jan 2020 - Present" value="${data ? data.date : ''}" oninput="generateCVFromForm()">
             </div>
             <div class="input-group full-width">
                 <label>${t.lbl_desc}</label>
-                <textarea class="form-input job-desc" rows="3"></textarea>
+                <textarea class="form-input job-desc" rows="3" oninput="generateCVFromForm()">${data ? data.desc : ''}</textarea>
             </div>
         </div>
     `;
     container.appendChild(div);
+    if (!data) generateCVFromForm();
 };
 
-window.addFormEducation = () => {
+window.addFormEducation = (data = null) => {
     const container = document.getElementById('form-education-list');
     const div = document.createElement('div');
     div.className = 'dynamic-item';
     const t = translations[currentLang];
     
     div.innerHTML = `
-        <button class="remove-dynamic-btn" onclick="this.parentElement.remove()">×</button>
+        <button class="remove-dynamic-btn" onclick="removeItemAndRefresh(this)">×</button>
         <div class="input-grid">
             <div class="input-group">
                 <label>${t.lbl_school}</label>
-                <input type="text" class="form-input edu-school" placeholder="Ex: MIT">
+                <input type="text" class="form-input edu-school" placeholder="Ex: MIT" value="${data ? data.school : ''}" oninput="generateCVFromForm()">
             </div>
             <div class="input-group">
                 <label>${t.lbl_degree}</label>
-                <input type="text" class="form-input edu-degree" placeholder="Ex: Computer Science">
+                <input type="text" class="form-input edu-degree" placeholder="Ex: CS" value="${data ? data.degree : ''}" oninput="generateCVFromForm()">
             </div>
             <div class="input-group full-width">
                 <label>${t.lbl_date}</label>
-                <input type="text" class="form-input edu-date" placeholder="Ex: 2015 - 2019">
+                <input type="text" class="form-input edu-date" placeholder="Ex: 2015 - 2019" value="${data ? data.date : ''}" oninput="generateCVFromForm()">
             </div>
         </div>
     `;
     container.appendChild(div);
+    if (!data) generateCVFromForm();
 };
 
-window.skipToEditor = () => {
-    const currentContent = document.getElementById('cv-root').innerHTML.trim();
-    // Only reset if truly empty
-    if (!currentContent) {
-        resetAll(true); 
-    }
-    showView('editor-view');
-    saveToCloud();
+window.removeItemAndRefresh = (btn) => {
+    btn.parentElement.remove();
+    generateCVFromForm();
 };
 
+// --- DATA BINDING ---
 window.generateCVFromForm = () => {
-    // 1. Gather Data
+    // 1. Gather Data from DOM Inputs
     const data = {
-        fullname: document.getElementById('inp-fullname').value || "ADINIZ SOYADINIZ",
-        title: document.getElementById('inp-title').value || "Unvanınız",
-        email: document.getElementById('inp-email').value || "email@ornek.com",
-        phone: document.getElementById('inp-phone').value || "0555 123 45 67",
-        address: document.getElementById('inp-address').value || "Şehir, Ülke",
-        birthplace: document.getElementById('inp-birthplace').value || "İstanbul",
-        license: document.getElementById('inp-license').value || "B Sınıfı",
-        summary: document.getElementById('inp-summary').value || "Profesyonel özetiniz...",
+        fullname: document.getElementById('inp-fullname').value,
+        title: document.getElementById('inp-title').value,
+        email: document.getElementById('inp-email').value,
+        phone: document.getElementById('inp-phone').value,
+        address: document.getElementById('inp-address').value,
+        birthplace: document.getElementById('inp-birthplace').value,
+        license: document.getElementById('inp-license').value,
+        summary: document.getElementById('inp-summary').value,
         experiences: [],
         education: []
     };
 
-    // Gather Experience
     document.querySelectorAll('#form-experiences-list .dynamic-item').forEach(item => {
         data.experiences.push({
             title: item.querySelector('.job-title').value,
@@ -439,7 +407,6 @@ window.generateCVFromForm = () => {
         });
     });
 
-    // Gather Education
     document.querySelectorAll('#form-education-list .dynamic-item').forEach(item => {
         data.education.push({
             school: item.querySelector('.edu-school').value,
@@ -448,174 +415,153 @@ window.generateCVFromForm = () => {
         });
     });
 
-    // 2. Generate HTML based on Template
+    // 2. Generate HTML
     const isCompact = document.body.classList.contains('tpl-compact');
     let html = "";
+    
+    // Labels based on Lang
+    const labels = {
+        exp: currentLang === 'tr' ? 'İŞ DENEYİMİ' : 'EMPLOYMENT HISTORY',
+        edu: currentLang === 'tr' ? 'EĞİTİM' : 'EDUCATION',
+        prof: currentLang === 'tr' ? 'PROFİL' : 'PROFILE',
+        birth: translations[currentLang].cv_label_birth,
+        lic: translations[currentLang].cv_label_license
+    };
 
     if (isCompact) {
-        // COMPACT GENERATION
+        // COMPACT
         let expHTML = data.experiences.map(exp => `
             <div class="section">
-                <div class="section-actions"><button class="action-btn" onclick="moveUp(this)">▲</button><button class="action-btn" onclick="moveDown(this)">▼</button><button class="action-btn delete" onclick="removeSection(this)">🗑️</button></div>
-                <div class="section-header"><span class="section-title" contenteditable="true">${currentLang === 'tr' ? 'İŞ DENEYİMİ' : 'EMPLOYMENT HISTORY'}</span></div>
-                <div class="entry"><button class="btn-delete-item" onclick="removeEntry(this)">×</button>
-                    <div class="left-col" contenteditable="true">${exp.date}</div>
-                    <div class="right-col"><h3 contenteditable="true">${exp.title}, ${exp.company}</h3><p contenteditable="true">${exp.desc}</p></div>
+                <div class="section-header"><span class="section-title">${labels.exp}</span></div>
+                <div class="entry">
+                    <div class="left-col">${exp.date}</div>
+                    <div class="right-col"><h3>${exp.title}, ${exp.company}</h3><p>${exp.desc.replace(/\n/g, '<br>')}</p></div>
                 </div>
             </div>`).join('');
         
         let eduHTML = data.education.map(edu => `
              <div class="section">
-                <div class="section-actions"><button class="action-btn" onclick="moveUp(this)">▲</button><button class="action-btn" onclick="moveDown(this)">▼</button><button class="action-btn delete" onclick="removeSection(this)">🗑️</button></div>
-                <div class="section-header"><span class="section-title" contenteditable="true">${currentLang === 'tr' ? 'EĞİTİM' : 'EDUCATION'}</span></div>
-                <div class="entry"><button class="btn-delete-item" onclick="removeEntry(this)">×</button>
-                    <div class="left-col" contenteditable="true">${edu.date}</div>
-                    <div class="right-col"><h3 contenteditable="true">${edu.degree}</h3><p contenteditable="true">${edu.school}</p></div>
+                <div class="section-header"><span class="section-title">${labels.edu}</span></div>
+                <div class="entry">
+                    <div class="left-col">${edu.date}</div>
+                    <div class="right-col"><h3>${edu.degree}</h3><p>${edu.school}</p></div>
                 </div>
             </div>`).join('');
 
         html = `
         <header>
-            <h1 contenteditable="true">${data.fullname}</h1>
-            <div class="subtitle" contenteditable="true">${data.title}</div>
-            <div class="address-line" contenteditable="true">${data.address}</div>
-            <div class="contact-row"><span contenteditable="true">${data.phone}</span><span contenteditable="true">${data.email}</span></div>
+            <h1>${data.fullname || 'ADINIZ SOYADINIZ'}</h1>
+            <div class="subtitle">${data.title}</div>
+            <div class="address-line">${data.address}</div>
+            <div class="contact-row"><span>${data.phone}</span><span>${data.email}</span></div>
             <div class="compact-separator"></div>
             <div class="personal-details">
-                <div class="detail-item"><span class="lbl" contenteditable="true" data-cv-label="birth">${translations[currentLang].cv_label_birth}</span><span class="dots"></span><span class="val" contenteditable="true">${data.birthplace}</span></div>
-                <div class="detail-item"><span class="lbl" contenteditable="true" data-cv-label="license">${translations[currentLang].cv_label_license}</span><span class="dots"></span><span class="val" contenteditable="true">${data.license}</span></div>
+                <div class="detail-item"><span class="lbl">${labels.birth}</span><span class="dots"></span><span class="val">${data.birthplace}</span></div>
+                <div class="detail-item"><span class="lbl">${labels.lic}</span><span class="dots"></span><span class="val">${data.license}</span></div>
             </div>
         </header>
         <div id="main-content">
              <div class="section">
-                <div class="section-actions"><button class="action-btn" onclick="moveUp(this)">▲</button><button class="action-btn" onclick="moveDown(this)">▼</button><button class="action-btn delete" onclick="removeSection(this)">🗑️</button></div>
-                <div class="section-header"><span class="section-title" contenteditable="true">${currentLang === 'tr' ? 'PROFİL' : 'PROFILE'}</span></div>
-                <div class="entry"><button class="btn-delete-item" onclick="removeEntry(this)">×</button><div class="right-col" contenteditable="true">${data.summary}</div></div>
+                <div class="section-header"><span class="section-title">${labels.prof}</span></div>
+                <div class="entry"><div class="right-col">${data.summary}</div></div>
             </div>
             ${expHTML}
             ${eduHTML}
         </div>`;
 
     } else {
-        // CLASSIC GENERATION
+        // CLASSIC
         let expHTML = data.experiences.map(exp => `
             <div class="section">
-                <div class="section-actions"><button class="action-btn" onclick="moveUp(this)">▲</button><button class="action-btn" onclick="moveDown(this)">▼</button><button class="action-btn delete" onclick="removeSection(this)">🗑️</button></div>
-                <div class="section-header"><span class="section-title" contenteditable="true">${currentLang === 'tr' ? 'İŞ DENEYİMİ' : 'EMPLOYMENT HISTORY'}</span></div>
-                <div class="entry"><button class="btn-delete-item" onclick="removeEntry(this)">×</button>
-                    <div class="left-col" contenteditable="true">${exp.date}</div>
-                    <div class="right-col"><h3 contenteditable="true">${exp.title}, ${exp.company}</h3><p contenteditable="true">${exp.desc}</p></div>
+                <div class="section-header"><span class="section-title">${labels.exp}</span></div>
+                <div class="entry">
+                    <div class="left-col">${exp.date}</div>
+                    <div class="right-col"><h3>${exp.title}, ${exp.company}</h3><p>${exp.desc.replace(/\n/g, '<br>')}</p></div>
                 </div>
             </div>`).join('');
         
         let eduHTML = data.education.map(edu => `
              <div class="section">
-                <div class="section-actions"><button class="action-btn" onclick="moveUp(this)">▲</button><button class="action-btn" onclick="moveDown(this)">▼</button><button class="action-btn delete" onclick="removeSection(this)">🗑️</button></div>
-                <div class="section-header"><span class="section-title" contenteditable="true">${currentLang === 'tr' ? 'EĞİTİM' : 'EDUCATION'}</span></div>
-                <div class="entry"><button class="btn-delete-item" onclick="removeEntry(this)">×</button>
-                    <div class="left-col" contenteditable="true">${edu.date}</div>
-                    <div class="right-col"><h3 contenteditable="true">${edu.degree}</h3><p contenteditable="true">${edu.school}</p></div>
+                <div class="section-header"><span class="section-title">${labels.edu}</span></div>
+                <div class="entry">
+                    <div class="left-col">${edu.date}</div>
+                    <div class="right-col"><h3>${edu.degree}</h3><p>${edu.school}</p></div>
                 </div>
             </div>`).join('');
 
         html = `
         <header>
-            <h1 contenteditable="true">${data.fullname}</h1>
-            <div class="subtitle" contenteditable="true">${data.title}</div>
-            <div class="contact-info" contenteditable="true">
+            <h1>${data.fullname || 'ADINIZ SOYADINIZ'}</h1>
+            <div class="subtitle">${data.title}</div>
+            <div class="contact-info">
                 <span>📍 ${data.address}</span> | <span>📞 ${data.phone}</span> | <span>✉️ ${data.email}</span>
             </div>
-            <!-- Hidden Fields for Compact switch compatibility -->
-            <div class="address-line" style="display:none" contenteditable="true">${data.address}</div>
-            <div class="contact-row" style="display:none"><span contenteditable="true">${data.phone}</span><span contenteditable="true">${data.email}</span></div>
+            <!-- Hidden Fields for switch compatibility -->
+            <div class="address-line" style="display:none">${data.address}</div>
+            <div class="contact-row" style="display:none"><span>${data.phone}</span><span>${data.email}</span></div>
             <div class="personal-details" style="display:none">
-                 <div class="detail-item"><span class="lbl" contenteditable="true" data-cv-label="birth">${translations[currentLang].cv_label_birth}</span><span class="dots"></span><span class="val" contenteditable="true">${data.birthplace}</span></div>
-                <div class="detail-item"><span class="lbl" contenteditable="true" data-cv-label="license">${translations[currentLang].cv_label_license}</span><span class="dots"></span><span class="val" contenteditable="true">${data.license}</span></div>
+                 <div class="detail-item"><span class="lbl">${labels.birth}</span><span class="dots"></span><span class="val">${data.birthplace}</span></div>
+                <div class="detail-item"><span class="lbl">${labels.lic}</span><span class="dots"></span><span class="val">${data.license}</span></div>
             </div>
         </header>
         <div id="main-content">
              <div class="section">
-                <div class="section-actions"><button class="action-btn" onclick="moveUp(this)">▲</button><button class="action-btn" onclick="moveDown(this)">▼</button><button class="action-btn delete" onclick="removeSection(this)">🗑️</button></div>
-                <div class="section-header"><span class="section-title" contenteditable="true">${currentLang === 'tr' ? 'PROFİL' : 'PROFILE'}</span></div>
-                <div class="entry"><button class="btn-delete-item" onclick="removeEntry(this)">×</button><div class="right-col" contenteditable="true">${data.summary}</div></div>
+                <div class="section-header"><span class="section-title">${labels.prof}</span></div>
+                <div class="entry"><div class="right-col">${data.summary}</div></div>
             </div>
             ${expHTML}
             ${eduHTML}
         </div>`;
     }
 
-    // 3. Inject & Switch
     document.getElementById('cv-root').innerHTML = html;
-    saveToCloud();
-    showView('editor-view');
+    saveToCloud(data); // Save the form data structure
 };
 
+function loadUserDataIntoForm(data) {
+    document.getElementById('inp-fullname').value = data.fullname || '';
+    document.getElementById('inp-title').value = data.title || '';
+    document.getElementById('inp-email').value = data.email || '';
+    document.getElementById('inp-phone').value = data.phone || '';
+    document.getElementById('inp-address').value = data.address || '';
+    document.getElementById('inp-birthplace').value = data.birthplace || '';
+    document.getElementById('inp-license').value = data.license || '';
+    document.getElementById('inp-summary').value = data.summary || '';
 
-window.createNewSection = () => {
-    const mainContent = document.getElementById('main-content');
-    const newSection = document.createElement('div');
-    newSection.className = 'section';
-    const title = currentLang === 'tr' ? "YENİ BÖLÜM" : "NEW SECTION";
-    const date = currentLang === 'tr' ? "Tarih Aralığı" : "Date Range";
-    const head = currentLang === 'tr' ? "Başlık" : "Title";
-    
-    newSection.innerHTML = `
-        <div class="section-actions">
-            <button class="action-btn" onclick="moveUp(this)" title="Yukarı">▲</button>
-            <button class="action-btn" onclick="moveDown(this)" title="Aşağı">▼</button>
-            <button class="action-btn delete" onclick="removeSection(this)" title="Sil">🗑️</button>
-        </div>
-        <div class="section-header"><span class="section-title" contenteditable="true">${title}</span></div>
-        <div class="content-list">
-            <div class="entry">
-                <button class="btn-delete-item" onclick="removeEntry(this)">×</button>
-                <div class="left-col" contenteditable="true">${date}</div>
-                <div class="right-col"><h3 contenteditable="true">${head}</h3><p contenteditable="true">...</p></div>
-            </div>
-        </div>
-        <div class="add-item-container"><button class="btn-add-item" onclick="addEntry(this)">+ Ekle</button></div>`;
-    mainContent.appendChild(newSection);
-    saveToCloud();
-};
+    const expList = document.getElementById('form-experiences-list');
+    expList.innerHTML = '';
+    if (data.experiences) {
+        data.experiences.forEach(exp => addFormExperience(exp));
+    }
 
-window.addEntry = (btn) => {
-    let container = btn.closest('.section').querySelector('.content-list');
-    if (!container) container = btn.closest('.section');
+    const eduList = document.getElementById('form-education-list');
+    eduList.innerHTML = '';
+    if (data.education) {
+        data.education.forEach(edu => addFormEducation(edu));
+    }
+}
 
-    const date = currentLang === 'tr' ? "Tarih" : "Date";
-    const head = currentLang === 'tr' ? "Yeni Başlık" : "New Item";
-
-    const newEntry = document.createElement('div');
-    newEntry.className = 'entry';
-    newEntry.innerHTML = `
-        <button class="btn-delete-item" onclick="removeEntry(this)">×</button>
-        <div class="left-col" contenteditable="true">${date}</div>
-        <div class="right-col"><h3 contenteditable="true">${head}</h3><p contenteditable="true">...</p></div>`;
-    
-    container.appendChild(newEntry);
-    saveToCloud();
-};
-
-window.removeSection = (btn) => { if(confirm("Silmek istediğinize emin misiniz?")) { btn.closest('.section').remove(); saveToCloud(); } };
-window.removeEntry = (btn) => { btn.closest('.entry').remove(); saveToCloud(); };
-window.moveUp = (btn) => { const s = btn.closest('.section'); if(s.previousElementSibling) { s.parentNode.insertBefore(s, s.previousElementSibling); saveToCloud(); } };
-window.moveDown = (btn) => { const s = btn.closest('.section'); if(s.nextElementSibling) { s.parentNode.insertBefore(s.nextElementSibling, s); saveToCloud(); } };
-
-// --- BULUT SENKRONİZASYONU ---
-async function saveToCloud() {
+// --- SAVE / LOAD ---
+async function saveToCloud(formData = null) {
     if (!currentUser || isSyncing) return;
+    
+    // If formData is not passed (e.g. template change), gather it
+    if (!formData) {
+        // ... gather logic similar to generateCVFromForm or store state globally
+        // For simplicity, we assume this function is usually called by generateCVFromForm
+        return; 
+    }
+
     isSyncing = true;
     updateStatus('syncing');
     
-    const content = document.getElementById('cv-root').innerHTML;
-    const tpl = document.body.className;
     const docRef = doc(db, 'artifacts', appId, 'users', currentUser.uid, 'data', 'cvContent');
     
     try {
         await setDoc(docRef, { 
-            html: content, 
-            template: tpl,
-            theme: currentTheme, // Temayı da kaydet
+            formData: formData, // Store structured data
+            template: document.body.className,
+            theme: currentTheme,
             updatedAt: new Date().toISOString() 
         }, { merge: true });
         updateStatus('online');
@@ -646,164 +592,25 @@ function updateStatus(state) {
     }
 }
 
-// --- RESET FONKSİYONU ---
+// --- RESET ---
 window.resetAll = async (skipConfirm = false) => {
     if(!skipConfirm && !confirm(translations[currentLang].confirm_reset)) return;
-
-    let content = "";
     
-    // Varsayılan İçerik (Default Content)
-    if (currentLang === 'tr') {
-        content = `
-        <header>
-            <h1 contenteditable="true">ADINIZ SOYADINIZ</h1>
-            <div class="subtitle" contenteditable="true">Unvanınız</div>
-            
-            <!-- CLASSIC MODE ONLY -->
-            <div class="contact-info" contenteditable="true">
-                <span>📍 Şehir, Ülke</span> | <span>📞 Telefon</span> | <span>✉️ E-posta</span>
-            </div>
-
-            <!-- COMPACT MODE ONLY -->
-            <div class="address-line" contenteditable="true">Açık Adresiniz, Şehir, Ülke</div>
-            
-            <div class="contact-row">
-                <span contenteditable="true">555 123 45 67</span>
-                <span contenteditable="true">email@ornek.com</span>
-            </div>
-
-            <div class="compact-separator"></div>
-
-            <div class="personal-details">
-                <div class="detail-item">
-                    <span class="lbl" contenteditable="true" data-cv-label="birth">Doğum Yeri</span>
-                    <span class="dots"></span>
-                    <span class="val" contenteditable="true">İstanbul</span>
-                </div>
-                <div class="detail-item">
-                    <span class="lbl" contenteditable="true" data-cv-label="license">Ehliyet</span>
-                    <span class="dots"></span>
-                    <span class="val" contenteditable="true">B Sınıfı</span>
-                </div>
-            </div>
-        </header>
-        <div id="main-content">
-            <div class="section">
-                <div class="section-actions">
-                    <button class="action-btn" onclick="moveUp(this)" title="Yukarı">▲</button>
-                    <button class="action-btn" onclick="moveDown(this)" title="Aşağı">▼</button>
-                    <button class="action-btn delete" onclick="removeSection(this)" title="Sil">🗑️</button>
-                </div>
-                <div class="section-header"><span class="section-title" contenteditable="true">PROFİL</span></div>
-                <div class="entry">
-                        <button class="btn-delete-item" onclick="removeEntry(this)">×</button>
-                    <div class="right-col" contenteditable="true">
-                        Profesyonel özetinizi buraya yazın. Deneyimlerinizden ve hedeflerinizden bahsedin.
-                    </div>
-                </div>
-            </div>
-
-            <div class="section">
-                <div class="section-actions">
-                    <button class="action-btn" onclick="moveUp(this)" title="Yukarı">▲</button>
-                    <button class="action-btn" onclick="moveDown(this)" title="Aşağı">▼</button>
-                    <button class="action-btn delete" onclick="removeSection(this)" title="Sil">🗑️</button>
-                </div>
-                <div class="section-header"><span class="section-title" contenteditable="true">İŞ DENEYİMİ</span></div>
-                <div class="entry">
-                        <button class="btn-delete-item" onclick="removeEntry(this)">×</button>
-                    <div class="left-col" contenteditable="true">Oca 2019 — May 2021</div>
-                    <div class="right-col">
-                        <h3 contenteditable="true">Pozisyon Adı, Şirket Adı</h3>
-                        <p contenteditable="true">Burada yaptığınız işleri ve başarılarınızı maddeler halinde sıralayabilirsiniz.</p>
-                    </div>
-                </div>
-            </div>
-        </div>`;
-    } else {
-        content = `
-        <header>
-            <h1 contenteditable="true">YOUR NAME</h1>
-            <div class="subtitle" contenteditable="true">Your Title</div>
-            
-            <div class="contact-info" contenteditable="true">
-                <span>📍 City, Country</span> | <span>📞 Phone</span> | <span>✉️ Email</span>
-            </div>
-
-            <div class="address-line" contenteditable="true">Full Address, City, Country</div>
-            
-            <div class="contact-row">
-                <span contenteditable="true">555 123 45 67</span>
-                <span contenteditable="true">email@example.com</span>
-            </div>
-
-            <div class="compact-separator"></div>
-
-            <div class="personal-details">
-                <div class="detail-item">
-                    <span class="lbl" contenteditable="true" data-cv-label="birth">Place of birth</span>
-                    <span class="dots"></span>
-                    <span class="val" contenteditable="true">City</span>
-                </div>
-                <div class="detail-item">
-                    <span class="lbl" contenteditable="true" data-cv-label="license">Driving license</span>
-                    <span class="dots"></span>
-                    <span class="val" contenteditable="true">Type B</span>
-                </div>
-            </div>
-        </header>
-        <div id="main-content">
-            <div class="section">
-                <div class="section-actions">
-                    <button class="action-btn" onclick="moveUp(this)" title="Up">▲</button>
-                    <button class="action-btn" onclick="moveDown(this)" title="Down">▼</button>
-                    <button class="action-btn delete" onclick="removeSection(this)" title="Delete">🗑️</button>
-                </div>
-                <div class="section-header"><span class="section-title" contenteditable="true">PROFILE</span></div>
-                <div class="entry">
-                    <button class="btn-delete-item" onclick="removeEntry(this)">×</button>
-                    <div class="right-col" contenteditable="true">
-                        Write your professional summary here. Mention your experience and goals.
-                    </div>
-                </div>
-            </div>
-
-            <div class="section">
-                <div class="section-actions">
-                    <button class="action-btn" onclick="moveUp(this)" title="Up">▲</button>
-                    <button class="action-btn" onclick="moveDown(this)" title="Down">▼</button>
-                    <button class="action-btn delete" onclick="removeSection(this)" title="Delete">🗑️</button>
-                </div>
-                <div class="section-header"><span class="section-title" contenteditable="true">EMPLOYMENT HISTORY</span></div>
-                <div class="entry">
-                    <button class="btn-delete-item" onclick="removeEntry(this)">×</button>
-                    <div class="left-col" contenteditable="true">Jan 2019 — May 2021</div>
-                    <div class="right-col">
-                        <h3 contenteditable="true">Position Title, Company Name</h3>
-                        <p contenteditable="true">List your achievements and responsibilities here.</p>
-                    </div>
-                </div>
-            </div>
-        </div>`;
+    // Clear Form Inputs
+    const inputs = document.querySelectorAll('.form-input');
+    inputs.forEach(i => i.value = '');
+    document.getElementById('form-experiences-list').innerHTML = '';
+    document.getElementById('form-education-list').innerHTML = '';
+    
+    generateCVFromForm();
+    if(!skipConfirm) {
+        const t = document.getElementById('toast');
+        t.innerText = translations[currentLang].toast_reset;
+        t.classList.add('show');
+        setTimeout(() => t.classList.remove('show'), 3000);
     }
-
-    document.getElementById('cv-root').innerHTML = content;
-    await saveToCloud();
-    if(!skipConfirm) showToast(translations[currentLang].toast_reset);
 };
 
-
-// Otomatik kaydetme tetikleyicisi
-let saveTimeout;
-document.addEventListener('input', () => {
-    clearTimeout(saveTimeout);
-    saveTimeout = setTimeout(saveToCloud, 1500);
-});
-
-// Toast mesajı
-function showToast(msg) {
-    const toast = document.getElementById('toast');
-    toast.innerText = msg;
-    toast.classList.add('show');
-    setTimeout(() => toast.classList.remove('show'), 3000);
-}
+window.createNewSection = () => {
+    alert("Yeni sistemde bölümler sabittir (İş & Eğitim). Lütfen sol panelden 'İş Ekle' veya 'Okul Ekle' butonlarını kullanın.");
+};
