@@ -1,3 +1,4 @@
+
 /* --- ROOT VARIABLES --- */
 :root {
     --primary-color: #3498db;
@@ -249,10 +250,136 @@ body.tpl-compact .cv-content { font-size: 12px; }
 
 header { text-align: center; margin-bottom: 30px; border-bottom: 2px solid #2d3436; padding-bottom: 25px; }
 h1 { text-transform: uppercase; letter-spacing: 3px; font-size: 32px; font-weight: 700; margin: 0; }
-.section-header { border-bottom: 1.5px solid #2d3436; margin-bottom: 18px; padding-bottom: 6px; }
-.section-title { font-size: 15px; text-transform: uppercase; font-weight: 800; font-family: var(--font-ui); }
-.entry { display: flex; margin-bottom: 15px; position: relative; }
+
+/* --- SECTIONS & PROFESSIONAL CONTROLS --- */
+.section {
+    position: relative; /* Allows absolute positioning of controls */
+    border: 1px solid transparent;
+    border-radius: 4px;
+    padding: 4px;
+    margin-bottom: 10px;
+    transition: all 0.2s;
+}
+
+.section:hover {
+    border-color: rgba(52, 152, 219, 0.2);
+    background-color: rgba(52, 152, 219, 0.02);
+}
+
+.section-header { 
+    border-bottom: 1.5px solid #2d3436; 
+    margin-bottom: 18px; 
+    padding-bottom: 6px; 
+}
+.section-title { 
+    font-size: 15px; 
+    text-transform: uppercase; 
+    font-weight: 800; 
+    font-family: var(--font-ui); 
+}
+
+/* Floating Section Controls */
+.section-actions {
+    position: absolute;
+    right: 0;
+    top: -15px;
+    background: white;
+    padding: 4px 8px;
+    border-radius: 20px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    border: 1px solid #eee;
+    display: flex;
+    gap: 4px;
+    opacity: 0; /* Hidden by default */
+    transform: translateY(5px);
+    transition: all 0.2s ease;
+    z-index: 10;
+}
+
+.section:hover .section-actions {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Styled Action Buttons */
+.action-btn {
+    width: 24px;
+    height: 24px;
+    border: none;
+    background: #f1f2f6;
+    border-radius: 50%;
+    color: #57606f;
+    cursor: pointer;
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: 0.2s;
+}
+
+.action-btn:hover {
+    background: var(--primary-color);
+    color: white;
+}
+
+.action-btn.delete:hover {
+    background: var(--danger-color);
+    color: white;
+}
+
+/* --- ENTRIES --- */
+.entry { 
+    display: flex; 
+    margin-bottom: 15px; 
+    position: relative; 
+    padding-left: 20px; /* Space for delete button */
+}
+
+/* Delete Entry Button */
+.btn-delete-item {
+    position: absolute;
+    left: -10px;
+    top: 0;
+    width: 20px;
+    height: 20px;
+    background: #ff7675;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    font-size: 12px;
+    cursor: pointer;
+    opacity: 0;
+    transition: 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+}
+
+.entry:hover .btn-delete-item {
+    opacity: 1;
+    left: -5px;
+}
+
 .left-col { width: 140px; flex-shrink: 0; font-size: 12px; font-weight: 700; color: #636e72; }
+.right-col { width: 100%; }
+
+/* Add Entry Button Style */
+.add-item-container { text-align: center; margin-top: 10px; }
+.btn-add-item {
+    background: transparent;
+    border: 1px dashed #ccc;
+    color: #999;
+    padding: 6px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 11px;
+    transition: 0.2s;
+}
+.btn-add-item:hover {
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+}
 
 /* --- ANIMATIONS & TOAST --- */
 #toast { 
@@ -282,4 +409,13 @@ h1 { text-transform: uppercase; letter-spacing: 3px; font-size: 32px; font-weigh
     main { margin: 0; padding: 0; width: 100%; }
     .toolbar, #auth-view, #template-view, .lang-switcher, #toast { display: none !important; }
     .page { width: 100%; margin: 0; padding: 0; box-shadow: none; border: none; }
+    
+    /* Hide all controls during print */
+    .section-actions, .btn-delete-item, .btn-add-item, .add-item-container, .section { 
+        border: none !important; 
+        padding: 0 !important;
+        margin-bottom: 10px !important;
+        background-color: transparent !important;
+    }
+    .section-actions, .btn-delete-item, .btn-add-item { display: none !important; }
 }

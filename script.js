@@ -1,3 +1,4 @@
+
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
 import { 
     getAuth, 
@@ -104,42 +105,57 @@ window.selectTemplate = (tpl) => {
     saveToCloud(); 
 };
 
+// YENİ: Şablon Değiştirme Fonksiyonu
+window.backToTemplates = () => {
+    saveToCloud(); // Değişiklikleri kaydet
+    showView('template-view'); // Şablon ekranına dön
+};
+
 window.createNewSection = () => {
     const mainContent = document.getElementById('main-content');
     const newSection = document.createElement('div');
     newSection.className = 'section';
     newSection.innerHTML = `
         <div class="section-actions">
-            <button class="action-btn btn-move" onclick="moveUp(this)">▲</button>
-            <button class="action-btn btn-move" onclick="moveDown(this)">▼</button>
-            <button class="action-btn btn-remove-sec" onclick="removeSection(this)">×</button>
+            <button class="action-btn" onclick="moveUp(this)" title="Yukarı">▲</button>
+            <button class="action-btn" onclick="moveDown(this)" title="Aşağı">▼</button>
+            <button class="action-btn delete" onclick="removeSection(this)" title="Sil">🗑️</button>
         </div>
-        <div class="section-header"><span class="section-title" contenteditable="true">NEW SECTION</span></div>
+        <div class="section-header"><span class="section-title" contenteditable="true">YENİ BÖLÜM</span></div>
         <div class="content-list">
             <div class="entry">
                 <button class="btn-delete-item" onclick="removeEntry(this)">×</button>
-                <div class="left-col" contenteditable="true">Date</div>
-                <div class="right-col"><h3 contenteditable="true">Title</h3><p contenteditable="true">Description...</p></div>
+                <div class="left-col" contenteditable="true">Tarih Aralığı</div>
+                <div class="right-col"><h3 contenteditable="true">Başlık</h3><p contenteditable="true">Detaylar...</p></div>
             </div>
         </div>
-        <div style="text-align: center;"><button class="btn-add-item" onclick="addEntry(this)">+ Add Entry</button></div>`;
+        <div class="add-item-container"><button class="btn-add-item" onclick="addEntry(this)">+ Ekle</button></div>`;
     mainContent.appendChild(newSection);
     saveToCloud();
 };
 
 window.addEntry = (btn) => {
-    const list = btn.closest('.section').querySelector('.content-list') || btn.closest('.section');
+    // Butonun yerini doğru bulmak için yapıyı kontrol et
+    let container = btn.closest('.section').querySelector('.content-list');
+    
+    // Eğer eski yapıdan kalma ise ve content-list yoksa direkt section'a ekle (Geriye dönük uyumluluk)
+    if (!container) {
+        container = btn.closest('.section');
+    }
+
     const newEntry = document.createElement('div');
     newEntry.className = 'entry';
     newEntry.innerHTML = `
         <button class="btn-delete-item" onclick="removeEntry(this)">×</button>
-        <div class="left-col" contenteditable="true">Date</div>
-        <div class="right-col"><h3 contenteditable="true">New Entry</h3><p contenteditable="true">Detail...</p></div>`;
-    list.appendChild(newEntry);
+        <div class="left-col" contenteditable="true">Tarih Aralığı</div>
+        <div class="right-col"><h3 contenteditable="true">Yeni Başlık</h3><p contenteditable="true">Detaylar...</p></div>`;
+    
+    // Add butonundan önce ekle
+    container.appendChild(newEntry);
     saveToCloud();
 };
 
-window.removeSection = (btn) => { if(confirm("Delete this section?")) { btn.closest('.section').remove(); saveToCloud(); } };
+window.removeSection = (btn) => { if(confirm("Bu bölümü silmek istediğinize emin misiniz?")) { btn.closest('.section').remove(); saveToCloud(); } };
 window.removeEntry = (btn) => { btn.closest('.entry').remove(); saveToCloud(); };
 window.moveUp = (btn) => { const s = btn.closest('.section'); if(s.previousElementSibling) { s.parentNode.insertBefore(s, s.previousElementSibling); saveToCloud(); } };
 window.moveDown = (btn) => { const s = btn.closest('.section'); if(s.nextElementSibling) { s.parentNode.insertBefore(s.nextElementSibling, s); saveToCloud(); } };
@@ -177,12 +193,12 @@ function updateStatus(state) {
     dot.className = 'status-dot';
     if (state === 'online') {
         dot.classList.add('status-online');
-        text.innerText = 'Cloud Sync Active';
+        text.innerText = 'Senkronize';
     } else if (state === 'syncing') {
         dot.classList.add('status-syncing');
-        text.innerText = 'Syncing...';
+        text.innerText = 'Kaydediliyor...';
     } else {
-        text.innerText = 'Offline';
+        text.innerText = 'Çevrimdışı';
     }
 }
 
@@ -192,12 +208,12 @@ window.exportData = () => {
     const blob = new Blob([JSON.stringify({html: content, template: document.body.className})], {type: "application/json"});
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
-    a.download = `monocv-backup.json`;
+    a.download = `monocv-yedek.json`;
     a.click();
 };
 
 window.resetAll = () => {
-    if(confirm("This will reset all your data. Are you sure?")) {
+    if(confirm("Tüm verileriniz silinecek. Emin misiniz?")) {
         localStorage.clear();
         location.reload();
     }
