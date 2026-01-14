@@ -205,6 +205,7 @@ function updateStatus(state) {
 // Örnek İçerik Yükleme Fonksiyonu
 window.loadATSExample = async () => {
     if(confirm("Mevcut CV içeriği silinip örnek ATS uyumlu içerik yüklenecek. Onaylıyor musunuz?")) {
+        // Not: < ve > işaretleri &lt; ve &gt; olarak düzeltildi (HTML hatası oluşmaması için)
         const atsContent = `
         <header>
             <h1 contenteditable="true">LAYNEY SPENCER</h1>
@@ -268,7 +269,7 @@ window.loadATSExample = async () => {
                         <h3 contenteditable="true">Assistant Director, John Ward Emergency Facility</h3>
                         <p contenteditable="true">Supported the successful transition from T-System EMR to Meditech EMR. Supported changes during the flow processes to align best clinical practices with new EMR functions.</p>
                         <ul style="margin-top:5px; padding-left:15px;" contenteditable="true">
-                            <li>Increased operations efficiency in the new Fast Track operations department. Increased FT volume from <17% of total patient volume to >38%.</li>
+                            <li>Increased operations efficiency in the new Fast Track operations department. Increased FT volume from &lt;17% of total patient volume to &gt;38%.</li>
                             <li>Supported patient satisfaction through frequent patient visits and coaching staff on the way to enhance patient satisfaction.</li>
                         </ul>
                     </div>
