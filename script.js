@@ -10,7 +10,6 @@ import {
     signInWithPopup 
 } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-import { GoogleGenAI, Type } from "@google/genai";
 
 // --- FIREBASE YAPILANDIRMASI ---
 const firebaseConfig = {
@@ -29,8 +28,6 @@ const auth = getAuth(app);
 const db = getFirestore(app);
 const googleProvider = new GoogleAuthProvider();
 const appId = "mono-cv-app";
-
-// Not: AI servisi artık sayfa yüklendiğinde değil, ihtiyaç duyulduğunda başlatılacak.
 
 let isLoginMode = true;
 let currentUser = null;
@@ -62,7 +59,7 @@ const translations = {
         btn_download_pdf: "🖨️ PDF İndir",
         btn_reset: "🗑️ Sıfırla",
         btn_logout: "Çıkış Yap",
-        btn_ai_upload: "AI ile Yükle",
+        btn_ai_upload: "PDF Yükle (Otomatik)",
         status_connecting: "Bağlanıyor...",
         status_online: "Senkronize",
         status_syncing: "Kaydediliyor...",
@@ -77,10 +74,10 @@ const translations = {
         lbl_color: "Vurgu Rengi",
         lbl_font: "Yazı Tipi",
         btn_save_close: "Kapat",
-        ai_analyzing: "CV'niz Analiz Ediliyor...",
-        ai_desc: "Yapay zeka verilerinizi ayıklayıp yerleştiriyor.",
-        ai_success: "CV'niz başarıyla dönüştürüldü!",
-        ai_error: "CV okunamadı. Dosya formatı bozuk veya içerik algılanamadı."
+        ai_analyzing: "Dosya İşleniyor...",
+        ai_desc: "Verileriniz script ile ayrıştırılıyor.",
+        ai_success: "PDF başarıyla işlendi!",
+        ai_error: "PDF okunamadı. Lütfen metin tabanlı (taranmamış) bir PDF yükleyin."
     },
     en: {
         auth_title: "Login",
@@ -100,7 +97,7 @@ const translations = {
         btn_download_pdf: "🖨️ Download PDF",
         btn_reset: "🗑️ Reset",
         btn_logout: "Logout",
-        btn_ai_upload: "Upload with AI",
+        btn_ai_upload: "Upload PDF (Auto)",
         status_connecting: "Connecting...",
         status_online: "Synced",
         status_syncing: "Saving...",
@@ -115,10 +112,10 @@ const translations = {
         lbl_color: "Accent Color",
         lbl_font: "Font Family",
         btn_save_close: "Close",
-        ai_analyzing: "Analyzing Your CV...",
-        ai_desc: "AI is extracting and formatting your data.",
-        ai_success: "CV successfully converted!",
-        ai_error: "Could not read CV. File format is corrupt or content unreadable."
+        ai_analyzing: "Processing File...",
+        ai_desc: "Parsing data via script.",
+        ai_success: "PDF parsed successfully!",
+        ai_error: "Could not read PDF. Please use a text-based (not scanned) PDF."
     }
 };
 
@@ -163,12 +160,9 @@ window.openThemeModal = () => {
     const modal = document.getElementById('theme-modal');
     modal.classList.add('active');
     
-    // User Friendly Positioning:
-    // İlk açılışta CV'nin üzerine gelmemesi için sağ tarafa konumlandırıyoruz.
+    // User Friendly Positioning
     if (!modal.style.top || !modal.style.left) {
         modal.style.top = "100px";
-        // Ekran genişliğine göre sağ kenara yakın bir konum belirle
-        // Modal genişliği (css'de 320px) + biraz boşluk
         const initialLeft = Math.max(20, window.innerWidth - 360);
         modal.style.left = initialLeft + "px";
     }
@@ -413,7 +407,7 @@ function updateStatus(state) {
     }
 }
 
-// --- AI UPLOAD FUNCTIONALITY ---
+// --- FILE UPLOAD & REGEX PARSER FUNCTIONALITY ---
 window.triggerFileUpload = () => {
     document.getElementById('cv-upload').click();
 };
@@ -421,120 +415,155 @@ window.triggerFileUpload = () => {
 window.handleFileUpload = async (input) => {
     if (input.files.length === 0) return;
     const file = input.files[0];
+
+    // Only allow PDF for client-side parsing script
+    if (file.type !== 'application/pdf') {
+        alert("Lütfen geçerli bir PDF dosyası yükleyin. (Görüntü/Resim formatı desteklenmemektedir)");
+        return;
+    }
     
     // Show Loading
     document.getElementById('ai-loading').classList.add('active');
 
-    const reader = new FileReader();
-    reader.onload = async function(e) {
-        const base64Data = e.target.result.split(',')[1];
-        const mimeType = file.type;
+    const fileReader = new FileReader();
+    fileReader.onload = async function(e) {
+        const typedarray = new Uint8Array(e.target.result);
 
         try {
-            await analyzeCVWithGemini(base64Data, mimeType);
+            await extractAndParsePDF(typedarray);
         } catch (error) {
-            console.error("AI Error:", error);
+            console.error("Parsing Error:", error);
             alert(translations[currentLang].ai_error);
         } finally {
             document.getElementById('ai-loading').classList.remove('active');
         }
     };
-    reader.readAsDataURL(file);
-    // Reset input so same file can be selected again if needed
+    fileReader.readAsArrayBuffer(file);
     input.value = '';
 };
 
-async function analyzeCVWithGemini(base64Data, mimeType) {
-    // Initialize AI client with current API KEY
-    const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-    
-    // Strict Schema Definition using @google/genai Type
-    const cvSchema = {
-        type: Type.OBJECT,
-        properties: {
-            fullName: { type: Type.STRING, description: "The full name of the candidate." },
-            title: { type: Type.STRING, description: "Professional title or current role." },
-            contact: {
-                type: Type.OBJECT,
-                properties: {
-                    location: { type: Type.STRING },
-                    phone: { type: Type.STRING },
-                    email: { type: Type.STRING },
-                    fullAddress: { type: Type.STRING }
-                }
-            },
-            personal: {
-                type: Type.OBJECT,
-                properties: {
-                    birthPlace: { type: Type.STRING },
-                    license: { type: Type.STRING }
-                }
-            },
-            profile: { type: Type.STRING, description: "Professional summary or bio." },
-            experience: {
-                type: Type.ARRAY,
-                items: {
-                    type: Type.OBJECT,
-                    properties: {
-                        date: { type: Type.STRING },
-                        title: { type: Type.STRING },
-                        company: { type: Type.STRING },
-                        description: { type: Type.STRING }
-                    }
-                }
-            },
-            education: {
-                type: Type.ARRAY,
-                items: {
-                    type: Type.OBJECT,
-                    properties: {
-                        date: { type: Type.STRING },
-                        degree: { type: Type.STRING },
-                        school: { type: Type.STRING }
-                    }
-                }
-            },
-            certifications: {
-                type: Type.ARRAY,
-                items: {
-                    type: Type.OBJECT,
-                    properties: {
-                        name: { type: Type.STRING },
-                        provider: { type: Type.STRING }
-                    }
-                }
-            }
-        },
-        required: ["fullName", "contact", "experience", "education"]
+async function extractAndParsePDF(pdfData) {
+    const pdf = await pdfjsLib.getDocument(pdfData).promise;
+    let fullText = "";
+
+    // Extract text from all pages
+    for (let i = 1; i <= pdf.numPages; i++) {
+        const page = await pdf.getPage(i);
+        const textContent = await page.getTextContent();
+        const pageText = textContent.items.map(item => item.str).join(' ');
+        fullText += pageText + "\n";
+    }
+
+    // Process text with REGEX Script
+    const parsedData = parseCVTextBasic(fullText);
+    populateCVFromJSON(parsedData);
+    showToast(translations[currentLang].ai_success);
+}
+
+// === THE "SCRIPT" - REGEX PARSER LOGIC ===
+function parseCVTextBasic(text) {
+    const data = {
+        fullName: "",
+        title: "",
+        contact: { location: "", phone: "", email: "", fullAddress: "" },
+        personal: { birthPlace: "", license: "" },
+        profile: "",
+        experience: [],
+        education: [],
+        certifications: []
     };
 
-    const prompt = `Extract data from this CV document (PDF/Image).
-    The text might contain mixed languages (e.g., Turkish header, English content). 
-    Extract the content exactly as written, but map it to the correct schema fields.
-    - If the name is in capital letters (e.g. HÜSEYİN YAŞAR), extract it as Full Name.
-    - If you see "Human Resources Specialist Assistant" or similar roles, map them to Experience or Title.
-    - Fix any obvious OCR errors (typos) in the extraction.
-    `;
+    // 1. CLEANUP
+    // Remove multiple spaces and newlines
+    const cleanText = text.replace(/\s+/g, ' ').trim();
+    
+    // 2. EXTRACT CONTACT INFO (Regex)
+    const emailRegex = /([a-zA-Z0-9._-]+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9_-]+)/;
+    const emailMatch = cleanText.match(emailRegex);
+    if (emailMatch) data.contact.email = emailMatch[0];
 
-    const response = await ai.models.generateContent({
-        model: 'gemini-1.5-flash',
-        contents: {
-            parts: [
-                { inlineData: { mimeType: mimeType, data: base64Data } },
-                { text: prompt }
-            ]
-        },
-        config: {
-            responseMimeType: "application/json",
-            responseSchema: cvSchema
+    // Basic Phone Match (Turkey specific + Generic)
+    const phoneRegex = /(?:\+90|0)?\s*[0-9]{3}\s*[0-9]{3}\s*[0-9]{2}\s*[0-9]{2}/;
+    const phoneMatch = cleanText.match(phoneRegex);
+    if (phoneMatch) data.contact.phone = phoneMatch[0];
+
+    // 3. GUESS NAME (Heuristic: Usually at start, uppercase)
+    // We take the first non-empty sequence that doesn't look like a label
+    // This is hard without AI, so we'll guess the very first few words.
+    const words = cleanText.split(' ');
+    // Take first 2-3 words as name if they don't contain numbers/symbols
+    let nameGuess = words.slice(0, 2).join(' ');
+    if (nameGuess.length > 3 && !/[0-9]/.test(nameGuess)) {
+        data.fullName = nameGuess;
+    }
+
+    // 4. FIND SECTIONS BY KEYWORDS
+    // We look for keyword indices to slice the text
+    const keywords = {
+        experience: ["İŞ DENEYİMİ", "WORK EXPERIENCE", "DENEYİM", "EXPERIENCE"],
+        education: ["EĞİTİM", "EDUCATION", "AKADEMİK", "UNIVERSITY"],
+        skills: ["YETENEKLER", "SKILLS", "BECERİLER"],
+        certifications: ["SERTİFİKALAR", "CERTIFICATES", "CERTIFICATIONS"],
+        contact: ["İLETİŞİM", "CONTACT"]
+    };
+
+    // Helper to find position of sections
+    function findSectionStart(text, keys) {
+        for (let key of keys) {
+            let idx = text.toUpperCase().indexOf(key);
+            if (idx !== -1) return idx;
+        }
+        return -1;
+    }
+
+    const expIdx = findSectionStart(cleanText, keywords.experience);
+    const eduIdx = findSectionStart(cleanText, keywords.education);
+    const certIdx = findSectionStart(cleanText, keywords.certifications);
+    
+    // Sort indices to know where a section ends (it ends where next one begins)
+    const indices = [
+        { type: 'experience', idx: expIdx },
+        { type: 'education', idx: eduIdx },
+        { type: 'certifications', idx: certIdx }
+    ].filter(x => x.idx !== -1).sort((a, b) => a.idx - b.idx);
+
+    // Extract content based on sorted indices
+    indices.forEach((item, i) => {
+        const start = item.idx;
+        const end = indices[i + 1] ? indices[i + 1].idx : cleanText.length;
+        const sectionContent = cleanText.substring(start, end); // Keep 'cleanText' raw for better slicing? Actually processed text is flat.
+        
+        // Remove the header title itself from content
+        // This is a rough split, naive but functional for a script
+        let contentClean = sectionContent.substring(15); // Skip approximate header length
+        
+        if (item.type === 'experience') {
+            // Split by common delimiters or just dump as one block for user to edit
+            // Creating a dummy entry because we can't parse structured job objects easily with regex
+            data.experience.push({
+                date: "...",
+                title: "Bulunan Deneyim Verisi",
+                company: "",
+                description: contentClean.substring(0, 300) + "..." // Limit length
+            });
+        }
+        if (item.type === 'education') {
+            data.education.push({
+                date: "...",
+                degree: "Bulunan Eğitim Verisi",
+                school: contentClean.substring(0, 150) + "..."
+            });
+        }
+        if (item.type === 'certifications') {
+             // Split by bullets or newlines if possible, here just splitting by comma as a guess
+             const parts = contentClean.split(/(?:,|•|-)/).filter(s => s.length > 5);
+             parts.slice(0, 4).forEach(p => {
+                 data.certifications.push({ name: p.trim(), provider: "" });
+             });
         }
     });
 
-    // With responseSchema, response.text is guaranteed to be valid JSON conforming to the schema.
-    const cvData = JSON.parse(response.text);
-    
-    populateCVFromJSON(cvData);
-    showToast(translations[currentLang].ai_success);
+    return data;
 }
 
 function populateCVFromJSON(data) {

@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="tr">
 <head>
@@ -13,25 +14,23 @@
     <!-- CSS Link -->
     <link rel="stylesheet" href="style.css">
 
-    <!-- Import Map for Google GenAI -->
-    <script type="importmap">
-    {
-      "imports": {
-        "@google/genai": "https://esm.run/@google/genai"
-      }
-    }
+    <!-- PDF.js for Client Side Parsing -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script>
+        // Set worker globally
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
     </script>
 </head>
 <body>
 
     <div id="toast">Kaydedildi!</div>
 
-    <!-- AI Loading Overlay -->
+    <!-- Loading Overlay -->
     <div id="ai-loading" class="modal-overlay">
         <div class="loading-content">
             <div class="ai-spinner"></div>
-            <h3 data-i18n="ai_analyzing">CV'niz Analiz Ediliyor...</h3>
-            <p data-i18n="ai_desc">Yapay zeka verilerinizi ayıklayıp yerleştiriyor.</p>
+            <h3 data-i18n="ai_analyzing">Dosya İşleniyor...</h3>
+            <p data-i18n="ai_desc">Verileriniz script ile ayrıştırılıyor.</p>
         </div>
     </div>
 
@@ -141,11 +140,11 @@
                 <span id="status-text" data-i18n="status_connecting">Bağlanıyor...</span>
             </div>
 
-            <!-- New AI Upload Button -->
+            <!-- New PDF Script Upload Button -->
             <button class="btn btn-secondary" onclick="triggerFileUpload()" style="background: rgba(155, 89, 182, 0.4); border: 1px solid #8e44ad;">
-                🤖 <span data-i18n="btn_ai_upload">AI ile Yükle</span>
+                📤 <span data-i18n="btn_ai_upload">PDF Yükle (Otomatik)</span>
             </button>
-            <input type="file" id="cv-upload" accept=".pdf, .jpg, .jpeg, .png" onchange="handleFileUpload(this)" hidden>
+            <input type="file" id="cv-upload" accept=".pdf" onchange="handleFileUpload(this)" hidden>
 
             <button class="btn btn-secondary" onclick="createNewSection()" data-i18n="btn_add_section">+ Bölüm Ekle</button>
             <button class="btn btn-success" type="button" onclick="loadATSExample()" data-i18n="btn_load_sample">📄 Örnek CV Yükle</button>
