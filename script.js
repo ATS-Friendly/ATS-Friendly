@@ -163,10 +163,14 @@ window.openThemeModal = () => {
     const modal = document.getElementById('theme-modal');
     modal.classList.add('active');
     
-    // Reset position if off-screen or first open, center-ish but draggable
+    // User Friendly Positioning:
+    // İlk açılışta CV'nin üzerine gelmemesi için sağ tarafa konumlandırıyoruz.
     if (!modal.style.top || !modal.style.left) {
         modal.style.top = "100px";
-        modal.style.left = "calc(50% - 160px)";
+        // Ekran genişliğine göre sağ kenara yakın bir konum belirle
+        // Modal genişliği (css'de 320px) + biraz boşluk
+        const initialLeft = Math.max(20, window.innerWidth - 360);
+        modal.style.left = initialLeft + "px";
     }
     
     initDragElement(modal.querySelector('.modal-content'));
@@ -441,49 +445,76 @@ window.handleFileUpload = async (input) => {
 };
 
 async function analyzeCVWithGemini(base64Data, mimeType) {
-    // Initialize AI client only when needed to avoid page load errors
+    // Initialize AI client with current API KEY
     const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
     
-    const prompt = `You are an expert CV parser. I will provide a CV file (PDF or Image). 
-    Extract the following information and return it in a strict JSON format matching this schema:
-    {
-        "fullName": "Name Surname",
-        "title": "Professional Title (if extracted)",
-        "contact": { 
-            "location": "City, Country", 
-            "phone": "Phone Number", 
-            "email": "Email Address",
-            "fullAddress": "Full Street Address if available" 
+    // Strict Schema Definition using @google/genai Type
+    const cvSchema = {
+        type: Type.OBJECT,
+        properties: {
+            fullName: { type: Type.STRING, description: "The full name of the candidate." },
+            title: { type: Type.STRING, description: "Professional title or current role." },
+            contact: {
+                type: Type.OBJECT,
+                properties: {
+                    location: { type: Type.STRING },
+                    phone: { type: Type.STRING },
+                    email: { type: Type.STRING },
+                    fullAddress: { type: Type.STRING }
+                }
+            },
+            personal: {
+                type: Type.OBJECT,
+                properties: {
+                    birthPlace: { type: Type.STRING },
+                    license: { type: Type.STRING }
+                }
+            },
+            profile: { type: Type.STRING, description: "Professional summary or bio." },
+            experience: {
+                type: Type.ARRAY,
+                items: {
+                    type: Type.OBJECT,
+                    properties: {
+                        date: { type: Type.STRING },
+                        title: { type: Type.STRING },
+                        company: { type: Type.STRING },
+                        description: { type: Type.STRING }
+                    }
+                }
+            },
+            education: {
+                type: Type.ARRAY,
+                items: {
+                    type: Type.OBJECT,
+                    properties: {
+                        date: { type: Type.STRING },
+                        degree: { type: Type.STRING },
+                        school: { type: Type.STRING }
+                    }
+                }
+            },
+            certifications: {
+                type: Type.ARRAY,
+                items: {
+                    type: Type.OBJECT,
+                    properties: {
+                        name: { type: Type.STRING },
+                        provider: { type: Type.STRING }
+                    }
+                }
+            }
         },
-        "personal": {
-            "birthPlace": "City of Birth",
-            "license": "Driving License Class"
-        },
-        "profile": "A professional summary/bio paragraph.",
-        "experience": [
-            {
-                "date": "Date Range (e.g. Jan 2020 - Present)",
-                "title": "Job Title",
-                "company": "Company Name",
-                "description": "Description of roles and achievements."
-            }
-        ],
-        "education": [
-            {
-                "date": "Year or Range",
-                "degree": "Degree Name",
-                "school": "University/School Name"
-            }
-        ],
-        "certifications": [
-            {
-                "name": "Certification Name",
-                "provider": "Provider/Institution (if available)"
-            }
-        ]
-    }
-    If a field is missing, use an empty string. The language of the response should match the language of the CV (Turkish or English). 
-    IMPORTANT: Return ONLY valid JSON. Do not include markdown code blocks.`;
+        required: ["fullName", "contact", "experience", "education"]
+    };
+
+    const prompt = `Extract data from this CV document (PDF/Image).
+    The text might contain mixed languages (e.g., Turkish header, English content). 
+    Extract the content exactly as written, but map it to the correct schema fields.
+    - If the name is in capital letters (e.g. HÜSEYİN YAŞAR), extract it as Full Name.
+    - If you see "Human Resources Specialist Assistant" or similar roles, map them to Experience or Title.
+    - Fix any obvious OCR errors (typos) in the extraction.
+    `;
 
     const response = await ai.models.generateContent({
         model: 'gemini-1.5-flash',
@@ -494,22 +525,13 @@ async function analyzeCVWithGemini(base64Data, mimeType) {
             ]
         },
         config: {
-            responseMimeType: "application/json"
+            responseMimeType: "application/json",
+            responseSchema: cvSchema
         }
     });
 
-    let jsonStr = response.text;
-    
-    // Safety Cleanup: Remove Markdown code blocks if GenAI adds them despite instructions
-    jsonStr = jsonStr.replace(/```json/g, '').replace(/```/g, '');
-    // Ensure we only have the JSON part (find first { and last })
-    const firstOpen = jsonStr.indexOf('{');
-    const lastClose = jsonStr.lastIndexOf('}');
-    if (firstOpen !== -1 && lastClose !== -1) {
-        jsonStr = jsonStr.substring(firstOpen, lastClose + 1);
-    }
-
-    const cvData = JSON.parse(jsonStr);
+    // With responseSchema, response.text is guaranteed to be valid JSON conforming to the schema.
+    const cvData = JSON.parse(response.text);
     
     populateCVFromJSON(cvData);
     showToast(translations[currentLang].ai_success);
@@ -556,17 +578,21 @@ function populateCVFromJSON(data) {
         </div>
     ` : '';
 
+    // Safely handle potentially missing nested objects
+    const contact = data.contact || {};
+    const personal = data.personal || {};
+
     const newContent = `
     <header>
         <h1 contenteditable="true">${data.fullName || 'ADINIZ SOYADINIZ'}</h1>
         <div class="subtitle" contenteditable="true">${data.title || ''}</div>
-        <div class="contact-info" contenteditable="true"><span>📍 ${data.contact.location || ''}</span> | <span>📞 ${data.contact.phone || ''}</span> | <span>✉️ ${data.contact.email || ''}</span></div>
-        <div class="address-line" contenteditable="true">${data.contact.fullAddress || data.contact.location || ''}</div>
-        <div class="contact-row"><span contenteditable="true">${data.contact.phone || ''}</span><span contenteditable="true">${data.contact.email || ''}</span></div>
+        <div class="contact-info" contenteditable="true"><span>📍 ${contact.location || ''}</span> | <span>📞 ${contact.phone || ''}</span> | <span>✉️ ${contact.email || ''}</span></div>
+        <div class="address-line" contenteditable="true">${contact.fullAddress || contact.location || ''}</div>
+        <div class="contact-row"><span contenteditable="true">${contact.phone || ''}</span><span contenteditable="true">${contact.email || ''}</span></div>
         <div class="compact-separator"></div>
         <div class="personal-details">
-            <div class="detail-item"><span class="lbl" contenteditable="true" data-cv-label="birth">${translations[currentLang].cv_label_birth}</span><span class="dots"></span><span class="val" contenteditable="true">${data.personal.birthPlace || ''}</span></div>
-            <div class="detail-item"><span class="lbl" contenteditable="true" data-cv-label="license">${translations[currentLang].cv_label_license}</span><span class="dots"></span><span class="val" contenteditable="true">${data.personal.license || ''}</span></div>
+            <div class="detail-item"><span class="lbl" contenteditable="true" data-cv-label="birth">${translations[currentLang].cv_label_birth}</span><span class="dots"></span><span class="val" contenteditable="true">${personal.birthPlace || ''}</span></div>
+            <div class="detail-item"><span class="lbl" contenteditable="true" data-cv-label="license">${translations[currentLang].cv_label_license}</span><span class="dots"></span><span class="val" contenteditable="true">${personal.license || ''}</span></div>
         </div>
     </header>
     <div id="main-content">
