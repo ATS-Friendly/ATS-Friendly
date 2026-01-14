@@ -72,7 +72,29 @@ const translations = {
         modal_theme_title: "Tasarım Ayarları",
         lbl_color: "Vurgu Rengi",
         lbl_font: "Yazı Tipi",
-        btn_save_close: "Kapat"
+        btn_save_close: "Kapat",
+        // Form Translations
+        form_title: "Bilgilerinizi Girin",
+        form_desc: "CV'nizi oluşturmak için aşağıdaki alanları doldurun.",
+        form_personal: "Kişisel Bilgiler",
+        form_profile: "Profil Özeti",
+        form_experience: "İş Deneyimi",
+        form_education: "Eğitim",
+        form_lbl_fullname: "Ad Soyad",
+        form_lbl_title: "Unvan",
+        form_lbl_email: "E-posta",
+        form_lbl_phone: "Telefon",
+        form_lbl_address: "Adres",
+        btn_add_job: "İş Ekle",
+        btn_add_edu: "Okul Ekle",
+        btn_generate: "CV OLUŞTUR ✨",
+        btn_skip: "Atla ve Düzenleyiciye Git",
+        lbl_job_title: "Pozisyon Adı",
+        lbl_company: "Şirket",
+        lbl_date: "Tarih (Örn: 2020 - 2022)",
+        lbl_desc: "Açıklama",
+        lbl_school: "Okul / Üniversite",
+        lbl_degree: "Bölüm / Derece"
     },
     en: {
         auth_title: "Login",
@@ -105,7 +127,29 @@ const translations = {
         modal_theme_title: "Design Settings",
         lbl_color: "Accent Color",
         lbl_font: "Font Family",
-        btn_save_close: "Close"
+        btn_save_close: "Close",
+        // Form Translations
+        form_title: "Enter Your Details",
+        form_desc: "Fill in the fields below to generate your CV.",
+        form_personal: "Personal Details",
+        form_profile: "Professional Summary",
+        form_experience: "Work Experience",
+        form_education: "Education",
+        form_lbl_fullname: "Full Name",
+        form_lbl_title: "Job Title",
+        form_lbl_email: "Email",
+        form_lbl_phone: "Phone",
+        form_lbl_address: "Address",
+        btn_add_job: "Add Job",
+        btn_add_edu: "Add Education",
+        btn_generate: "GENERATE CV ✨",
+        btn_skip: "Skip to Editor",
+        lbl_job_title: "Job Title",
+        lbl_company: "Company",
+        lbl_date: "Date (e.g., 2020 - 2022)",
+        lbl_desc: "Description",
+        lbl_school: "School / University",
+        lbl_degree: "Degree / Field"
     }
 };
 
@@ -293,12 +337,12 @@ onAuthStateChanged(auth, async (user) => {
 // --- ŞABLON VE EDİTÖR MANTIĞI ---
 window.selectTemplate = (tpl) => {
     document.body.className = tpl;
-    showView('editor-view');
-    
-    // Check if new user (empty content), then load default
-    if(!document.getElementById('cv-root').innerHTML.trim()) {
-        resetAll(true); // Load default without confirmation for new users
+    // New Flow: Check if user has existing content, if not, go to Onboarding
+    const currentContent = document.getElementById('cv-root').innerHTML.trim();
+    if (!currentContent) {
+        showView('onboarding-view');
     } else {
+        showView('editor-view');
         saveToCloud();
     }
 };
@@ -307,6 +351,205 @@ window.backToTemplates = () => {
     saveToCloud(); 
     showView('template-view');
 };
+
+// --- ONBOARDING FORM LOGIC ---
+window.addFormExperience = () => {
+    const container = document.getElementById('form-experiences-list');
+    const div = document.createElement('div');
+    div.className = 'dynamic-item';
+    const t = translations[currentLang];
+    
+    div.innerHTML = `
+        <button class="remove-dynamic-btn" onclick="this.parentElement.remove()">×</button>
+        <div class="input-grid">
+            <div class="input-group">
+                <label>${t.lbl_job_title}</label>
+                <input type="text" class="form-input job-title" placeholder="Ex: Manager">
+            </div>
+            <div class="input-group">
+                <label>${t.lbl_company}</label>
+                <input type="text" class="form-input job-company" placeholder="Ex: Google">
+            </div>
+            <div class="input-group full-width">
+                <label>${t.lbl_date}</label>
+                <input type="text" class="form-input job-date" placeholder="Ex: Jan 2020 - Present">
+            </div>
+            <div class="input-group full-width">
+                <label>${t.lbl_desc}</label>
+                <textarea class="form-input job-desc" rows="3"></textarea>
+            </div>
+        </div>
+    `;
+    container.appendChild(div);
+};
+
+window.addFormEducation = () => {
+    const container = document.getElementById('form-education-list');
+    const div = document.createElement('div');
+    div.className = 'dynamic-item';
+    const t = translations[currentLang];
+    
+    div.innerHTML = `
+        <button class="remove-dynamic-btn" onclick="this.parentElement.remove()">×</button>
+        <div class="input-grid">
+            <div class="input-group">
+                <label>${t.lbl_school}</label>
+                <input type="text" class="form-input edu-school" placeholder="Ex: MIT">
+            </div>
+            <div class="input-group">
+                <label>${t.lbl_degree}</label>
+                <input type="text" class="form-input edu-degree" placeholder="Ex: Computer Science">
+            </div>
+            <div class="input-group full-width">
+                <label>${t.lbl_date}</label>
+                <input type="text" class="form-input edu-date" placeholder="Ex: 2015 - 2019">
+            </div>
+        </div>
+    `;
+    container.appendChild(div);
+};
+
+window.skipToEditor = () => {
+    resetAll(true); // Load default placeholder content
+    showView('editor-view');
+};
+
+window.generateCVFromForm = () => {
+    // 1. Gather Data
+    const data = {
+        fullname: document.getElementById('inp-fullname').value || "ADINIZ SOYADINIZ",
+        title: document.getElementById('inp-title').value || "Unvanınız",
+        email: document.getElementById('inp-email').value || "email@ornek.com",
+        phone: document.getElementById('inp-phone').value || "0555 123 45 67",
+        address: document.getElementById('inp-address').value || "Şehir, Ülke",
+        birthplace: document.getElementById('inp-birthplace').value || "İstanbul",
+        license: document.getElementById('inp-license').value || "B Sınıfı",
+        summary: document.getElementById('inp-summary').value || "Profesyonel özetiniz...",
+        experiences: [],
+        education: []
+    };
+
+    // Gather Experience
+    document.querySelectorAll('#form-experiences-list .dynamic-item').forEach(item => {
+        data.experiences.push({
+            title: item.querySelector('.job-title').value,
+            company: item.querySelector('.job-company').value,
+            date: item.querySelector('.job-date').value,
+            desc: item.querySelector('.job-desc').value
+        });
+    });
+
+    // Gather Education
+    document.querySelectorAll('#form-education-list .dynamic-item').forEach(item => {
+        data.education.push({
+            school: item.querySelector('.edu-school').value,
+            degree: item.querySelector('.edu-degree').value,
+            date: item.querySelector('.edu-date').value
+        });
+    });
+
+    // 2. Generate HTML based on Template
+    const isCompact = document.body.classList.contains('tpl-compact');
+    let html = "";
+
+    if (isCompact) {
+        // COMPACT GENERATION
+        let expHTML = data.experiences.map(exp => `
+            <div class="section">
+                <div class="section-actions"><button class="action-btn" onclick="moveUp(this)">▲</button><button class="action-btn" onclick="moveDown(this)">▼</button><button class="action-btn delete" onclick="removeSection(this)">🗑️</button></div>
+                <div class="section-header"><span class="section-title" contenteditable="true">${currentLang === 'tr' ? 'İŞ DENEYİMİ' : 'EMPLOYMENT HISTORY'}</span></div>
+                <div class="entry"><button class="btn-delete-item" onclick="removeEntry(this)">×</button>
+                    <div class="left-col" contenteditable="true">${exp.date}</div>
+                    <div class="right-col"><h3 contenteditable="true">${exp.title}, ${exp.company}</h3><p contenteditable="true">${exp.desc}</p></div>
+                </div>
+            </div>`).join('');
+        
+        let eduHTML = data.education.map(edu => `
+             <div class="section">
+                <div class="section-actions"><button class="action-btn" onclick="moveUp(this)">▲</button><button class="action-btn" onclick="moveDown(this)">▼</button><button class="action-btn delete" onclick="removeSection(this)">🗑️</button></div>
+                <div class="section-header"><span class="section-title" contenteditable="true">${currentLang === 'tr' ? 'EĞİTİM' : 'EDUCATION'}</span></div>
+                <div class="entry"><button class="btn-delete-item" onclick="removeEntry(this)">×</button>
+                    <div class="left-col" contenteditable="true">${edu.date}</div>
+                    <div class="right-col"><h3 contenteditable="true">${edu.degree}</h3><p contenteditable="true">${edu.school}</p></div>
+                </div>
+            </div>`).join('');
+
+        html = `
+        <header>
+            <h1 contenteditable="true">${data.fullname}</h1>
+            <div class="subtitle" contenteditable="true">${data.title}</div>
+            <div class="address-line" contenteditable="true">${data.address}</div>
+            <div class="contact-row"><span contenteditable="true">${data.phone}</span><span contenteditable="true">${data.email}</span></div>
+            <div class="compact-separator"></div>
+            <div class="personal-details">
+                <div class="detail-item"><span class="lbl" contenteditable="true" data-cv-label="birth">${translations[currentLang].cv_label_birth}</span><span class="dots"></span><span class="val" contenteditable="true">${data.birthplace}</span></div>
+                <div class="detail-item"><span class="lbl" contenteditable="true" data-cv-label="license">${translations[currentLang].cv_label_license}</span><span class="dots"></span><span class="val" contenteditable="true">${data.license}</span></div>
+            </div>
+        </header>
+        <div id="main-content">
+             <div class="section">
+                <div class="section-actions"><button class="action-btn" onclick="moveUp(this)">▲</button><button class="action-btn" onclick="moveDown(this)">▼</button><button class="action-btn delete" onclick="removeSection(this)">🗑️</button></div>
+                <div class="section-header"><span class="section-title" contenteditable="true">${currentLang === 'tr' ? 'PROFİL' : 'PROFILE'}</span></div>
+                <div class="entry"><button class="btn-delete-item" onclick="removeEntry(this)">×</button><div class="right-col" contenteditable="true">${data.summary}</div></div>
+            </div>
+            ${expHTML}
+            ${eduHTML}
+        </div>`;
+
+    } else {
+        // CLASSIC GENERATION
+        let expHTML = data.experiences.map(exp => `
+            <div class="section">
+                <div class="section-actions"><button class="action-btn" onclick="moveUp(this)">▲</button><button class="action-btn" onclick="moveDown(this)">▼</button><button class="action-btn delete" onclick="removeSection(this)">🗑️</button></div>
+                <div class="section-header"><span class="section-title" contenteditable="true">${currentLang === 'tr' ? 'İŞ DENEYİMİ' : 'EMPLOYMENT HISTORY'}</span></div>
+                <div class="entry"><button class="btn-delete-item" onclick="removeEntry(this)">×</button>
+                    <div class="left-col" contenteditable="true">${exp.date}</div>
+                    <div class="right-col"><h3 contenteditable="true">${exp.title}, ${exp.company}</h3><p contenteditable="true">${exp.desc}</p></div>
+                </div>
+            </div>`).join('');
+        
+        let eduHTML = data.education.map(edu => `
+             <div class="section">
+                <div class="section-actions"><button class="action-btn" onclick="moveUp(this)">▲</button><button class="action-btn" onclick="moveDown(this)">▼</button><button class="action-btn delete" onclick="removeSection(this)">🗑️</button></div>
+                <div class="section-header"><span class="section-title" contenteditable="true">${currentLang === 'tr' ? 'EĞİTİM' : 'EDUCATION'}</span></div>
+                <div class="entry"><button class="btn-delete-item" onclick="removeEntry(this)">×</button>
+                    <div class="left-col" contenteditable="true">${edu.date}</div>
+                    <div class="right-col"><h3 contenteditable="true">${edu.degree}</h3><p contenteditable="true">${edu.school}</p></div>
+                </div>
+            </div>`).join('');
+
+        html = `
+        <header>
+            <h1 contenteditable="true">${data.fullname}</h1>
+            <div class="subtitle" contenteditable="true">${data.title}</div>
+            <div class="contact-info" contenteditable="true">
+                <span>📍 ${data.address}</span> | <span>📞 ${data.phone}</span> | <span>✉️ ${data.email}</span>
+            </div>
+            <!-- Hidden Fields for Compact switch compatibility -->
+            <div class="address-line" style="display:none" contenteditable="true">${data.address}</div>
+            <div class="contact-row" style="display:none"><span contenteditable="true">${data.phone}</span><span contenteditable="true">${data.email}</span></div>
+            <div class="personal-details" style="display:none">
+                 <div class="detail-item"><span class="lbl" contenteditable="true" data-cv-label="birth">${translations[currentLang].cv_label_birth}</span><span class="dots"></span><span class="val" contenteditable="true">${data.birthplace}</span></div>
+                <div class="detail-item"><span class="lbl" contenteditable="true" data-cv-label="license">${translations[currentLang].cv_label_license}</span><span class="dots"></span><span class="val" contenteditable="true">${data.license}</span></div>
+            </div>
+        </header>
+        <div id="main-content">
+             <div class="section">
+                <div class="section-actions"><button class="action-btn" onclick="moveUp(this)">▲</button><button class="action-btn" onclick="moveDown(this)">▼</button><button class="action-btn delete" onclick="removeSection(this)">🗑️</button></div>
+                <div class="section-header"><span class="section-title" contenteditable="true">${currentLang === 'tr' ? 'PROFİL' : 'PROFILE'}</span></div>
+                <div class="entry"><button class="btn-delete-item" onclick="removeEntry(this)">×</button><div class="right-col" contenteditable="true">${data.summary}</div></div>
+            </div>
+            ${expHTML}
+            ${eduHTML}
+        </div>`;
+    }
+
+    // 3. Inject & Switch
+    document.getElementById('cv-root').innerHTML = html;
+    saveToCloud();
+    showView('editor-view');
+};
+
 
 window.createNewSection = () => {
     const mainContent = document.getElementById('main-content');
