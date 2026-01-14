@@ -116,7 +116,9 @@ body {
     border-color: var(--primary-color); 
 }
 .template-preview { 
-    height: 380px; 
+    /* Changed from fixed height to Aspect Ratio 210/297 (A4) to prevent fat look */
+    width: 100%;
+    aspect-ratio: 210/297; 
     background: #eee; 
     display: flex; 
     align-items: center; 
