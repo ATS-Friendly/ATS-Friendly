@@ -29,8 +29,8 @@ const auth = getAuth(app);
 const db = getFirestore(app);
 const googleProvider = new GoogleAuthProvider();
 const appId = "mono-cv-app";
-// GenAI Client Initialization
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+
+// Not: AI servisi artık sayfa yüklendiğinde değil, ihtiyaç duyulduğunda başlatılacak.
 
 let isLoginMode = true;
 let currentUser = null;
@@ -396,6 +396,9 @@ window.handleFileUpload = async (input) => {
 };
 
 async function analyzeCVWithGemini(base64Data, mimeType) {
+    // Initialize AI client only when needed to avoid page load errors
+    const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+    
     const prompt = `You are an expert CV parser. I will provide a CV file (PDF or Image). 
     Extract the following information and return it in a strict JSON format matching this schema:
     {
