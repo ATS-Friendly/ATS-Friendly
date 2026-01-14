@@ -15,29 +15,35 @@
 
     <div id="toast">Kaydedildi!</div>
 
+    <!-- Language Switcher -->
+    <div class="lang-switcher">
+        <button class="lang-btn active" onclick="setLanguage('tr')">TR</button>
+        <button class="lang-btn" onclick="setLanguage('en')">EN</button>
+    </div>
+
     <!-- 1. GİRİŞ EKRANI -->
     <section id="auth-view" class="view-section active">
         <div class="auth-card">
-            <h2 id="auth-title">Giriş Yap</h2>
+            <h2 id="auth-title" data-i18n="auth_title">Giriş Yap</h2>
             <input type="email" id="auth-email" class="auth-input" placeholder="E-posta">
             <input type="password" id="auth-password" class="auth-input" placeholder="Şifre">
             
-            <button class="auth-btn" onclick="handleAuth()">Devam Et</button>
+            <button class="auth-btn" onclick="handleAuth()" data-i18n="auth_continue">Devam Et</button>
             
             <!-- Google Butonu -->
             <button class="auth-btn google-btn" onclick="loginWithGoogle()">
                 <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#FFC107" d="M43.611 20.083H42V20H24v8h11.303c-1.649 4.657-6.08 8-11.303 8-6.627 0-12-5.373-12-12s5.373-12 12-12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4 12.955 4 4 12.955 4 24s8.955 20 20 20 20-8.955 20-20c0-1.341-.138-2.65-.389-3.917z"/><path fill="#FF3D00" d="m6.306 14.691 6.571 4.819C14.655 15.108 18.961 12 24 12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4c-7.305 0-13.782 3.914-17.694 9.691z"/><path fill="#4CAF50" d="M24 44c5.166 0 9.86-1.977 13.409-5.192l-6.19-5.238A11.91 11.91 0 0 1 24 36c-5.202 0-9.619-3.317-11.283-7.946l-6.522 5.025C10.111 38.971 16.51 44 24 44z"/><path fill="#1976D2" d="M43.611 20.083H42V20H24v8h11.303a12.04 12.04 0 0 1-4.087 5.571l.003-.002 6.19 5.238C36.971 39.205 44 34 44 24c0-1.341-.138-2.65-.389-3.917z"/></svg>
-                Google ile Giriş
+                <span data-i18n="auth_google">Google ile Giriş</span>
             </button>
             
-            <p class="auth-toggle" onclick="toggleAuthMode()" id="auth-toggle-text">Hesabın yok mu? Kayıt Ol</p>
+            <p class="auth-toggle" onclick="toggleAuthMode()" id="auth-toggle-text" data-i18n="auth_toggle_signup">Hesabın yok mu? Kayıt Ol</p>
         </div>
     </section>
 
     <!-- 2. ŞABLON SEÇİMİ -->
     <section id="template-view" class="view-section">
         <div class="template-header">
-            <h1>Profesyonel Bir Şablon Seçin</h1>
+            <h1 data-i18n="tpl_select_header">Profesyonel Bir Şablon Seçin</h1>
         </div>
         <div class="template-grid">
             <div class="template-card" onclick="selectTemplate('tpl-classic')">
@@ -45,8 +51,8 @@
                     <img src="https://cdn.prod.website-files.com/62f0854c1cef28185535ab61/65f992db51efa92ea7d033b5_Compact-1.png" alt="Klasik Şablon Önizleme">
                 </div>
                 <div class="template-info">
-                    <h3>Klasik</h3>
-                    <p>🏛️ Geleneksel & Akademik</p>
+                    <h3 data-i18n="tpl_classic">Klasik</h3>
+                    <p data-i18n="tpl_classic_desc">🏛️ Geleneksel & Akademik</p>
                 </div>
             </div>
             
@@ -55,8 +61,8 @@
                     <img src="https://imgv2-2-f.scribdassets.com/img/document/649557521/original/ce87161cab/1?v=1g" alt="Kompakt Şablon Önizleme">
                 </div>
                 <div class="template-info">
-                    <h3>Kompakt</h3>
-                    <p>📄 Minimal & Tek Sayfa</p>
+                    <h3 data-i18n="tpl_compact">Kompakt</h3>
+                    <p data-i18n="tpl_compact_desc">📄 Minimal & Tek Sayfa</p>
                 </div>
             </div>
         </div>
@@ -70,17 +76,17 @@
             
             <div id="sync-status">
                 <div id="status-dot" class="status-dot"></div>
-                <span id="status-text">Bağlanıyor...</span>
+                <span id="status-text" data-i18n="status_connecting">Bağlanıyor...</span>
             </div>
 
-            <button class="btn btn-secondary" onclick="createNewSection()">+ Bölüm Ekle</button>
-            <button class="btn btn-success" type="button" onclick="loadATSExample()">📄 Örnek CV Yükle</button>
-            <button class="btn btn-warning" onclick="backToTemplates()">🎨 Şablonu Değiştir</button>
-            <button class="btn btn-primary" onclick="window.print()">🖨️ PDF İndir</button>
-            <button class="btn btn-danger" onclick="resetAll()">🗑️ Sıfırla</button>
+            <button class="btn btn-secondary" onclick="createNewSection()" data-i18n="btn_add_section">+ Bölüm Ekle</button>
+            <button class="btn btn-success" type="button" onclick="loadATSExample()" data-i18n="btn_load_sample">📄 Örnek CV Yükle</button>
+            <button class="btn btn-warning" onclick="backToTemplates()" data-i18n="btn_change_tpl">🎨 Şablonu Değiştir</button>
+            <button class="btn btn-primary" onclick="window.print()" data-i18n="btn_download_pdf">🖨️ PDF İndir</button>
+            <button class="btn btn-danger" onclick="resetAll()" data-i18n="btn_reset">🗑️ Sıfırla</button>
             
             <div style="flex-grow: 1;"></div>
-            <button class="btn btn-danger" onclick="logout()">Çıkış Yap</button>
+            <button class="btn btn-danger" onclick="logout()" data-i18n="btn_logout">Çıkış Yap</button>
         </aside>
 
         <main>
@@ -95,25 +101,25 @@
                     </div>
 
                     <!-- COMPACT MODE ONLY -->
-                    <div class="address-line" contenteditable="true">1515 Pacific Ave, Los Angeles, CA 90291, United States</div>
+                    <div class="address-line" contenteditable="true">Açık Adresiniz, Şehir, Ülke</div>
                     
                     <div class="contact-row">
-                        <span contenteditable="true">3868683442</span>
-                        <span contenteditable="true">email@email.com</span>
+                        <span contenteditable="true">555 123 45 67</span>
+                        <span contenteditable="true">email@ornek.com</span>
                     </div>
 
                     <div class="compact-separator"></div>
 
                     <div class="personal-details">
                         <div class="detail-item">
-                            <span class="val" contenteditable="true">Doğum Yeri</span>
+                            <span class="lbl" contenteditable="true" data-cv-label="birth">Doğum Yeri</span>
                             <span class="dots"></span>
-                            <span class="val" contenteditable="true">San Antonio</span>
+                            <span class="val" contenteditable="true">İstanbul</span>
                         </div>
                         <div class="detail-item">
-                            <span class="val" contenteditable="true">Ehliyet</span>
+                            <span class="lbl" contenteditable="true" data-cv-label="license">Ehliyet</span>
                             <span class="dots"></span>
-                            <span class="val" contenteditable="true">B</span>
+                            <span class="val" contenteditable="true">B Sınıfı</span>
                         </div>
                     </div>
                 </header>

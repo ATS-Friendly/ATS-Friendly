@@ -23,6 +23,39 @@ body {
     overflow-x: hidden;
 }
 
+/* --- LANGUAGE SWITCHER --- */
+.lang-switcher {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 2000;
+    background: white;
+    padding: 5px;
+    border-radius: 30px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    display: flex;
+    gap: 5px;
+}
+.lang-btn {
+    border: none;
+    background: transparent;
+    padding: 8px 16px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-weight: 700;
+    color: #636e72;
+    font-size: 13px;
+    transition: 0.2s;
+    font-family: var(--font-ui);
+}
+.lang-btn:hover {
+    background: #f1f2f6;
+}
+.lang-btn.active {
+    background: var(--primary-color);
+    color: white;
+}
+
 /* --- VIEW MANAGEMENT --- */
 .view-section { 
     display: none; 
