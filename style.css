@@ -107,6 +107,8 @@ body {
     transition: 0.3s; 
     border: 3px solid transparent; 
     box-shadow: 0 10px 30px rgba(0,0,0,0.05); 
+    display: flex;
+    flex-direction: column;
 }
 .template-card:hover { 
     transform: translateY(-10px); 
@@ -114,18 +116,38 @@ body {
     border-color: var(--primary-color); 
 }
 .template-preview { 
-    height: 350px; 
+    height: 380px; 
     background: #eee; 
     display: flex; 
     align-items: center; 
     justify-content: center; 
-    font-weight: 700; 
-    color: #999; 
+    overflow: hidden;
+    position: relative;
+}
+.template-preview img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: top center;
+    transition: transform 0.5s ease;
+}
+.template-card:hover .template-preview img {
+    transform: scale(1.05);
 }
 .template-info { 
-    padding: 15px; 
+    padding: 20px; 
     text-align: center; 
-    font-weight: 600; 
+    border-top: 1px solid #eee;
+}
+.template-info h3 {
+    margin: 0 0 5px 0;
+    font-size: 18px;
+    color: #2d3436;
+}
+.template-info p {
+    margin: 0;
+    font-size: 13px;
+    color: #636e72;
 }
 
 /* --- EDITOR TOOLBAR (SIDEBAR) --- */

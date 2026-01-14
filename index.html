@@ -41,17 +41,38 @@
             <p>ATS uyumlu tasarımlarımızla öne çıkın.</p>
         </div>
         <div class="template-grid">
+            <!-- 
+                 NOT: Kendi ekran görüntülerinizi eklemek için src="..." kısımlarını değiştirin.
+                 Örnek: src="img/klasik.png" 
+            -->
             <div class="template-card" onclick="selectTemplate('tpl-classic')">
-                <div class="template-preview" style="background: #f8f9fa;">KLASİK</div>
-                <div class="template-info">🏛️ Geleneksel & Akademik</div>
+                <div class="template-preview">
+                    <img src="https://placehold.co/400x565/f8f9fa/2d3436?text=Klasik+Görünüm" alt="Klasik Şablon Önizleme">
+                </div>
+                <div class="template-info">
+                    <h3>Klasik</h3>
+                    <p>🏛️ Geleneksel & Akademik</p>
+                </div>
             </div>
+            
             <div class="template-card" onclick="selectTemplate('tpl-modern')">
-                <div class="template-preview" style="background: #e3f2fd; color: #1976d2;">MODERN</div>
-                <div class="template-info">🔷 Yaratıcı & Kurumsal</div>
+                <div class="template-preview">
+                    <img src="https://placehold.co/400x565/e3f2fd/1976d2?text=Modern+Görünüm" alt="Modern Şablon Önizleme">
+                </div>
+                <div class="template-info">
+                    <h3>Modern</h3>
+                    <p>🔷 Yaratıcı & Kurumsal</p>
+                </div>
             </div>
+
             <div class="template-card" onclick="selectTemplate('tpl-compact')">
-                <div class="template-preview" style="background: #fff; border: 1px solid #ddd;">KOMPAKT</div>
-                <div class="template-info">📄 Minimal & Tek Sayfa</div>
+                <div class="template-preview">
+                    <img src="https://placehold.co/400x565/ffffff/95a5a6?text=Kompakt+Görünüm" alt="Kompakt Şablon Önizleme">
+                </div>
+                <div class="template-info">
+                    <h3>Kompakt</h3>
+                    <p>📄 Minimal & Tek Sayfa</p>
+                </div>
             </div>
         </div>
     </section>
@@ -70,7 +91,7 @@
             <button class="btn btn-secondary" onclick="createNewSection()">+ Bölüm Ekle</button>
             <button class="btn btn-warning" onclick="backToTemplates()">🎨 Şablonu Değiştir</button>
             <button class="btn btn-primary" onclick="window.print()">🖨️ PDF İndir</button>
-            <button class="btn btn-dark" onclick="exportData()">⬇️ Yedek Al</button>
+            <!-- Yedek Al butonu kaldırıldı -->
             
             <div style="flex-grow: 1;"></div>
             <button class="btn btn-danger" onclick="logout()">Çıkış Yap</button>

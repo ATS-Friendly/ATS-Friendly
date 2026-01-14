@@ -202,16 +202,6 @@ function updateStatus(state) {
     }
 }
 
-// --- DIŞA AKTARMA & YEDEKLEME ---
-window.exportData = () => {
-    const content = document.getElementById('cv-root').innerHTML;
-    const blob = new Blob([JSON.stringify({html: content, template: document.body.className})], {type: "application/json"});
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = `monocv-yedek.json`;
-    a.click();
-};
-
 window.resetAll = () => {
     if(confirm("Tüm verileriniz silinecek. Emin misiniz?")) {
         localStorage.clear();
