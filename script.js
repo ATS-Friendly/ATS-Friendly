@@ -88,7 +88,7 @@ const translations = {
         btn_add_job: "İş Ekle",
         btn_add_edu: "Okul Ekle",
         btn_generate: "CV OLUŞTUR ✨",
-        btn_skip: "Atla ve Düzenleyiciye Git",
+        btn_skip: "Mevcut İçeriği Koru (Atla)",
         lbl_job_title: "Pozisyon Adı",
         lbl_company: "Şirket",
         lbl_date: "Tarih (Örn: 2020 - 2022)",
@@ -143,7 +143,7 @@ const translations = {
         btn_add_job: "Add Job",
         btn_add_edu: "Add Education",
         btn_generate: "GENERATE CV ✨",
-        btn_skip: "Skip to Editor",
+        btn_skip: "Keep Existing Content (Skip)",
         lbl_job_title: "Job Title",
         lbl_company: "Company",
         lbl_date: "Date (e.g., 2020 - 2022)",
@@ -337,14 +337,9 @@ onAuthStateChanged(auth, async (user) => {
 // --- ŞABLON VE EDİTÖR MANTIĞI ---
 window.selectTemplate = (tpl) => {
     document.body.className = tpl;
-    // New Flow: Check if user has existing content, if not, go to Onboarding
-    const currentContent = document.getElementById('cv-root').innerHTML.trim();
-    if (!currentContent) {
-        showView('onboarding-view');
-    } else {
-        showView('editor-view');
-        saveToCloud();
-    }
+    // CRITICAL FIX: Always show onboarding view first!
+    // The user can choose to skip it if they want to keep existing data.
+    showView('onboarding-view');
 };
 
 window.backToTemplates = () => {
@@ -410,8 +405,13 @@ window.addFormEducation = () => {
 };
 
 window.skipToEditor = () => {
-    resetAll(true); // Load default placeholder content
+    const currentContent = document.getElementById('cv-root').innerHTML.trim();
+    // Only reset if truly empty
+    if (!currentContent) {
+        resetAll(true); 
+    }
     showView('editor-view');
+    saveToCloud();
 };
 
 window.generateCVFromForm = () => {
