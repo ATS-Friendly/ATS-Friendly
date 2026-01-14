@@ -246,15 +246,17 @@ body {
     border-bottom: 1px solid rgba(255,255,255,0.05);
 }
 .brand-logo {
-    width: 36px; height: 36px;
+    min-width: 36px;
+    height: 36px;
     background: linear-gradient(135deg, #3498db, #8e44ad);
     color: white;
     font-weight: 800;
-    font-size: 20px;
+    font-size: 18px;
     display: flex;
     align-items: center;
     justify-content: center;
     border-radius: 8px;
+    padding: 0 4px;
 }
 .brand-text {
     font-size: 18px;
