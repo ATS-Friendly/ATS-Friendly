@@ -36,7 +36,7 @@ let currentLang = 'tr';
 // Theme Defaults
 let currentTheme = {
     color: '#2c3e50',
-    font: 'serif' // 'serif' or 'sans'
+    font: 'ptserif' 
 };
 
 // --- DİL YÖNETİMİ (LOCALIZATION) ---
@@ -162,7 +162,20 @@ window.applyColor = (color) => {
 
 window.applyFont = (fontType) => {
     currentTheme.font = fontType;
-    const fontVal = fontType === 'serif' ? "'PT Serif', serif" : "'Open Sans', sans-serif";
+    let fontVal = "'PT Serif', serif";
+    
+    switch(fontType) {
+        case 'roboto': fontVal = "'Roboto', sans-serif"; break;
+        case 'opensans': fontVal = "'Open Sans', sans-serif"; break;
+        case 'montserrat': fontVal = "'Montserrat', sans-serif"; break;
+        case 'lato': fontVal = "'Lato', sans-serif"; break;
+        case 'raleway': fontVal = "'Raleway', sans-serif"; break;
+        case 'playfair': fontVal = "'Playfair Display', serif"; break;
+        case 'lora': fontVal = "'Lora', serif"; break;
+        case 'merriweather': fontVal = "'Merriweather', serif"; break;
+        case 'ptserif': default: fontVal = "'PT Serif', serif"; break;
+    }
+
     document.documentElement.style.setProperty('--font-cv', fontVal);
 };
 

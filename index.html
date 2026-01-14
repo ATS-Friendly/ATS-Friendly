@@ -6,7 +6,9 @@
     <title>MonoCV | Profesyonel Bulut CV Oluşturucu</title>
     
     <!-- Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=PT+Serif:ital,wght@0,400;0,700;1,400;1,700&family=Merriweather:wght@300;400;700&family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&family=Lora:ital,wght@0,400;0,700;1,400&family=Merriweather:wght@300;400;700&family=Montserrat:wght@400;600;700&family=Open+Sans:wght@400;600;700&family=PT+Serif:ital,wght@0,400;0,700;1,400&family=Playfair+Display:wght@400;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Raleway:wght@400;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     
     <!-- CSS Link -->
     <link rel="stylesheet" href="style.css">
@@ -38,17 +40,22 @@
                         <button class="color-btn" style="background-color: #c0392b;" onclick="applyColor('#c0392b')" title="Crimson Red"></button>
                         <button class="color-btn" style="background-color: #8e44ad;" onclick="applyColor('#8e44ad')" title="Royal Purple"></button>
                         <button class="color-btn" style="background-color: #000000;" onclick="applyColor('#000000')" title="Elegant Black"></button>
+                        <button class="color-btn" style="background-color: #d35400;" onclick="applyColor('#d35400')" title="Pumpkin Orange"></button>
+                        <button class="color-btn" style="background-color: #7f8c8d;" onclick="applyColor('#7f8c8d')" title="Concrete Grey"></button>
                     </div>
                 </div>
                 <div class="setting-group">
                     <label data-i18n="lbl_font">Yazı Tipi</label>
-                    <div class="font-options">
-                        <button class="font-btn serif" onclick="applyFont('serif')">
-                            <span class="font-preview">Ag</span> Serif (Klasik)
-                        </button>
-                        <button class="font-btn sans" onclick="applyFont('sans')">
-                            <span class="font-preview">Ag</span> Sans (Modern)
-                        </button>
+                    <div class="font-options-grid">
+                        <button class="font-btn" style="font-family: 'Roboto', sans-serif;" onclick="applyFont('roboto')">Roboto</button>
+                        <button class="font-btn" style="font-family: 'Open Sans', sans-serif;" onclick="applyFont('opensans')">Open Sans</button>
+                        <button class="font-btn" style="font-family: 'Montserrat', sans-serif;" onclick="applyFont('montserrat')">Montserrat</button>
+                        <button class="font-btn" style="font-family: 'Lato', sans-serif;" onclick="applyFont('lato')">Lato</button>
+                        <button class="font-btn" style="font-family: 'Raleway', sans-serif;" onclick="applyFont('raleway')">Raleway</button>
+                        <button class="font-btn" style="font-family: 'PT Serif', serif;" onclick="applyFont('ptserif')">PT Serif</button>
+                        <button class="font-btn" style="font-family: 'Playfair Display', serif;" onclick="applyFont('playfair')">Playfair</button>
+                        <button class="font-btn" style="font-family: 'Lora', serif;" onclick="applyFont('lora')">Lora</button>
+                        <button class="font-btn" style="font-family: 'Merriweather', serif;" onclick="applyFont('merriweather')">Merriweather</button>
                     </div>
                 </div>
             </div>
