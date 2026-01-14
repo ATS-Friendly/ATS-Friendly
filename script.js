@@ -206,10 +206,28 @@ window.resetAll = async () => {
     if(confirm("DİKKAT: CV içeriğiniz tamamen silinecek ve başlangıç haline dönecektir. Bu işlem geri alınamaz. Devam etmek istiyor musunuz?")) {
         const defaultContent = `
         <header>
-            <h1 contenteditable="true">ADINIZ SOYADINIZ</h1>
-            <div class="subtitle" contenteditable="true">Unvanınız</div>
-            <div class="contact-info" contenteditable="true">
-                <span>📍 Şehir, Ülke</span> | <span>📞 Telefon</span> | <span>✉️ E-posta</span>
+            <h1 contenteditable="true">LAYNEY SPENCER</h1>
+            <div class="subtitle" contenteditable="true">Assistant Director</div>
+            <div class="address-line" contenteditable="true">1515 Pacific Ave, Los Angeles, CA 90291, United States</div>
+            
+            <div class="contact-row">
+                <span contenteditable="true">3868683442</span>
+                <span contenteditable="true">email@email.com</span>
+            </div>
+
+            <div class="compact-separator"></div>
+
+            <div class="personal-details">
+                <div class="detail-item">
+                    <span class="lbl">Place of birth</span>
+                    <span class="dots"></span>
+                    <span class="val" contenteditable="true">San Antonio</span>
+                </div>
+                <div class="detail-item">
+                    <span class="lbl">Driving license</span>
+                    <span class="dots"></span>
+                    <span class="val" contenteditable="true">Full</span>
+                </div>
             </div>
         </header>
         <div id="main-content">
@@ -219,15 +237,30 @@ window.resetAll = async () => {
                     <button class="action-btn" onclick="moveDown(this)" title="Aşağı">▼</button>
                     <button class="action-btn delete" onclick="removeSection(this)" title="Sil">🗑️</button>
                 </div>
-                <div class="section-header"><span class="section-title" contenteditable="true">ÖZET</span></div>
-                <div class="content-list">
-                    <div class="entry">
-                        <button class="btn-delete-item" onclick="removeEntry(this)">×</button>
-                        <div class="left-col" contenteditable="true">Tarih Aralığı</div>
-                        <div class="right-col"><h3 contenteditable="true">Başlık</h3><p contenteditable="true">Detaylar...</p></div>
+                <div class="section-header"><span class="section-title" contenteditable="true">PROFILE</span></div>
+                <div class="entry">
+                     <button class="btn-delete-item" onclick="removeEntry(this)">×</button>
+                    <div class="right-col" contenteditable="true">
+                        Astute Assistant Director with over 14 years of experience dealing with complex macro issues that have threatened the company's profitability.
                     </div>
                 </div>
-                <div class="add-item-container"><button class="btn-add-item" onclick="addEntry(this)">+ Ekle</button></div>
+            </div>
+
+            <div class="section">
+                <div class="section-actions">
+                    <button class="action-btn" onclick="moveUp(this)" title="Yukarı">▲</button>
+                    <button class="action-btn" onclick="moveDown(this)" title="Aşağı">▼</button>
+                    <button class="action-btn delete" onclick="removeSection(this)" title="Sil">🗑️</button>
+                </div>
+                <div class="section-header"><span class="section-title" contenteditable="true">EMPLOYMENT HISTORY</span></div>
+                <div class="entry">
+                     <button class="btn-delete-item" onclick="removeEntry(this)">×</button>
+                    <div class="left-col" contenteditable="true">Jan 2019 — May 2021</div>
+                    <div class="right-col">
+                        <h3 contenteditable="true">Assistant Director, John Ward Emergency Facility</h3>
+                        <p contenteditable="true">Supported the successful transition from T-System EMR to Meditech EMR.</p>
+                    </div>
+                </div>
             </div>
         </div>`;
         

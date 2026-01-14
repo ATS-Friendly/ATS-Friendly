@@ -266,8 +266,14 @@ body {
     line-height: 1.6; 
 }
 
+/* Default Header (Classic) */
 header { text-align: center; margin-bottom: 30px; border-bottom: 2px solid #2d3436; padding-bottom: 25px; }
 h1 { text-transform: uppercase; letter-spacing: 3px; font-size: 32px; font-weight: 700; margin: 0; }
+
+/* Hide Compact-Specific Elements in Classic Mode */
+.contact-row, .compact-separator, .personal-details, .address-line {
+    display: none;
+}
 
 /* --- SECTIONS & PROFESSIONAL CONTROLS --- */
 .section {
@@ -434,28 +440,80 @@ body.tpl-compact header {
     border-bottom: none; 
     margin-bottom: 20px; 
     padding-bottom: 0;
+    text-align: center;
 }
+body.tpl-compact .contact-info { display: none; } /* Hide classic contact row */
+
 body.tpl-compact h1 { 
     font-size: 28px; 
     letter-spacing: 2px; 
-    margin-bottom: 5px; 
+    margin-bottom: 8px; 
     color: #000;
 }
 body.tpl-compact .subtitle { 
     font-size: 14px; 
-    font-style: italic; 
-    margin-bottom: 10px;
-    color: #444;
+    font-weight: 700;
+    color: #222;
+    margin-bottom: 8px;
 }
-body.tpl-compact .contact-info { 
-    font-size: 11px; 
-    color: #000; 
-    border-top: 1px solid #000; 
-    border-bottom: 1px solid #000; 
-    padding: 6px 0; 
-    margin-top: 10px;
-    display: inline-block;
-    width: 100%;
+body.tpl-compact .address-line {
+    display: block;
+    font-size: 14px;
+    color: #222;
+    margin-bottom: 20px;
+}
+
+/* Contact Row: Phone Left, Email Right */
+body.tpl-compact .contact-row {
+    display: flex;
+    justify-content: space-between;
+    font-weight: 700;
+    font-size: 14px;
+    color: #222;
+    margin-bottom: 5px;
+}
+
+/* Double Line Separator */
+body.tpl-compact .compact-separator {
+    display: block;
+    height: 4px;
+    border-top: 2px solid #000;
+    border-bottom: 1px solid #000;
+    margin-bottom: 15px;
+}
+
+/* Personal Details: Dotted Leaders */
+body.tpl-compact .personal-details {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 30px;
+    margin-bottom: 25px;
+    justify-content: space-between;
+}
+body.tpl-compact .detail-item {
+    display: flex;
+    align-items: baseline;
+    width: 45%;
+    font-size: 14px;
+    font-style: italic;
+    color: #222;
+}
+body.tpl-compact .detail-item .lbl {
+    flex-shrink: 0;
+    color: #555;
+    font-style: normal;
+}
+body.tpl-compact .detail-item .val {
+    flex-shrink: 0;
+    font-weight: 700;
+    font-style: italic;
+}
+body.tpl-compact .detail-item .dots {
+    flex-grow: 1;
+    border-bottom: 1px dotted #999;
+    margin: 0 5px;
+    position: relative;
+    top: -4px;
 }
 
 /* Compact Sections */
@@ -466,20 +524,21 @@ body.tpl-compact .section-header {
     justify-content: center; 
     margin: 25px 0 15px 0; 
     text-align: center;
+    background: #f4f4f4; /* Subtle background strip */
+    border-top: 1px solid #ccc;
+    border-bottom: 1px solid #ccc;
+    padding: 6px 0;
 }
 body.tpl-compact .section-header::before,
 body.tpl-compact .section-header::after {
-    content: ""; 
-    flex: 1; 
-    border-bottom: 1px solid #000; 
-    margin: 0 15px; 
-    opacity: 0.3;
+    display: none; /* Remove side lines from previous iteration */
 }
 body.tpl-compact .section-title { 
-    font-size: 13px; 
+    font-size: 14px; 
     font-weight: 700; 
-    letter-spacing: 1.5px; 
+    letter-spacing: 2px; 
     color: #000;
+    background: transparent;
 }
 
 /* Compact Entries (Single Line Title/Date) */
