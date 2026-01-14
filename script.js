@@ -33,6 +33,11 @@ let isLoginMode = true;
 let currentUser = null;
 let isSyncing = false;
 let currentLang = 'tr';
+// Theme Defaults
+let currentTheme = {
+    color: '#2c3e50',
+    font: 'serif' // 'serif' or 'sans'
+};
 
 // --- DİL YÖNETİMİ (LOCALIZATION) ---
 const translations = {
@@ -49,6 +54,7 @@ const translations = {
         tpl_compact_desc: "📄 Minimal & Tek Sayfa",
         btn_add_section: "+ Bölüm Ekle",
         btn_load_sample: "📄 Örnek CV Yükle",
+        btn_design: "🎨 Tasarım",
         btn_change_tpl: "🎨 Şablonu Değiştir",
         btn_download_pdf: "🖨️ PDF İndir",
         btn_reset: "🗑️ Sıfırla",
@@ -62,7 +68,11 @@ const translations = {
         confirm_reset: "DİKKAT: CV içeriğiniz tamamen silinecek ve seçili dilde (Türkçe) başlangıç haline dönecektir. Devam etmek istiyor musunuz?",
         confirm_sample: "Mevcut CV içeriği silinip seçili dilde (Türkçe) örnek içerik yüklenecek. Onaylıyor musunuz?",
         toast_reset: "CV başarıyla sıfırlandı.",
-        toast_sample: "Örnek CV yüklendi!"
+        toast_sample: "Örnek CV yüklendi!",
+        modal_theme_title: "Tasarım Ayarları",
+        lbl_color: "Vurgu Rengi",
+        lbl_font: "Yazı Tipi",
+        btn_save_close: "Kaydet & Kapat"
     },
     en: {
         auth_title: "Login",
@@ -77,6 +87,7 @@ const translations = {
         tpl_compact_desc: "📄 Minimal & Single Page",
         btn_add_section: "+ Add Section",
         btn_load_sample: "📄 Load Sample CV",
+        btn_design: "🎨 Design",
         btn_change_tpl: "🎨 Change Template",
         btn_download_pdf: "🖨️ Download PDF",
         btn_reset: "🗑️ Reset",
@@ -90,7 +101,11 @@ const translations = {
         confirm_reset: "WARNING: Your CV content will be erased and reset to the default in English. Do you want to continue?",
         confirm_sample: "Current CV content will be replaced with English sample content. Do you confirm?",
         toast_reset: "CV successfully reset.",
-        toast_sample: "Sample CV loaded!"
+        toast_sample: "Sample CV loaded!",
+        modal_theme_title: "Design Settings",
+        lbl_color: "Accent Color",
+        lbl_font: "Font Family",
+        btn_save_close: "Save & Close"
     }
 };
 
@@ -130,9 +145,29 @@ function showView(viewId) {
     if (target) target.classList.add('active');
 }
 
+// --- TEMA YÖNETİMİ ---
+window.openThemeModal = () => {
+    document.getElementById('theme-modal').classList.add('active');
+};
+
+window.closeThemeModal = () => {
+    document.getElementById('theme-modal').classList.remove('active');
+    saveToCloud(); // Modal kapanırken kaydet
+};
+
+window.applyColor = (color) => {
+    currentTheme.color = color;
+    document.documentElement.style.setProperty('--cv-accent-color', color);
+};
+
+window.applyFont = (fontType) => {
+    currentTheme.font = fontType;
+    const fontVal = fontType === 'serif' ? "'PT Serif', serif" : "'Open Sans', sans-serif";
+    document.documentElement.style.setProperty('--font-cv', fontVal);
+};
+
 // --- KİMLİK DOĞRULAMA (AUTH) ---
 
-// Google ile Giriş Yapma Fonksiyonu
 window.loginWithGoogle = async () => {
     try {
         updateStatus('syncing'); 
@@ -146,8 +181,7 @@ window.loginWithGoogle = async () => {
 window.toggleAuthMode = () => {
     isLoginMode = !isLoginMode;
     const t = translations[currentLang];
-    document.getElementById('auth-title').innerText = isLoginMode ? t.auth_title : "Kayıt Ol"; // Basitlik için hardcoded title fallback
-    // Dil fonksiyonu auth text'i günceller
+    document.getElementById('auth-title').innerText = isLoginMode ? t.auth_title : "Kayıt Ol";
     window.setLanguage(currentLang);
 };
 
@@ -177,8 +211,17 @@ onAuthStateChanged(auth, async (user) => {
         const snap = await getDoc(docRef);
         
         if (snap.exists()) {
-            document.getElementById('cv-root').innerHTML = snap.data().html;
-            document.body.className = snap.data().template || '';
+            const data = snap.data();
+            document.getElementById('cv-root').innerHTML = data.html;
+            document.body.className = data.template || '';
+            
+            // Temayı Yükle
+            if (data.theme) {
+                currentTheme = data.theme;
+                window.applyColor(currentTheme.color);
+                window.applyFont(currentTheme.font);
+            }
+            
             showView('editor-view');
             updateStatus('online');
         } else {
@@ -205,7 +248,6 @@ window.createNewSection = () => {
     const mainContent = document.getElementById('main-content');
     const newSection = document.createElement('div');
     newSection.className = 'section';
-    // Varsayılan dil içerik
     const title = currentLang === 'tr' ? "YENİ BÖLÜM" : "NEW SECTION";
     const date = currentLang === 'tr' ? "Tarih Aralığı" : "Date Range";
     const head = currentLang === 'tr' ? "Başlık" : "Title";
@@ -266,6 +308,7 @@ async function saveToCloud() {
         await setDoc(docRef, { 
             html: content, 
             template: tpl,
+            theme: currentTheme, // Temayı da kaydet
             updatedAt: new Date().toISOString() 
         }, { merge: true });
         updateStatus('online');
