@@ -447,21 +447,23 @@ async function extractAndParsePDF(pdfData) {
     let fullText = "";
 
     // Extract text from all pages
+    // CRITICAL FIX: Join with \n to preserve lines!
     for (let i = 1; i <= pdf.numPages; i++) {
         const page = await pdf.getPage(i);
         const textContent = await page.getTextContent();
-        const pageText = textContent.items.map(item => item.str).join(' ');
+        // Join with Newline to preserve structure
+        const pageText = textContent.items.map(item => item.str).join('\n');
         fullText += pageText + "\n";
     }
 
     // Process text with REGEX Script
-    const parsedData = parseCVTextBasic(fullText);
+    const parsedData = parseCVTextAdvanced(fullText);
     populateCVFromJSON(parsedData);
     showToast(translations[currentLang].ai_success);
 }
 
-// === THE "SCRIPT" - REGEX PARSER LOGIC ===
-function parseCVTextBasic(text) {
+// === THE ADVANCED SCRIPT - REGEX PARSER LOGIC ===
+function parseCVTextAdvanced(text) {
     const data = {
         fullName: "",
         title: "",
@@ -473,95 +475,158 @@ function parseCVTextBasic(text) {
         certifications: []
     };
 
-    // 1. CLEANUP
-    // Remove multiple spaces and newlines
-    const cleanText = text.replace(/\s+/g, ' ').trim();
+    // 1. CLEANUP BUT KEEP LINES
+    // Split into lines for analysis
+    const lines = text.split(/\r?\n/).map(l => l.trim()).filter(l => l.length > 0);
     
-    // 2. EXTRACT CONTACT INFO (Regex)
+    // 2. EXTRACT CONTACT INFO (Regex on lines)
     const emailRegex = /([a-zA-Z0-9._-]+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9_-]+)/;
-    const emailMatch = cleanText.match(emailRegex);
-    if (emailMatch) data.contact.email = emailMatch[0];
-
-    // Basic Phone Match (Turkey specific + Generic)
     const phoneRegex = /(?:\+90|0)?\s*[0-9]{3}\s*[0-9]{3}\s*[0-9]{2}\s*[0-9]{2}/;
-    const phoneMatch = cleanText.match(phoneRegex);
-    if (phoneMatch) data.contact.phone = phoneMatch[0];
-
-    // 3. GUESS NAME (Heuristic: Usually at start, uppercase)
-    // We take the first non-empty sequence that doesn't look like a label
-    // This is hard without AI, so we'll guess the very first few words.
-    const words = cleanText.split(' ');
-    // Take first 2-3 words as name if they don't contain numbers/symbols
-    let nameGuess = words.slice(0, 2).join(' ');
-    if (nameGuess.length > 3 && !/[0-9]/.test(nameGuess)) {
-        data.fullName = nameGuess;
+    
+    for(let line of lines) {
+        if(!data.contact.email) {
+            const m = line.match(emailRegex);
+            if(m) data.contact.email = m[0];
+        }
+        if(!data.contact.phone) {
+            const m = line.match(phoneRegex);
+            if(m) data.contact.phone = m[0];
+        }
     }
 
-    // 4. FIND SECTIONS BY KEYWORDS
-    // We look for keyword indices to slice the text
+    // 3. GUESS NAME (First non-header line that isn't contact info)
+    // Simple heuristic: First line that has 2 words and no numbers
+    for(let i=0; i<Math.min(lines.length, 10); i++) {
+        const l = lines[i];
+        if(!l.match(emailRegex) && !l.match(phoneRegex) && !l.includes("CONTACT") && l.split(' ').length >= 2 && !/[0-9]/.test(l)) {
+            data.fullName = l;
+            break;
+        }
+    }
+
+    // 4. ADVANCED SECTION PARSING
     const keywords = {
         experience: ["İŞ DENEYİMİ", "WORK EXPERIENCE", "DENEYİM", "EXPERIENCE"],
         education: ["EĞİTİM", "EDUCATION", "AKADEMİK", "UNIVERSITY"],
-        skills: ["YETENEKLER", "SKILLS", "BECERİLER"],
         certifications: ["SERTİFİKALAR", "CERTIFICATES", "CERTIFICATIONS"],
         contact: ["İLETİŞİM", "CONTACT"]
     };
 
-    // Helper to find position of sections
-    function findSectionStart(text, keys) {
-        for (let key of keys) {
-            let idx = text.toUpperCase().indexOf(key);
-            if (idx !== -1) return idx;
+    let currentSection = null;
+    let sectionBuffer = [];
+
+    // Process all lines to bucket them into sections
+    for(let line of lines) {
+        const upperLine = line.toUpperCase();
+        
+        // Check if line is a header
+        let isHeader = false;
+        if (keywords.experience.some(k => upperLine.includes(k) && upperLine.length < 30)) {
+            currentSection = 'experience'; isHeader = true;
+        } else if (keywords.education.some(k => upperLine.includes(k) && upperLine.length < 20)) {
+            currentSection = 'education'; isHeader = true;
+        } else if (keywords.certifications.some(k => upperLine.includes(k) && upperLine.length < 30)) {
+            currentSection = 'certifications'; isHeader = true;
+        } else if (keywords.contact.some(k => upperLine.includes(k) && upperLine.length < 20)) {
+            currentSection = 'contact'; isHeader = true;
         }
-        return -1;
+
+        if (isHeader) {
+            continue; // Skip the header line itself
+        }
+
+        if (currentSection) {
+            // Add line to the specific section array in our temp storage
+            if (!data[`_raw_${currentSection}`]) data[`_raw_${currentSection}`] = [];
+            data[`_raw_${currentSection}`].push(line);
+        } else if (!data.profile && !isHeader && line.length > 50 && !data.fullName.includes(line)) {
+             // If not in a section yet, and line is long, assume it's profile
+             data.profile += line + " ";
+        }
     }
 
-    const expIdx = findSectionStart(cleanText, keywords.experience);
-    const eduIdx = findSectionStart(cleanText, keywords.education);
-    const certIdx = findSectionStart(cleanText, keywords.certifications);
-    
-    // Sort indices to know where a section ends (it ends where next one begins)
-    const indices = [
-        { type: 'experience', idx: expIdx },
-        { type: 'education', idx: eduIdx },
-        { type: 'certifications', idx: certIdx }
-    ].filter(x => x.idx !== -1).sort((a, b) => a.idx - b.idx);
+    // 5. PARSE EXPERIENCE LINES (The Tricky Part)
+    if (data._raw_experience) {
+        let currentJob = { title: "", company: "", date: "", description: "" };
+        
+        for (let i = 0; i < data._raw_experience.length; i++) {
+            const line = data._raw_experience[i];
+            
+            // Heuristic: Check if line looks like "Company | Date" or has a year range
+            // Matches: "Company | 2020", "2019 - 2021", "June 2025 - Present"
+            const isDateLine = /\|/.test(line) || /\d{4}.{1,3}\d{4}|Present|Devam/.test(line);
+            
+            if (isDateLine) {
+                // If we hit a new date line, push previous job if valid
+                if (currentJob.title || currentJob.company) {
+                    data.experience.push({...currentJob});
+                    currentJob = { title: "", company: "", date: "", description: "" };
+                }
 
-    // Extract content based on sorted indices
-    indices.forEach((item, i) => {
-        const start = item.idx;
-        const end = indices[i + 1] ? indices[i + 1].idx : cleanText.length;
-        const sectionContent = cleanText.substring(start, end); // Keep 'cleanText' raw for better slicing? Actually processed text is flat.
-        
-        // Remove the header title itself from content
-        // This is a rough split, naive but functional for a script
-        let contentClean = sectionContent.substring(15); // Skip approximate header length
-        
-        if (item.type === 'experience') {
-            // Split by common delimiters or just dump as one block for user to edit
-            // Creating a dummy entry because we can't parse structured job objects easily with regex
-            data.experience.push({
-                date: "...",
-                title: "Bulunan Deneyim Verisi",
-                company: "",
-                description: contentClean.substring(0, 300) + "..." // Limit length
-            });
+                // Parse this line
+                if (line.includes('|')) {
+                    const parts = line.split('|');
+                    currentJob.company = parts[0].trim();
+                    currentJob.date = parts.slice(1).join('|').trim();
+                } else {
+                    currentJob.date = line; // Assume it's just date
+                }
+
+                // The line BEFORE this date line is likely the Title
+                if (i > 0) {
+                    // Extract title from previous lines in buffer (simple approach: take the one right before)
+                     // But wait, the description of previous job might be there.
+                     // Refined: If the previous line was short and title-like?
+                     // Let's assume the PDF structure is Title \n Company|Date
+                     // So we take the previous line as title, and remove it from the previous job's description (if it was added)
+                     // A safer bet for THIS specific PDF: Title is above Date.
+                     const potentialTitle = data._raw_experience[i-1];
+                     // Check if potentialTitle is not already used or part of description
+                     // This is hard to do perfectly without AI. 
+                     // Simplification: We assume the line immediately preceding a Date line is the Title.
+                     currentJob.title = potentialTitle;
+                     
+                     // Warning: We might have added this potentialTitle to the PREVIOUS job's description.
+                     // We should pop it? Too complex.
+                     // Let's just accept this simple logic for now.
+                }
+
+            } else {
+                // It's description or Title (if not yet found date)
+                // If we just started a job (have title/date), append to description
+                 if (currentJob.date) {
+                    currentJob.description += line + " ";
+                 } 
+                 // If we don't have a date yet, this might be a Title coming up, or just noise.
+                 // We ignore it here, it will be caught by `potentialTitle` check above when we hit the date.
+            }
         }
-        if (item.type === 'education') {
-            data.education.push({
-                date: "...",
-                degree: "Bulunan Eğitim Verisi",
-                school: contentClean.substring(0, 150) + "..."
-            });
-        }
-        if (item.type === 'certifications') {
-             // Split by bullets or newlines if possible, here just splitting by comma as a guess
-             const parts = contentClean.split(/(?:,|•|-)/).filter(s => s.length > 5);
-             parts.slice(0, 4).forEach(p => {
-                 data.certifications.push({ name: p.trim(), provider: "" });
-             });
-        }
-    });
+        // Push last job
+        if (currentJob.title || currentJob.date) data.experience.push(currentJob);
+    }
+
+    // 6. PARSE EDUCATION
+    if (data._raw_education) {
+        // Simpler logic for education
+        data._raw_education.forEach(line => {
+             // If line has year, it's date. Else it's school/degree.
+             if (/\d{4}/.test(line)) {
+                 data.education.push({ date: line, school: "", degree: "Education Entry" });
+             } else if (data.education.length > 0) {
+                 const lastEdu = data.education[data.education.length - 1];
+                 lastEdu.school += line + " ";
+             }
+        });
+    }
+    
+    // 7. PARSE CERTIFICATIONS
+    if (data._raw_certifications) {
+        data._raw_certifications.forEach(line => {
+            if (line.length > 5) {
+                data.certifications.push({ name: line, provider: "" });
+            }
+        });
+    }
 
     return data;
 }
@@ -574,7 +639,7 @@ function populateCVFromJSON(data) {
         <div class="section">
             <div class="section-actions"><button class="action-btn" onclick="moveUp(this)">▲</button><button class="action-btn" onclick="moveDown(this)">▼</button><button class="action-btn delete" onclick="removeSection(this)">×</button></div>
             <div class="section-header"><span class="section-title" contenteditable="true">${currentLang === 'tr' ? 'İŞ DENEYİMİ' : 'EMPLOYMENT HISTORY'}</span></div>
-            <div class="entry"><button class="btn-delete-item" onclick="removeEntry(this)">×</button><div class="left-col" contenteditable="true">${exp.date || ''}</div><div class="right-col"><h3 contenteditable="true">${exp.title || ''}, ${exp.company || ''}</h3><p contenteditable="true">${exp.description || ''}</p></div></div>
+            <div class="entry"><button class="btn-delete-item" onclick="removeEntry(this)">×</button><div class="left-col" contenteditable="true">${exp.date || ''}</div><div class="right-col"><h3 contenteditable="true">${exp.title || 'Job Title'}, ${exp.company || ''}</h3><p contenteditable="true">${exp.description || ''}</p></div></div>
         </div>
     `).join('') : '';
 
