@@ -202,10 +202,38 @@ function updateStatus(state) {
     }
 }
 
-window.resetAll = () => {
-    if(confirm("Tüm verileriniz silinecek. Emin misiniz?")) {
-        localStorage.clear();
-        location.reload();
+window.resetAll = async () => {
+    if(confirm("DİKKAT: CV içeriğiniz tamamen silinecek ve başlangıç haline dönecektir. Bu işlem geri alınamaz. Devam etmek istiyor musunuz?")) {
+        const defaultContent = `
+        <header>
+            <h1 contenteditable="true">ADINIZ SOYADINIZ</h1>
+            <div class="subtitle" contenteditable="true">Unvanınız</div>
+            <div class="contact-info" contenteditable="true">
+                <span>📍 Şehir, Ülke</span> | <span>📞 Telefon</span> | <span>✉️ E-posta</span>
+            </div>
+        </header>
+        <div id="main-content">
+            <div class="section">
+                <div class="section-actions">
+                    <button class="action-btn" onclick="moveUp(this)" title="Yukarı">▲</button>
+                    <button class="action-btn" onclick="moveDown(this)" title="Aşağı">▼</button>
+                    <button class="action-btn delete" onclick="removeSection(this)" title="Sil">🗑️</button>
+                </div>
+                <div class="section-header"><span class="section-title" contenteditable="true">ÖZET</span></div>
+                <div class="content-list">
+                    <div class="entry">
+                        <button class="btn-delete-item" onclick="removeEntry(this)">×</button>
+                        <div class="left-col" contenteditable="true">Tarih Aralığı</div>
+                        <div class="right-col"><h3 contenteditable="true">Başlık</h3><p contenteditable="true">Detaylar...</p></div>
+                    </div>
+                </div>
+                <div class="add-item-container"><button class="btn-add-item" onclick="addEntry(this)">+ Ekle</button></div>
+            </div>
+        </div>`;
+        
+        document.getElementById('cv-root').innerHTML = defaultContent;
+        await saveToCloud();
+        showToast("CV başarıyla sıfırlandı.");
     }
 };
 

@@ -421,20 +421,6 @@ h1 { text-transform: uppercase; letter-spacing: 3px; font-size: 32px; font-weigh
 
 /* --- TEMPLATE THEMES --- */
 
-/* 1. MODERN THEME */
-body.tpl-modern .page { 
-    border-top: 15px solid var(--primary-color); 
-}
-body.tpl-modern h1 { 
-    color: var(--primary-color); 
-}
-body.tpl-modern .section-header {
-    border-color: var(--primary-color);
-}
-body.tpl-modern .section-title {
-    color: var(--primary-color);
-}
-
 /* 2. COMPACT THEME (Redesigned) */
 body.tpl-compact .page { 
     padding: 15mm 20mm; 
