@@ -77,6 +77,7 @@ const translations = {
         form_profile: "Profil Özeti",
         form_experience: "İş Deneyimi",
         form_education: "Eğitim",
+        form_custom: "Özel Bölümler",
         form_lbl_fullname: "Ad Soyad",
         form_lbl_title: "Unvan",
         form_lbl_email: "E-posta",
@@ -84,12 +85,15 @@ const translations = {
         form_lbl_address: "Adres",
         btn_add_job: "İş Ekle",
         btn_add_edu: "Okul Ekle",
+        btn_add_custom: "Bölüm Ekle",
         lbl_job_title: "Pozisyon Adı",
         lbl_company: "Şirket",
         lbl_date: "Tarih",
         lbl_desc: "Açıklama",
         lbl_school: "Okul / Üniversite",
-        lbl_degree: "Bölüm / Derece"
+        lbl_degree: "Bölüm / Derece",
+        lbl_section_title: "Bölüm Başlığı",
+        lbl_section_content: "İçerik / Açıklama"
     },
     en: {
         auth_title: "Login",
@@ -127,6 +131,7 @@ const translations = {
         form_profile: "Professional Summary",
         form_experience: "Work Experience",
         form_education: "Education",
+        form_custom: "Custom Sections",
         form_lbl_fullname: "Full Name",
         form_lbl_title: "Job Title",
         form_lbl_email: "Email",
@@ -134,12 +139,15 @@ const translations = {
         form_lbl_address: "Address",
         btn_add_job: "Add Job",
         btn_add_edu: "Add Education",
+        btn_add_custom: "Add Section",
         lbl_job_title: "Job Title",
         lbl_company: "Company",
         lbl_date: "Date",
         lbl_desc: "Description",
         lbl_school: "School / University",
-        lbl_degree: "Degree / Field"
+        lbl_degree: "Degree / Field",
+        lbl_section_title: "Section Title",
+        lbl_section_content: "Content / Description"
     }
 };
 
@@ -377,6 +385,27 @@ window.addFormEducation = (data = null) => {
     if (!data) generateCVFromForm();
 };
 
+window.addFormCustomSection = (data = null) => {
+    const container = document.getElementById('form-custom-list');
+    const div = document.createElement('div');
+    div.className = 'dynamic-item';
+    const t = translations[currentLang];
+    
+    div.innerHTML = `
+        <button class="remove-dynamic-btn" onclick="removeItemAndRefresh(this)">×</button>
+        <div class="input-group" style="margin-bottom:10px;">
+            <label>${t.lbl_section_title}</label>
+            <input type="text" class="form-input custom-title" placeholder="Ex: Certificates" value="${data ? data.title : ''}" oninput="generateCVFromForm()">
+        </div>
+        <div class="input-group full-width">
+            <label>${t.lbl_section_content}</label>
+            <textarea class="form-input custom-content" rows="3" placeholder="Details..." oninput="generateCVFromForm()">${data ? data.content : ''}</textarea>
+        </div>
+    `;
+    container.appendChild(div);
+    if (!data) generateCVFromForm();
+};
+
 window.removeItemAndRefresh = (btn) => {
     btn.parentElement.remove();
     generateCVFromForm();
@@ -395,7 +424,8 @@ window.generateCVFromForm = () => {
         license: document.getElementById('inp-license').value,
         summary: document.getElementById('inp-summary').value,
         experiences: [],
-        education: []
+        education: [],
+        customSections: []
     };
 
     document.querySelectorAll('#form-experiences-list .dynamic-item').forEach(item => {
@@ -415,6 +445,13 @@ window.generateCVFromForm = () => {
         });
     });
 
+    document.querySelectorAll('#form-custom-list .dynamic-item').forEach(item => {
+        data.customSections.push({
+            title: item.querySelector('.custom-title').value,
+            content: item.querySelector('.custom-content').value
+        });
+    });
+
     // 2. Generate HTML
     const isCompact = document.body.classList.contains('tpl-compact');
     let html = "";
@@ -428,26 +465,55 @@ window.generateCVFromForm = () => {
         lic: translations[currentLang].cv_label_license
     };
 
-    if (isCompact) {
-        // COMPACT
-        let expHTML = data.experiences.map(exp => `
-            <div class="section">
-                <div class="section-header"><span class="section-title">${labels.exp}</span></div>
-                <div class="entry">
-                    <div class="left-col">${exp.date}</div>
-                    <div class="right-col"><h3>${exp.title}, ${exp.company}</h3><p>${exp.desc.replace(/\n/g, '<br>')}</p></div>
-                </div>
+    // GENERATE SECTION CONTENT (Grouped)
+    
+    // -- EXPERIENCES --
+    let expContent = "";
+    if (data.experiences.length > 0) {
+        let entries = data.experiences.map(exp => `
+            <div class="entry">
+                <div class="left-col">${exp.date}</div>
+                <div class="right-col"><h3>${exp.title}, ${exp.company}</h3><p>${exp.desc.replace(/\n/g, '<br>')}</p></div>
             </div>`).join('');
         
-        let eduHTML = data.education.map(edu => `
-             <div class="section">
-                <div class="section-header"><span class="section-title">${labels.edu}</span></div>
-                <div class="entry">
-                    <div class="left-col">${edu.date}</div>
-                    <div class="right-col"><h3>${edu.degree}</h3><p>${edu.school}</p></div>
-                </div>
+        expContent = `
+            <div class="section">
+                <div class="section-header"><span class="section-title">${labels.exp}</span></div>
+                ${entries}
+            </div>`;
+    }
+
+    // -- EDUCATION --
+    let eduContent = "";
+    if (data.education.length > 0) {
+        let entries = data.education.map(edu => `
+            <div class="entry">
+                <div class="left-col">${edu.date}</div>
+                <div class="right-col"><h3>${edu.degree}</h3><p>${edu.school}</p></div>
             </div>`).join('');
 
+        eduContent = `
+            <div class="section">
+                <div class="section-header"><span class="section-title">${labels.edu}</span></div>
+                ${entries}
+            </div>`;
+    }
+
+    // -- CUSTOM SECTIONS --
+    let customContent = "";
+    if (data.customSections.length > 0) {
+        customContent = data.customSections.map(sec => `
+            <div class="section">
+                <div class="section-header"><span class="section-title">${sec.title}</span></div>
+                <div class="entry">
+                    <div class="right-col"><p>${sec.content.replace(/\n/g, '<br>')}</p></div>
+                </div>
+            </div>
+        `).join('');
+    }
+
+
+    if (isCompact) {
         html = `
         <header>
             <h1>${data.fullname || 'ADINIZ SOYADINIZ'}</h1>
@@ -465,30 +531,12 @@ window.generateCVFromForm = () => {
                 <div class="section-header"><span class="section-title">${labels.prof}</span></div>
                 <div class="entry"><div class="right-col">${data.summary}</div></div>
             </div>
-            ${expHTML}
-            ${eduHTML}
+            ${expContent}
+            ${eduContent}
+            ${customContent}
         </div>`;
 
     } else {
-        // CLASSIC
-        let expHTML = data.experiences.map(exp => `
-            <div class="section">
-                <div class="section-header"><span class="section-title">${labels.exp}</span></div>
-                <div class="entry">
-                    <div class="left-col">${exp.date}</div>
-                    <div class="right-col"><h3>${exp.title}, ${exp.company}</h3><p>${exp.desc.replace(/\n/g, '<br>')}</p></div>
-                </div>
-            </div>`).join('');
-        
-        let eduHTML = data.education.map(edu => `
-             <div class="section">
-                <div class="section-header"><span class="section-title">${labels.edu}</span></div>
-                <div class="entry">
-                    <div class="left-col">${edu.date}</div>
-                    <div class="right-col"><h3>${edu.degree}</h3><p>${edu.school}</p></div>
-                </div>
-            </div>`).join('');
-
         html = `
         <header>
             <h1>${data.fullname || 'ADINIZ SOYADINIZ'}</h1>
@@ -509,8 +557,9 @@ window.generateCVFromForm = () => {
                 <div class="section-header"><span class="section-title">${labels.prof}</span></div>
                 <div class="entry"><div class="right-col">${data.summary}</div></div>
             </div>
-            ${expHTML}
-            ${eduHTML}
+            ${expContent}
+            ${eduContent}
+            ${customContent}
         </div>`;
     }
 
@@ -538,6 +587,12 @@ function loadUserDataIntoForm(data) {
     eduList.innerHTML = '';
     if (data.education) {
         data.education.forEach(edu => addFormEducation(edu));
+    }
+
+    const customList = document.getElementById('form-custom-list');
+    customList.innerHTML = '';
+    if (data.customSections) {
+        data.customSections.forEach(sec => addFormCustomSection(sec));
     }
 }
 
@@ -601,6 +656,7 @@ window.resetAll = async (skipConfirm = false) => {
     inputs.forEach(i => i.value = '');
     document.getElementById('form-experiences-list').innerHTML = '';
     document.getElementById('form-education-list').innerHTML = '';
+    document.getElementById('form-custom-list').innerHTML = '';
     
     generateCVFromForm();
     if(!skipConfirm) {
@@ -612,5 +668,6 @@ window.resetAll = async (skipConfirm = false) => {
 };
 
 window.createNewSection = () => {
-    alert("Yeni sistemde bölümler sabittir (İş & Eğitim). Lütfen sol panelden 'İş Ekle' veya 'Okul Ekle' butonlarını kullanın.");
+    // This is deprecated, handled by addFormCustomSection now
+    alert("Yeni sistemde 'Özel Bölümler' alanını kullanarak ekleme yapabilirsiniz.");
 };
