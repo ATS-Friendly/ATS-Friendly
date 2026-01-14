@@ -13,26 +13,10 @@
     
     <!-- CSS Link -->
     <link rel="stylesheet" href="style.css">
-
-    <!-- PDF.js for Client Side Parsing -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
-    <script>
-        // Set worker globally
-        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-    </script>
 </head>
 <body>
 
     <div id="toast">Kaydedildi!</div>
-
-    <!-- Loading Overlay -->
-    <div id="ai-loading" class="modal-overlay">
-        <div class="loading-content">
-            <div class="ai-spinner"></div>
-            <h3 data-i18n="ai_analyzing">Dosya İşleniyor...</h3>
-            <p data-i18n="ai_desc">Verileriniz script ile ayrıştırılıyor.</p>
-        </div>
-    </div>
 
     <!-- Language Switcher -->
     <div class="lang-switcher">
@@ -131,99 +115,57 @@
 
     <!-- 3. EDİTÖR -->
     <section id="editor-view" class="view-section">
-        <!-- Sidebar Toolbar -->
-        <aside class="toolbar">
-            <div class="brand">📄 MonoCV</div>
+        <!-- Dashboard Sidebar -->
+        <aside class="sidebar">
+            <div class="brand-container">
+                <div class="brand-logo">M</div>
+                <div class="brand-text">MonoCV</div>
+            </div>
             
             <div id="sync-status">
                 <div id="status-dot" class="status-dot"></div>
                 <span id="status-text" data-i18n="status_connecting">Bağlanıyor...</span>
             </div>
 
-            <!-- New PDF Script Upload Button -->
-            <button class="btn btn-secondary" onclick="triggerFileUpload()" style="background: rgba(155, 89, 182, 0.4); border: 1px solid #8e44ad;">
-                📤 <span data-i18n="btn_ai_upload">PDF Yükle (Otomatik)</span>
-            </button>
-            <input type="file" id="cv-upload" accept=".pdf" onchange="handleFileUpload(this)" hidden>
+            <nav class="nav-menu">
+                <div class="nav-group">
+                    <span class="nav-label" data-i18n="nav_content">İÇERİK</span>
+                    <button class="nav-item" onclick="createNewSection()">
+                        <span class="icon">➕</span> <span data-i18n="btn_add_section">Bölüm Ekle</span>
+                    </button>
+                </div>
 
-            <button class="btn btn-secondary" onclick="createNewSection()" data-i18n="btn_add_section">+ Bölüm Ekle</button>
-            <button class="btn btn-success" type="button" onclick="loadATSExample()" data-i18n="btn_load_sample">📄 Örnek CV Yükle</button>
-            <button class="btn btn-info" onclick="openThemeModal()" data-i18n="btn_design">🎨 Tasarım</button>
-            <button class="btn btn-warning" onclick="backToTemplates()" data-i18n="btn_change_tpl">🎨 Şablonu Değiştir</button>
-            <button class="btn btn-primary" onclick="window.print()" data-i18n="btn_download_pdf">🖨️ PDF İndir</button>
-            <button class="btn btn-danger" onclick="resetAll()" data-i18n="btn_reset">🗑️ Sıfırla</button>
-            
-            <div style="flex-grow: 1;"></div>
-            <button class="btn btn-danger" onclick="logout()" data-i18n="btn_logout">Çıkış Yap</button>
+                <div class="nav-group">
+                    <span class="nav-label" data-i18n="nav_design">TASARIM & ŞABLON</span>
+                    <button class="nav-item" onclick="openThemeModal()">
+                        <span class="icon">🎨</span> <span data-i18n="btn_design">Tasarım Ayarları</span>
+                    </button>
+                    <button class="nav-item" onclick="backToTemplates()">
+                        <span class="icon">💠</span> <span data-i18n="btn_change_tpl">Şablonu Değiştir</span>
+                    </button>
+                </div>
+
+                <div class="nav-group">
+                    <span class="nav-label" data-i18n="nav_actions">İŞLEMLER</span>
+                    <button class="nav-item" onclick="window.print()">
+                        <span class="icon">🖨️</span> <span data-i18n="btn_download_pdf">PDF İndir</span>
+                    </button>
+                    <button class="nav-item danger" onclick="resetAll()">
+                        <span class="icon">🗑️</span> <span data-i18n="btn_reset">Sıfırla / Temizle</span>
+                    </button>
+                </div>
+            </nav>
+
+            <div class="sidebar-footer">
+                <button class="nav-item logout" onclick="logout()">
+                    <span class="icon">🚪</span> <span data-i18n="btn_logout">Çıkış Yap</span>
+                </button>
+            </div>
         </aside>
 
         <main>
             <div class="page cv-content" id="cv-root">
-                <header>
-                    <h1 contenteditable="true">ADINIZ SOYADINIZ</h1>
-                    <div class="subtitle" contenteditable="true">Unvanınız</div>
-                    
-                    <!-- CLASSIC MODE ONLY -->
-                    <div class="contact-info" contenteditable="true">
-                        <span>📍 Şehir, Ülke</span> | <span>📞 Telefon</span> | <span>✉️ E-posta</span>
-                    </div>
-
-                    <!-- COMPACT MODE ONLY -->
-                    <div class="address-line" contenteditable="true">Açık Adresiniz, Şehir, Ülke</div>
-                    
-                    <div class="contact-row">
-                        <span contenteditable="true">555 123 45 67</span>
-                        <span contenteditable="true">email@ornek.com</span>
-                    </div>
-
-                    <div class="compact-separator"></div>
-
-                    <div class="personal-details">
-                        <div class="detail-item">
-                            <span class="lbl" contenteditable="true" data-cv-label="birth">Doğum Yeri</span>
-                            <span class="dots"></span>
-                            <span class="val" contenteditable="true">İstanbul</span>
-                        </div>
-                        <div class="detail-item">
-                            <span class="lbl" contenteditable="true" data-cv-label="license">Ehliyet</span>
-                            <span class="dots"></span>
-                            <span class="val" contenteditable="true">B Sınıfı</span>
-                        </div>
-                    </div>
-                </header>
-                <div id="main-content">
-                    <div class="section">
-                        <div class="section-actions">
-                            <button class="action-btn" onclick="moveUp(this)" title="Yukarı">▲</button>
-                            <button class="action-btn" onclick="moveDown(this)" title="Aşağı">▼</button>
-                            <button class="action-btn delete" onclick="removeSection(this)" title="Sil">×</button>
-                        </div>
-                        <div class="section-header"><span class="section-title" contenteditable="true">PROFİL</span></div>
-                        <div class="entry">
-                             <button class="btn-delete-item" onclick="removeEntry(this)">×</button>
-                            <div class="right-col" contenteditable="true">
-                                Profesyonel özetinizi buraya yazın. Deneyimlerinizden ve hedeflerinizden bahsedin.
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="section">
-                        <div class="section-actions">
-                            <button class="action-btn" onclick="moveUp(this)" title="Yukarı">▲</button>
-                            <button class="action-btn" onclick="moveDown(this)" title="Aşağı">▼</button>
-                            <button class="action-btn delete" onclick="removeSection(this)" title="Sil">×</button>
-                        </div>
-                        <div class="section-header"><span class="section-title" contenteditable="true">İŞ DENEYİMİ</span></div>
-                        <div class="entry">
-                             <button class="btn-delete-item" onclick="removeEntry(this)">×</button>
-                            <div class="left-col" contenteditable="true">Oca 2019 — May 2021</div>
-                            <div class="right-col">
-                                <h3 contenteditable="true">Pozisyon Adı, Şirket Adı</h3>
-                                <p contenteditable="true">Burada yaptığınız işleri ve başarılarınızı maddeler halinde sıralayabilirsiniz.</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                <!-- Content will be injected by script or resetAll() -->
             </div>
         </main>
     </section>
