@@ -116,7 +116,6 @@ body {
     border-color: var(--primary-color); 
 }
 .template-preview { 
-    /* Changed from fixed height to Aspect Ratio 210/297 (A4) to prevent fat look */
     width: 100%;
     aspect-ratio: 210/297; 
     background: #eee; 
@@ -266,18 +265,37 @@ body {
     line-height: 1.6; 
 }
 
-/* Default Header (Classic) */
-header { text-align: center; margin-bottom: 30px; border-bottom: 2px solid #2d3436; padding-bottom: 25px; }
-h1 { text-transform: uppercase; letter-spacing: 3px; font-size: 32px; font-weight: 700; margin: 0; }
+/* HEADER BASE STYLES */
+header { 
+    text-align: center; 
+    margin-bottom: 30px; 
+    border-bottom: 2px solid #2d3436; 
+    padding-bottom: 25px; 
+}
+h1 { 
+    text-transform: uppercase; 
+    letter-spacing: 3px; 
+    font-size: 32px; 
+    font-weight: 700; 
+    margin: 0; 
+}
 
-/* Hide Compact-Specific Elements in Classic Mode */
-.contact-row, .compact-separator, .personal-details, .address-line {
+/* --- TEMPLATE 1: CLASSIC (Default) --- */
+/* Classic uses .contact-info */
+.contact-info {
+    margin-top: 10px;
+    font-size: 14px;
+}
+
+/* Hide Compact-specific elements by default in Classic */
+.address-line, .contact-row, .compact-separator, .personal-details {
     display: none;
 }
 
+
 /* --- SECTIONS & PROFESSIONAL CONTROLS --- */
 .section {
-    position: relative; /* Allows absolute positioning of controls */
+    position: relative; 
     border: 1px solid transparent;
     border-radius: 4px;
     padding: 4px;
@@ -427,23 +445,33 @@ h1 { text-transform: uppercase; letter-spacing: 3px; font-size: 32px; font-weigh
 @keyframes fadein { from {bottom: 30px; opacity: 0;} to {bottom: 50px; opacity: 1;} }
 @keyframes pulse { 0% { opacity: 0.5; } 50% { opacity: 1; } 100% { opacity: 0.5; } }
 
-/* --- TEMPLATE THEMES --- */
+/* --- TEMPLATE 2: COMPACT THEME (Redesigned) --- */
 
-/* 2. COMPACT THEME (Redesigned) */
 body.tpl-compact .page { 
     padding: 15mm 20mm; 
     font-family: 'PT Serif', serif;
 }
 
-/* Compact Header */
+/* Visibility Toggles for Compact */
+body.tpl-compact .contact-info { display: none; } /* Hide classic contact row */
+body.tpl-compact .address-line,
+body.tpl-compact .contact-row,
+body.tpl-compact .compact-separator,
+body.tpl-compact .personal-details { 
+    display: block; 
+}
+body.tpl-compact .contact-row,
+body.tpl-compact .personal-details {
+    display: flex;
+}
+
+/* Compact Header Styles */
 body.tpl-compact header { 
     border-bottom: none; 
     margin-bottom: 20px; 
     padding-bottom: 0;
     text-align: center;
 }
-body.tpl-compact .contact-info { display: none; } /* Hide classic contact row */
-
 body.tpl-compact h1 { 
     font-size: 28px; 
     letter-spacing: 2px; 
@@ -457,7 +485,6 @@ body.tpl-compact .subtitle {
     margin-bottom: 8px;
 }
 body.tpl-compact .address-line {
-    display: block;
     font-size: 14px;
     color: #222;
     margin-bottom: 20px;
@@ -465,7 +492,6 @@ body.tpl-compact .address-line {
 
 /* Contact Row: Phone Left, Email Right */
 body.tpl-compact .contact-row {
-    display: flex;
     justify-content: space-between;
     font-weight: 700;
     font-size: 14px;
@@ -475,7 +501,6 @@ body.tpl-compact .contact-row {
 
 /* Double Line Separator */
 body.tpl-compact .compact-separator {
-    display: block;
     height: 4px;
     border-top: 2px solid #000;
     border-bottom: 1px solid #000;
@@ -484,7 +509,6 @@ body.tpl-compact .compact-separator {
 
 /* Personal Details: Dotted Leaders */
 body.tpl-compact .personal-details {
-    display: flex;
     flex-wrap: wrap;
     gap: 30px;
     margin-bottom: 25px;
@@ -531,7 +555,7 @@ body.tpl-compact .section-header {
 }
 body.tpl-compact .section-header::before,
 body.tpl-compact .section-header::after {
-    display: none; /* Remove side lines from previous iteration */
+    display: none; 
 }
 body.tpl-compact .section-title { 
     font-size: 14px; 

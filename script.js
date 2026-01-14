@@ -206,8 +206,15 @@ window.resetAll = async () => {
     if(confirm("DİKKAT: CV içeriğiniz tamamen silinecek ve başlangıç haline dönecektir. Bu işlem geri alınamaz. Devam etmek istiyor musunuz?")) {
         const defaultContent = `
         <header>
-            <h1 contenteditable="true">LAYNEY SPENCER</h1>
-            <div class="subtitle" contenteditable="true">Assistant Director</div>
+            <h1 contenteditable="true">ADINIZ SOYADINIZ</h1>
+            <div class="subtitle" contenteditable="true">Unvanınız</div>
+            
+            <!-- CLASSIC ONLY -->
+            <div class="contact-info" contenteditable="true">
+                <span>📍 Şehir, Ülke</span> | <span>📞 Telefon</span> | <span>✉️ E-posta</span>
+            </div>
+
+            <!-- COMPACT ONLY -->
             <div class="address-line" contenteditable="true">1515 Pacific Ave, Los Angeles, CA 90291, United States</div>
             
             <div class="contact-row">
@@ -237,11 +244,11 @@ window.resetAll = async () => {
                     <button class="action-btn" onclick="moveDown(this)" title="Aşağı">▼</button>
                     <button class="action-btn delete" onclick="removeSection(this)" title="Sil">🗑️</button>
                 </div>
-                <div class="section-header"><span class="section-title" contenteditable="true">PROFILE</span></div>
+                <div class="section-header"><span class="section-title" contenteditable="true">PROFIL</span></div>
                 <div class="entry">
                      <button class="btn-delete-item" onclick="removeEntry(this)">×</button>
                     <div class="right-col" contenteditable="true">
-                        Astute Assistant Director with over 14 years of experience dealing with complex macro issues that have threatened the company's profitability.
+                        Profesyonel özetinizi buraya yazın. Deneyimlerinizden ve hedeflerinizden bahsedin.
                     </div>
                 </div>
             </div>
@@ -252,13 +259,13 @@ window.resetAll = async () => {
                     <button class="action-btn" onclick="moveDown(this)" title="Aşağı">▼</button>
                     <button class="action-btn delete" onclick="removeSection(this)" title="Sil">🗑️</button>
                 </div>
-                <div class="section-header"><span class="section-title" contenteditable="true">EMPLOYMENT HISTORY</span></div>
+                <div class="section-header"><span class="section-title" contenteditable="true">İŞ DENEYİMİ</span></div>
                 <div class="entry">
                      <button class="btn-delete-item" onclick="removeEntry(this)">×</button>
-                    <div class="left-col" contenteditable="true">Jan 2019 — May 2021</div>
+                    <div class="left-col" contenteditable="true">Oca 2019 — May 2021</div>
                     <div class="right-col">
-                        <h3 contenteditable="true">Assistant Director, John Ward Emergency Facility</h3>
-                        <p contenteditable="true">Supported the successful transition from T-System EMR to Meditech EMR.</p>
+                        <h3 contenteditable="true">Pozisyon Adı, Şirket Adı</h3>
+                        <p contenteditable="true">Burada yaptığınız işleri ve başarılarınızı maddeler halinde sıralayabilirsiniz.</p>
                     </div>
                 </div>
             </div>
