@@ -10,6 +10,7 @@ import {
     signInWithPopup 
 } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+import { GoogleGenAI, Type } from "@google/genai";
 
 // --- FIREBASE YAPILANDIRMASI ---
 const firebaseConfig = {
@@ -28,6 +29,8 @@ const auth = getAuth(app);
 const db = getFirestore(app);
 const googleProvider = new GoogleAuthProvider();
 const appId = "mono-cv-app";
+// GenAI Client Initialization
+const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
 let isLoginMode = true;
 let currentUser = null;
@@ -59,6 +62,7 @@ const translations = {
         btn_download_pdf: "🖨️ PDF İndir",
         btn_reset: "🗑️ Sıfırla",
         btn_logout: "Çıkış Yap",
+        btn_ai_upload: "AI ile Yükle",
         status_connecting: "Bağlanıyor...",
         status_online: "Senkronize",
         status_syncing: "Kaydediliyor...",
@@ -72,7 +76,11 @@ const translations = {
         modal_theme_title: "Tasarım Ayarları",
         lbl_color: "Vurgu Rengi",
         lbl_font: "Yazı Tipi",
-        btn_save_close: "Kaydet & Kapat"
+        btn_save_close: "Kaydet & Kapat",
+        ai_analyzing: "CV'niz Analiz Ediliyor...",
+        ai_desc: "Yapay zeka verilerinizi ayıklayıp yerleştiriyor.",
+        ai_success: "CV'niz başarıyla dönüştürüldü!",
+        ai_error: "CV okunamadı. Lütfen PDF veya Resim yükleyin."
     },
     en: {
         auth_title: "Login",
@@ -92,6 +100,7 @@ const translations = {
         btn_download_pdf: "🖨️ Download PDF",
         btn_reset: "🗑️ Reset",
         btn_logout: "Logout",
+        btn_ai_upload: "Upload with AI",
         status_connecting: "Connecting...",
         status_online: "Synced",
         status_syncing: "Saving...",
@@ -105,7 +114,11 @@ const translations = {
         modal_theme_title: "Design Settings",
         lbl_color: "Accent Color",
         lbl_font: "Font Family",
-        btn_save_close: "Save & Close"
+        btn_save_close: "Save & Close",
+        ai_analyzing: "Analyzing Your CV...",
+        ai_desc: "AI is extracting and formatting your data.",
+        ai_success: "CV successfully converted!",
+        ai_error: "Could not read CV. Please upload PDF or Image."
     }
 };
 
@@ -351,6 +364,147 @@ function updateStatus(state) {
         text.innerText = t.status_offline;
     }
 }
+
+// --- AI UPLOAD FUNCTIONALITY ---
+window.triggerFileUpload = () => {
+    document.getElementById('cv-upload').click();
+};
+
+window.handleFileUpload = async (input) => {
+    if (input.files.length === 0) return;
+    const file = input.files[0];
+    
+    // Show Loading
+    document.getElementById('ai-loading').classList.add('active');
+
+    const reader = new FileReader();
+    reader.onload = async function(e) {
+        const base64Data = e.target.result.split(',')[1];
+        const mimeType = file.type;
+
+        try {
+            await analyzeCVWithGemini(base64Data, mimeType);
+        } catch (error) {
+            console.error("AI Error:", error);
+            alert(translations[currentLang].ai_error);
+            document.getElementById('ai-loading').classList.remove('active');
+        }
+    };
+    reader.readAsDataURL(file);
+    // Reset input so same file can be selected again if needed
+    input.value = '';
+};
+
+async function analyzeCVWithGemini(base64Data, mimeType) {
+    const prompt = `You are an expert CV parser. I will provide a CV file (PDF or Image). 
+    Extract the following information and return it in a strict JSON format matching this schema:
+    {
+        "fullName": "Name Surname",
+        "title": "Professional Title",
+        "contact": { 
+            "location": "City, Country", 
+            "phone": "Phone Number", 
+            "email": "Email Address",
+            "fullAddress": "Full Street Address if available" 
+        },
+        "personal": {
+            "birthPlace": "City of Birth",
+            "license": "Driving License Class"
+        },
+        "profile": "A professional summary/bio paragraph.",
+        "experience": [
+            {
+                "date": "Date Range (e.g. Jan 2020 - Present)",
+                "title": "Job Title",
+                "company": "Company Name",
+                "description": "Description of roles and achievements."
+            }
+        ],
+        "education": [
+            {
+                "date": "Year or Range",
+                "degree": "Degree Name",
+                "school": "University/School Name"
+            }
+        ]
+    }
+    If a field is missing, use an empty string. The language of the response should match the language of the CV (Turkish or English).`;
+
+    const response = await ai.models.generateContent({
+        model: 'gemini-1.5-flash',
+        contents: {
+            parts: [
+                { inlineData: { mimeType: mimeType, data: base64Data } },
+                { text: prompt }
+            ]
+        },
+        config: {
+            responseMimeType: "application/json"
+        }
+    });
+
+    const text = response.text;
+    const cvData = JSON.parse(text);
+    
+    populateCVFromJSON(cvData);
+    document.getElementById('ai-loading').classList.remove('active');
+    showToast(translations[currentLang].ai_success);
+}
+
+function populateCVFromJSON(data) {
+    // Generate HTML String based on extracted JSON
+    // We reuse the structure from resetAll/loadATSExample but inject data
+    
+    // Map experience to HTML
+    const expHTML = data.experience.map(exp => `
+        <div class="section">
+            <div class="section-actions"><button class="action-btn" onclick="moveUp(this)">▲</button><button class="action-btn" onclick="moveDown(this)">▼</button><button class="action-btn delete" onclick="removeSection(this)">×</button></div>
+            <div class="section-header"><span class="section-title" contenteditable="true">${currentLang === 'tr' ? 'İŞ DENEYİMİ' : 'EMPLOYMENT HISTORY'}</span></div>
+            <div class="entry"><button class="btn-delete-item" onclick="removeEntry(this)">×</button><div class="left-col" contenteditable="true">${exp.date || ''}</div><div class="right-col"><h3 contenteditable="true">${exp.title || ''}, ${exp.company || ''}</h3><p contenteditable="true">${exp.description || ''}</p></div></div>
+        </div>
+    `).join('');
+
+    // Map education to HTML
+    const eduHTML = data.education.map(edu => `
+        <div class="section">
+            <div class="section-actions"><button class="action-btn" onclick="moveUp(this)">▲</button><button class="action-btn" onclick="moveDown(this)">▼</button><button class="action-btn delete" onclick="removeSection(this)">×</button></div>
+            <div class="section-header"><span class="section-title" contenteditable="true">${currentLang === 'tr' ? 'EĞİTİM' : 'EDUCATION'}</span></div>
+            <div class="entry"><button class="btn-delete-item" onclick="removeEntry(this)">×</button><div class="left-col" contenteditable="true">${edu.date || ''}</div><div class="right-col"><h3 contenteditable="true">${edu.degree || ''}</h3><p contenteditable="true">${edu.school || ''}</p></div></div>
+        </div>
+    `).join('');
+
+    // Combine Profile
+    const profileHTML = data.profile ? `
+        <div class="section">
+            <div class="section-actions"><button class="action-btn" onclick="moveUp(this)">▲</button><button class="action-btn" onclick="moveDown(this)">▼</button><button class="action-btn delete" onclick="removeSection(this)">×</button></div>
+            <div class="section-header"><span class="section-title" contenteditable="true">${currentLang === 'tr' ? 'PROFİL' : 'PROFILE'}</span></div>
+            <div class="entry"><button class="btn-delete-item" onclick="removeEntry(this)">×</button><div class="right-col" contenteditable="true">${data.profile}</div></div>
+        </div>
+    ` : '';
+
+    const newContent = `
+    <header>
+        <h1 contenteditable="true">${data.fullName || 'ADINIZ SOYADINIZ'}</h1>
+        <div class="subtitle" contenteditable="true">${data.title || 'Unvanınız'}</div>
+        <div class="contact-info" contenteditable="true"><span>📍 ${data.contact.location || ''}</span> | <span>📞 ${data.contact.phone || ''}</span> | <span>✉️ ${data.contact.email || ''}</span></div>
+        <div class="address-line" contenteditable="true">${data.contact.fullAddress || data.contact.location || ''}</div>
+        <div class="contact-row"><span contenteditable="true">${data.contact.phone || ''}</span><span contenteditable="true">${data.contact.email || ''}</span></div>
+        <div class="compact-separator"></div>
+        <div class="personal-details">
+            <div class="detail-item"><span class="lbl" contenteditable="true" data-cv-label="birth">${translations[currentLang].cv_label_birth}</span><span class="dots"></span><span class="val" contenteditable="true">${data.personal.birthPlace || ''}</span></div>
+            <div class="detail-item"><span class="lbl" contenteditable="true" data-cv-label="license">${translations[currentLang].cv_label_license}</span><span class="dots"></span><span class="val" contenteditable="true">${data.personal.license || ''}</span></div>
+        </div>
+    </header>
+    <div id="main-content">
+        ${profileHTML}
+        ${expHTML}
+        ${eduHTML}
+    </div>`;
+
+    document.getElementById('cv-root').innerHTML = newContent;
+    saveToCloud();
+}
+
 
 // Örnek İçerik Yükleme (Dile Göre)
 window.loadATSExample = async () => {

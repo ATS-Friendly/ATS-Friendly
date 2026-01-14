@@ -12,10 +12,28 @@
     
     <!-- CSS Link -->
     <link rel="stylesheet" href="style.css">
+
+    <!-- Import Map for Google GenAI -->
+    <script type="importmap">
+    {
+      "imports": {
+        "@google/genai": "https://esm.run/@google/genai"
+      }
+    }
+    </script>
 </head>
 <body>
 
     <div id="toast">Kaydedildi!</div>
+
+    <!-- AI Loading Overlay -->
+    <div id="ai-loading" class="modal-overlay">
+        <div class="loading-content">
+            <div class="ai-spinner"></div>
+            <h3 data-i18n="ai_analyzing">CV'niz Analiz Ediliyor...</h3>
+            <p data-i18n="ai_desc">Yapay zeka verilerinizi ayıklayıp yerleştiriyor.</p>
+        </div>
+    </div>
 
     <!-- Language Switcher -->
     <div class="lang-switcher">
@@ -122,6 +140,12 @@
                 <div id="status-dot" class="status-dot"></div>
                 <span id="status-text" data-i18n="status_connecting">Bağlanıyor...</span>
             </div>
+
+            <!-- New AI Upload Button -->
+            <button class="btn btn-secondary" onclick="triggerFileUpload()" style="background: rgba(155, 89, 182, 0.4); border: 1px solid #8e44ad;">
+                🤖 <span data-i18n="btn_ai_upload">AI ile Yükle</span>
+            </button>
+            <input type="file" id="cv-upload" accept=".pdf, .jpg, .jpeg, .png" onchange="handleFileUpload(this)" hidden>
 
             <button class="btn btn-secondary" onclick="createNewSection()" data-i18n="btn_add_section">+ Bölüm Ekle</button>
             <button class="btn btn-success" type="button" onclick="loadATSExample()" data-i18n="btn_load_sample">📄 Örnek CV Yükle</button>
