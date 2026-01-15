@@ -50,6 +50,26 @@ let currentLayout = {
 // --- DİL YÖNETİMİ (LOCALIZATION) ---
 const translations = {
     tr: {
+        // LANDING PAGE
+        land_login: "Giriş Yap",
+        land_signup: "Kayıt Ol",
+        land_hero_title: "İşe Alım Robotlarını<br><span class='highlight-text'>Yenecek CV'nizi Oluşturun</span>",
+        land_hero_sub: "Modern işe alım sistemleri (ATS) ile %100 uyumlu, profesyonel ve sade CV'ler hazırlayın. Üstelik tamamen ücretsiz.",
+        land_cta_start: "Hemen Ücretsiz Başla",
+        land_cta_how: "Nasıl Çalışır?",
+        feat_ats_title: "ATS Dostu Format",
+        feat_ats_desc: "Karmaşık grafikler yok. İnsan kaynakları yazılımlarının (ATS) kolayca okuyabileceği temiz kod yapısı.",
+        feat_free_title: "%100 Ücretsiz",
+        feat_free_desc: "Gizli ödeme yok, filigran yok. Sınırsız düzenleme ve PDF indirme hakkı.",
+        feat_cloud_title: "Bulut Kayıt",
+        feat_cloud_desc: "CV'niz bulutta güvende. İstediğiniz cihazdan (PC veya Mobil) kaldığınız yerden devam edin.",
+        footer_rights: "Tüm hakları saklıdır.",
+        footer_privacy: "Gizlilik Politikası",
+        footer_terms: "Kullanım Koşulları",
+        footer_contact: "İletişim",
+
+        // AUTH
+        back_home: "Ana Sayfa",
         auth_title: "Hesabınıza Giriş Yapın",
         auth_subtitle_login: "CV'nizi düzenlemeye devam edin",
         auth_title_signup: "Hemen Ücretsiz Hesap Oluşturun",
@@ -60,6 +80,14 @@ const translations = {
         auth_toggle_link_login: "Hemen Kayıt Ol",
         auth_toggle_msg_signup: "Zaten hesabın var mı?",
         auth_toggle_link_signup: "Giriş Yap",
+        lbl_email_addr: "E-posta Adresi",
+        lbl_password: "Şifre",
+        terms_link: "Kullanım Koşulları",
+        privacy_link: "Gizlilik Politikası",
+        terms_and: "ve",
+        terms_agree: "nı okudum, kabul ediyorum.",
+        divider_or: "VEYA",
+        auth_google_continue: "Google ile Devam Et",
         
         auth_processing: "İşleniyor...",
         tpl_select_header: "Profesyonel Bir Şablon Seçin",
@@ -118,6 +146,26 @@ const translations = {
         lbl_section_content: "İçerik / Açıklama"
     },
     en: {
+        // LANDING PAGE
+        land_login: "Login",
+        land_signup: "Sign Up",
+        land_hero_title: "Create a CV That<br><span class='highlight-text'>Beats the Applicant Tracking Systems</span>",
+        land_hero_sub: "Prepare professional and clean CVs compatible with modern ATS software. And it's 100% free.",
+        land_cta_start: "Start for Free",
+        land_cta_how: "How it Works?",
+        feat_ats_title: "ATS Friendly",
+        feat_ats_desc: "No complex graphics. Clean code structure that HR software can easily read.",
+        feat_free_title: "100% Free",
+        feat_free_desc: "No hidden fees, no watermarks. Unlimited editing and PDF downloads.",
+        feat_cloud_title: "Cloud Save",
+        feat_cloud_desc: "Your CV is safe in the cloud. Continue where you left off from any device.",
+        footer_rights: "All rights reserved.",
+        footer_privacy: "Privacy Policy",
+        footer_terms: "Terms of Use",
+        footer_contact: "Contact",
+
+        // AUTH
+        back_home: "Home",
         auth_title: "Login to your account",
         auth_subtitle_login: "Continue editing your CV",
         auth_title_signup: "Create your free account",
@@ -128,6 +176,14 @@ const translations = {
         auth_toggle_link_login: "Sign Up Now",
         auth_toggle_msg_signup: "Already have an account?",
         auth_toggle_link_signup: "Login",
+        lbl_email_addr: "Email Address",
+        lbl_password: "Password",
+        terms_link: "Terms of Use",
+        privacy_link: "Privacy Policy",
+        terms_and: "and",
+        terms_agree: "I have read and agree.",
+        divider_or: "OR",
+        auth_google_continue: "Continue with Google",
 
         auth_processing: "Processing...",
         tpl_select_header: "Select a Professional Template",
@@ -194,7 +250,12 @@ window.setLanguage = (lang) => {
     document.querySelectorAll('[data-i18n]').forEach(el => {
         const key = el.getAttribute('data-i18n');
         if (translations[lang][key]) {
-            el.innerText = translations[lang][key];
+            // Check if element has inner HTML structure (like hero title)
+            if (el.innerHTML.includes('<')) {
+                 el.innerHTML = translations[lang][key];
+            } else {
+                 el.innerText = translations[lang][key];
+            }
         }
     });
 

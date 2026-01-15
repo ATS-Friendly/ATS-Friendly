@@ -293,10 +293,10 @@ body {
 .auth-card.professional { 
     background: white; 
     padding: 40px 50px; 
-    border-radius: 16px; 
+    border-radius: 20px; /* Rounded corners */
     width: 400px; 
-    box-shadow: 0 5px 20px rgba(0,0,0,0.05); 
-    border: 1px solid #eee;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.08); /* Softer, deeper shadow */
+    border: 1px solid rgba(0,0,0,0.05); /* Very subtle border */
     text-align: left; /* Default left align */
 }
 
@@ -1035,18 +1035,19 @@ body.tpl-compact .entry .right-col { width: 100%; padding-right: 130px; }
         margin: 0; /* Clear browser default margins */
         size: auto;
     }
-    body { 
+    body, html { 
         background: white; 
         padding: 0; 
         margin: 0; 
         display: block; 
+        width: 100%;
         -webkit-print-color-adjust: exact;
         print-color-adjust: exact;
     }
     .sidebar, #auth-view, #template-view, #landing-view, .editor-panel-form, .lang-switcher, #toast, .modal-overlay, #theme-modal, #layout-modal, .mobile-view-toggle, .mobile-fab-container { display: none !important; }
     
     /* RESET EDITOR LAYOUT FOR PRINT */
-    .editor-layout { display: block; padding: 0; width: 100%; height: auto; }
+    .editor-layout { display: block; padding: 0 !important; width: 100%; height: auto; margin: 0; }
     
     /* Ensure the preview container spans full width without scrollbars */
     .editor-panel-preview { 
@@ -1061,17 +1062,23 @@ body.tpl-compact .entry .right-col { width: 100%; padding-right: 130px; }
     
     /* CRITICAL: RESET SCALING FOR PRINT */
     /* Mobile view uses transform: scale() to fit screen. We must remove this for print. */
-    #cv-scale-container, #cv-root { 
+    #cv-scale-container { 
         transform: none !important; 
-        width: 210mm !important; /* Force A4 width */
+        width: 100% !important; /* Use 100% instead of fixed 210mm to handle varying paper contexts better */
         height: auto !important;
         box-shadow: none !important; 
         margin: 0 auto !important;
         overflow: visible !important;
+        display: flex;
+        justify-content: center;
+    }
+
+    #cv-root {
+        transform: none !important;
     }
     
     .page { 
-        width: 100%; 
+        width: 210mm; 
         max-width: 210mm; /* Force A4 Width */
         margin: 0 auto; 
         padding: var(--cv-padding) !important; /* Force user padding */
