@@ -38,6 +38,13 @@ let currentTheme = {
     color: '#2c3e50',
     font: 'ptserif' 
 };
+// Layout Defaults
+let currentLayout = {
+    fontSize: 11,
+    lineHeight: 1.4,
+    margin: 20,
+    sectionGap: 15
+};
 
 // --- DİL YÖNETİMİ (LOCALIZATION) ---
 const translations = {
@@ -53,6 +60,7 @@ const translations = {
         tpl_compact: "Kompakt",
         tpl_compact_desc: "📄 Minimal & Tek Sayfa",
         btn_design: "Tasarım Ayarları",
+        btn_layout: "Sayfa Düzeni",
         btn_change_tpl: "Şablonu Değiştir",
         btn_download_pdf: "PDF İndir",
         btn_reset: "Sıfırla / Temizle",
@@ -68,8 +76,13 @@ const translations = {
         confirm_reset: "DİKKAT: CV içeriğiniz tamamen silinecek ve başlangıç haline dönecektir. Devam etmek istiyor musunuz?",
         toast_reset: "CV başarıyla sıfırlandı.",
         modal_theme_title: "Tasarım Ayarları",
+        modal_layout_title: "Sayfa Düzeni",
         lbl_color: "Vurgu Rengi",
         lbl_font: "Yazı Tipi",
+        lbl_fontsize: "Yazı Boyutu",
+        lbl_lineheight: "Satır Aralığı",
+        lbl_margin: "Kenar Boşluğu",
+        lbl_sectiongap: "Bölüm Aralığı",
         btn_save_close: "Kapat",
         // Form Translations
         form_title: "Bilgilerinizi Düzenleyin",
@@ -107,6 +120,7 @@ const translations = {
         tpl_compact: "Compact",
         tpl_compact_desc: "📄 Minimal & Single Page",
         btn_design: "Design Settings",
+        btn_layout: "Page Layout",
         btn_change_tpl: "Change Template",
         btn_download_pdf: "Download PDF",
         btn_reset: "Reset / Clear",
@@ -122,8 +136,13 @@ const translations = {
         confirm_reset: "WARNING: Your CV content will be erased and reset to default. Do you want to continue?",
         toast_reset: "CV successfully reset.",
         modal_theme_title: "Design Settings",
+        modal_layout_title: "Page Layout",
         lbl_color: "Accent Color",
         lbl_font: "Font Family",
+        lbl_fontsize: "Font Size",
+        lbl_lineheight: "Line Height",
+        lbl_margin: "Margin",
+        lbl_sectiongap: "Section Gap",
         btn_save_close: "Close",
         // Form Translations
         form_title: "Edit Your Details",
@@ -180,9 +199,9 @@ function showView(viewId) {
     if (target) target.classList.add('active');
 }
 
-// --- TEMA YÖNETİMİ ---
-window.openThemeModal = () => {
-    const modal = document.getElementById('theme-modal');
+// --- MODAL YÖNETİMİ (TEMA & LAYOUT) ---
+function openModal(modalId) {
+    const modal = document.getElementById(modalId);
     modal.classList.add('active');
     
     if (!modal.style.top || !modal.style.left) {
@@ -192,12 +211,36 @@ window.openThemeModal = () => {
     }
     
     initDragElement(modal.querySelector('.modal-content'));
-};
+}
 
+window.openThemeModal = () => openModal('theme-modal');
 window.closeThemeModal = () => {
     document.getElementById('theme-modal').classList.remove('active');
     saveToCloud(); 
 };
+
+window.openLayoutModal = () => {
+    // Sync slider values with current state
+    document.getElementById('rng-fontsize').value = currentLayout.fontSize;
+    document.getElementById('val-fontsize').innerText = currentLayout.fontSize + 'pt';
+
+    document.getElementById('rng-lineheight').value = currentLayout.lineHeight;
+    document.getElementById('val-lineheight').innerText = currentLayout.lineHeight;
+
+    document.getElementById('rng-margin').value = currentLayout.margin;
+    document.getElementById('val-margin').innerText = currentLayout.margin + 'mm';
+    
+    document.getElementById('rng-sectiongap').value = currentLayout.sectionGap;
+    document.getElementById('val-sectiongap').innerText = currentLayout.sectionGap + 'px';
+
+    openModal('layout-modal');
+};
+
+window.closeLayoutModal = () => {
+    document.getElementById('layout-modal').classList.remove('active');
+    saveToCloud();
+};
+
 
 function initDragElement(elmnt) {
     let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
@@ -228,6 +271,7 @@ function initDragElement(elmnt) {
     }
 }
 
+// --- TEMA VE STİL UYGULAMALARI ---
 window.applyColor = (color) => {
     currentTheme.color = color;
     document.documentElement.style.setProperty('--cv-accent-color', color);
@@ -249,6 +293,36 @@ window.applyFont = (fontType) => {
     }
     document.documentElement.style.setProperty('--font-cv', fontVal);
 };
+
+window.updateLayout = () => {
+    const fs = document.getElementById('rng-fontsize').value;
+    const lh = document.getElementById('rng-lineheight').value;
+    const mg = document.getElementById('rng-margin').value;
+    const sg = document.getElementById('rng-sectiongap').value;
+
+    currentLayout = { fontSize: fs, lineHeight: lh, margin: mg, sectionGap: sg };
+
+    // Update UI Labels
+    document.getElementById('val-fontsize').innerText = fs + 'pt';
+    document.getElementById('val-lineheight').innerText = lh;
+    document.getElementById('val-margin').innerText = mg + 'mm';
+    document.getElementById('val-sectiongap').innerText = sg + 'px';
+
+    // Apply CSS Variables
+    document.documentElement.style.setProperty('--cv-font-size', fs + 'pt');
+    document.documentElement.style.setProperty('--cv-line-height', lh);
+    document.documentElement.style.setProperty('--cv-padding', mg + 'mm');
+    document.documentElement.style.setProperty('--cv-section-gap', sg + 'px');
+};
+
+function applySavedLayout(layout) {
+    if(!layout) return;
+    currentLayout = layout;
+    document.documentElement.style.setProperty('--cv-font-size', layout.fontSize + 'pt');
+    document.documentElement.style.setProperty('--cv-line-height', layout.lineHeight);
+    document.documentElement.style.setProperty('--cv-padding', layout.margin + 'mm');
+    document.documentElement.style.setProperty('--cv-section-gap', layout.sectionGap + 'px');
+}
 
 // --- AUTH ---
 window.loginWithGoogle = async () => {
@@ -301,6 +375,10 @@ onAuthStateChanged(auth, async (user) => {
                 currentTheme = data.theme;
                 window.applyColor(currentTheme.color);
                 window.applyFont(currentTheme.font);
+            }
+            
+            if (data.layout) {
+                applySavedLayout(data.layout);
             }
             
             showView('editor-view');
@@ -617,6 +695,7 @@ async function saveToCloud(formData = null) {
             formData: formData, // Store structured data
             template: document.body.className,
             theme: currentTheme,
+            layout: currentLayout,
             updatedAt: new Date().toISOString() 
         }, { merge: true });
         updateStatus('online');
