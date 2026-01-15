@@ -1234,7 +1234,7 @@ input[type=range] {
 
 header { 
     text-align: center; 
-    margin-top: 15mm; /* Professional top breathing room */
+    padding-top: 20mm !important; /* Professional top breathing room using padding to avoid collapse */
     margin-bottom: 30px; 
     border-bottom: 2px solid var(--cv-accent-color); 
     padding-bottom: 25px; 
@@ -1288,7 +1288,7 @@ body.tpl-compact .compact-separator,
 body.tpl-compact .personal-details { display: block; }
 body.tpl-compact .contact-row,
 body.tpl-compact .personal-details { display: flex; }
-body.tpl-compact header { border-bottom: none; margin-bottom: 20px; padding-bottom: 0; text-align: center; }
+body.tpl-compact header { border-bottom: none; margin-bottom: 20px; padding-bottom: 0; padding-top: 20mm !important; text-align: center; }
 body.tpl-compact h1 { font-size: 2.0em; letter-spacing: 2px; margin-bottom: 8px; }
 body.tpl-compact .subtitle { font-size: 1.0em; font-weight: 700; color: #222; margin-bottom: 8px; }
 body.tpl-compact .address-line { font-size: 1em; color: #222; margin-bottom: 20px; }
@@ -1374,7 +1374,7 @@ body.tpl-compact .entry .right-col { width: 100%; padding-right: 130px; }
         width: 210mm !important; 
         max-width: 210mm !important;
         margin: 0 auto !important; 
-        padding: var(--cv-padding) !important;
+        padding: 30mm 25mm 25mm 25mm !important; /* Forced 30mm top margin for industry standard */
         box-shadow: none !important; 
         border: none !important;
         overflow: visible !important;
