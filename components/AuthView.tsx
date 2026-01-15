@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 declare global {
   interface Window {
     FirebaseService: any;
-    AuthView: any;
+    AuthView: React.ComponentType<any>;
   }
 }
 

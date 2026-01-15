@@ -7,7 +7,7 @@ declare global {
     LandingView: React.ComponentType<any>;
     AuthView: React.ComponentType<any>;
     EditorView: React.ComponentType<any>;
-    App: any;
+    App: React.ComponentType;
   }
 }
 

@@ -7,7 +7,7 @@ declare global {
   interface Window {
     FirebaseService: any;
     TemplateView: React.ComponentType<any>;
-    EditorView: any;
+    EditorView: React.ComponentType<any>;
   }
 }
 
@@ -40,9 +40,10 @@ const CVPreview = ({ cvData, cvRootRef }) => {
     const borderStyle = { borderColor: cvData.theme.color };
 
     return (
-        <div ref={cvRootRef} className="p-[20mm] bg-white w-[210mm] min-h-[297mm] cv-preview-font text-black" style={{
+        <div ref={cvRootRef} className="p-[20mm] bg-white w-[210mm] min-h-[297mm] cv-preview-font text-black shadow-lg" style={{
             fontSize: `${cvData.layout.fontSize}pt`,
             lineHeight: cvData.layout.lineHeight,
+            boxSizing: 'border-box' // Ensure padding doesn't affect width calculation
         }}>
             <header className="pb-6 mb-8 text-center" style={{...borderStyle, borderBottomWidth: '2px'}}>
                 <h1 className="text-4xl font-bold tracking-widest uppercase" style={accentStyle}>{formData.fullname || 'Ad Soyad'}</h1>
@@ -173,30 +174,40 @@ const EditorView = ({ user, setView }) => {
             if (!scaleContainer || !cvRoot) return;
 
             if (!isMobile) {
+                // Desktop Reset
                 cvRoot.style.transform = 'scale(1)';
+                cvRoot.style.transformOrigin = 'top center';
                 scaleContainer.style.width = 'auto';
                 scaleContainer.style.height = 'auto';
+                scaleContainer.style.overflow = 'visible';
                 return;
             }
 
-            const originalWidth = 794; 
-            const availableWidth = window.innerWidth - 20;
+            // Mobile Scaling
+            const originalWidth = 794; // approx 210mm in pixels at 96dpi
+            const padding = 32;
+            const availableWidth = window.innerWidth - padding;
+            
+            // Calculate scale
             const scale = Math.min(1, availableWidth / originalWidth);
 
             cvRoot.style.transformOrigin = 'top center';
             cvRoot.style.transform = `scale(${scale})`;
             
-            const scaledWidth = originalWidth * scale;
+            // Adjust container height to match scaled content
             const scaledHeight = cvRoot.scrollHeight * scale;
 
-            scaleContainer.style.width = `${scaledWidth}px`;
-            scaleContainer.style.height = `${scaledHeight}px`;
+            scaleContainer.style.width = '100%';
+            scaleContainer.style.height = `${scaledHeight + 20}px`; // Extra buffer
+            scaleContainer.style.overflow = 'hidden'; // Prevent scrollbars from the scaled element
         };
 
+        // Run resize logic
         if (isMobile && mobileTab === 'preview') {
-            setTimeout(resizePreview, 50);
-        } else {
-            resizePreview();
+            // Small delay to ensure DOM is ready
+            setTimeout(resizePreview, 100);
+        } else if (!isMobile) {
+             resizePreview();
         }
 
         window.addEventListener('resize', resizePreview);
@@ -215,75 +226,83 @@ const EditorView = ({ user, setView }) => {
     const { formData } = cvData;
 
     return (
-        <div className="flex w-screen h-screen overflow-hidden">
-            <aside className="hidden lg:flex flex-col w-64 bg-gray-800 text-white">
+        <div className="flex w-screen h-screen overflow-hidden bg-gray-100">
+            <aside className="hidden lg:flex flex-col w-64 bg-gray-800 text-white shadow-xl z-20">
                 <div className="p-4 border-b border-gray-700">
                     <h1 className="text-xl font-bold">ATS-Friendly</h1>
                 </div>
                 <nav className="flex-1 p-4 space-y-2">
-                    <button onClick={() => window.print()} className="w-full px-3 py-2 text-left rounded hover:bg-gray-700">🖨️ PDF İndir</button>
-                    <button onClick={logout} className="w-full px-3 py-2 text-left rounded hover:bg-gray-700">🚪 Çıkış Yap</button>
+                    <button onClick={() => window.print()} className="w-full px-3 py-2 text-left rounded hover:bg-gray-700 flex items-center gap-2">
+                        <span>🖨️</span> PDF İndir
+                    </button>
+                    <button onClick={logout} className="w-full px-3 py-2 text-left rounded hover:bg-gray-700 flex items-center gap-2">
+                        <span>🚪</span> Çıkış Yap
+                    </button>
                 </nav>
             </aside>
             
             <div className="flex-1 flex flex-col h-screen">
-                <div className="flex-1 lg:grid lg:grid-cols-2 overflow-hidden">
-                    <div className={`p-6 overflow-y-auto bg-white ${isMobile && mobileTab !== 'edit' ? 'hidden' : 'block'}`}>
-                        <h2 className="text-xl font-bold mb-6">Bilgilerinizi Düzenleyin</h2>
+                <div className="flex-1 lg:grid lg:grid-cols-2 overflow-hidden relative">
+                    {/* Editor Section */}
+                    <div className={`h-full overflow-y-auto bg-white border-r border-gray-200 p-6 ${isMobile && mobileTab !== 'edit' ? 'hidden' : 'block'}`}>
+                        <h2 className="text-xl font-bold mb-6 text-gray-800">Bilgilerinizi Düzenleyin</h2>
                         <div className="mb-6">
-                            <h3 className="font-bold text-blue-600 mb-2">Kişisel Bilgiler</h3>
+                            <h3 className="font-bold text-blue-600 mb-2 border-b pb-1">Kişisel Bilgiler</h3>
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                <input value={formData.fullname} onChange={e => updateFormData({ fullname: e.target.value })} placeholder="Ad Soyad" className="p-2 border rounded"/>
-                                <input value={formData.title} onChange={e => updateFormData({ title: e.target.value })} placeholder="Unvan" className="p-2 border rounded"/>
-                                <input type="email" value={formData.email} onChange={e => updateFormData({ email: e.target.value })} placeholder="E-posta" className="p-2 border rounded"/>
-                                <input value={formData.phone} onChange={e => updateFormData({ phone: e.target.value })} placeholder="Telefon" className="p-2 border rounded"/>
-                                <input value={formData.address} onChange={e => updateFormData({ address: e.target.value })} placeholder="Adres" className="p-2 border rounded sm:col-span-2"/>
+                                <input value={formData.fullname} onChange={e => updateFormData({ fullname: e.target.value })} placeholder="Ad Soyad" className="p-2 border rounded focus:ring-2 focus:ring-blue-400 outline-none"/>
+                                <input value={formData.title} onChange={e => updateFormData({ title: e.target.value })} placeholder="Unvan" className="p-2 border rounded focus:ring-2 focus:ring-blue-400 outline-none"/>
+                                <input type="email" value={formData.email} onChange={e => updateFormData({ email: e.target.value })} placeholder="E-posta" className="p-2 border rounded focus:ring-2 focus:ring-blue-400 outline-none"/>
+                                <input value={formData.phone} onChange={e => updateFormData({ phone: e.target.value })} placeholder="Telefon" className="p-2 border rounded focus:ring-2 focus:ring-blue-400 outline-none"/>
+                                <input value={formData.address} onChange={e => updateFormData({ address: e.target.value })} placeholder="Adres" className="p-2 border rounded sm:col-span-2 focus:ring-2 focus:ring-blue-400 outline-none"/>
                             </div>
                         </div>
 
                         <div className="mb-6">
-                            <h3 className="font-bold text-blue-600 mb-2">Profil Özeti</h3>
-                            <textarea value={formData.summary} onChange={e => updateFormData({ summary: e.target.value })} placeholder="Kısa özet..." rows={4} className="w-full p-2 border rounded"></textarea>
+                            <h3 className="font-bold text-blue-600 mb-2 border-b pb-1">Profil Özeti</h3>
+                            <textarea value={formData.summary} onChange={e => updateFormData({ summary: e.target.value })} placeholder="Kısa özet..." rows={4} className="w-full p-2 border rounded focus:ring-2 focus:ring-blue-400 outline-none"></textarea>
                         </div>
                         
                         <div className="mb-6">
-                            <h3 className="font-bold text-blue-600 mb-2">İş Deneyimi</h3>
+                            <h3 className="font-bold text-blue-600 mb-2 border-b pb-1">İş Deneyimi</h3>
                             {formData.experiences.map((exp, index) => (
-                                <div key={exp.id} className="p-4 mb-2 bg-gray-50 border rounded-lg space-y-2">
-                                    <input value={exp.title} onChange={e => updateFormData(p => ({ experiences: p.experiences.map((i, idx) => idx === index ? {...i, title: e.target.value} : i) }))} placeholder="Pozisyon" className="w-full p-2 border rounded"/>
-                                    <input value={exp.company} onChange={e => updateFormData(p => ({ experiences: p.experiences.map((i, idx) => idx === index ? {...i, company: e.target.value} : i) }))} placeholder="Şirket" className="w-full p-2 border rounded"/>
-                                    <input value={exp.date} onChange={e => updateFormData(p => ({ experiences: p.experiences.map((i, idx) => idx === index ? {...i, date: e.target.value} : i) }))} placeholder="Tarih (örn: Oca 2020 - Halen)" className="w-full p-2 border rounded"/>
-                                    <textarea value={exp.desc} onChange={e => updateFormData(p => ({ experiences: p.experiences.map((i, idx) => idx === index ? {...i, desc: e.target.value} : i) }))} placeholder="Açıklama" rows={3} className="w-full p-2 border rounded"></textarea>
-                                    <button onClick={() => updateFormData(p => ({ experiences: p.experiences.filter(i => i.id !== exp.id) }))} className="text-red-500 text-sm">Deneyimi Sil</button>
+                                <div key={exp.id} className="p-4 mb-4 bg-gray-50 border border-gray-200 rounded-lg space-y-3">
+                                    <input value={exp.title} onChange={e => updateFormData(p => ({ experiences: p.experiences.map((i, idx) => idx === index ? {...i, title: e.target.value} : i) }))} placeholder="Pozisyon" className="w-full p-2 border rounded bg-white"/>
+                                    <input value={exp.company} onChange={e => updateFormData(p => ({ experiences: p.experiences.map((i, idx) => idx === index ? {...i, company: e.target.value} : i) }))} placeholder="Şirket" className="w-full p-2 border rounded bg-white"/>
+                                    <input value={exp.date} onChange={e => updateFormData(p => ({ experiences: p.experiences.map((i, idx) => idx === index ? {...i, date: e.target.value} : i) }))} placeholder="Tarih (örn: Oca 2020 - Halen)" className="w-full p-2 border rounded bg-white"/>
+                                    <textarea value={exp.desc} onChange={e => updateFormData(p => ({ experiences: p.experiences.map((i, idx) => idx === index ? {...i, desc: e.target.value} : i) }))} placeholder="Açıklama" rows={3} className="w-full p-2 border rounded bg-white"></textarea>
+                                    <div className="text-right">
+                                        <button onClick={() => updateFormData(p => ({ experiences: p.experiences.filter(i => i.id !== exp.id) }))} className="text-red-500 text-sm hover:underline">Deneyimi Sil</button>
+                                    </div>
                                 </div>
                             ))}
-                            <button onClick={() => updateFormData(p => ({ experiences: [...p.experiences, {id: generateId(), title: '', company: '', date: '', desc: ''}] }))} className="w-full p-2 mt-2 text-blue-600 border-2 border-dashed border-blue-300 rounded hover:bg-blue-50">+ İş Ekle</button>
+                            <button onClick={() => updateFormData(p => ({ experiences: [...p.experiences, {id: generateId(), title: '', company: '', date: '', desc: ''}] }))} className="w-full p-3 mt-2 text-blue-600 font-semibold border-2 border-dashed border-blue-200 rounded-lg hover:bg-blue-50 hover:border-blue-400 transition-colors">+ İş Deneyimi Ekle</button>
                         </div>
                     </div>
 
-                    <div className={`flex justify-center items-start p-4 lg:p-8 overflow-auto bg-gray-200 ${isMobile && mobileTab !== 'preview' ? 'hidden' : 'flex'}`}>
-                        <div ref={cvScaleContainerRef} className="print-area">
+                    {/* Preview Section */}
+                    <div className={`bg-gray-200 overflow-auto flex justify-center h-full ${isMobile && mobileTab !== 'preview' ? 'hidden' : 'flex'} ${!isMobile ? 'items-start py-8' : 'items-start pt-4'}`}>
+                        <div ref={cvScaleContainerRef} className="print-area transition-all duration-300 ease-out origin-top">
                            <CVPreview cvData={cvData} cvRootRef={cvRootRef} />
                         </div>
                     </div>
                 </div>
 
                 {isMobile && (
-                    <div className="flex items-center bg-white border-t border-gray-200 shadow-inner h-16">
-                        <button onClick={() => setMobileTab('edit')} className={`flex-1 flex flex-col items-center justify-center h-full text-xs font-bold ${mobileTab === 'edit' ? 'text-blue-600' : 'text-gray-500'}`}>
-                            <span className="text-2xl">✏️</span>
+                    <div className="flex items-center bg-white border-t border-gray-200 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)] h-16 z-30">
+                        <button onClick={() => setMobileTab('edit')} className={`flex-1 flex flex-col items-center justify-center h-full text-xs font-bold transition-colors ${mobileTab === 'edit' ? 'text-blue-600 bg-blue-50' : 'text-gray-500 hover:bg-gray-50'}`}>
+                            <span className="text-xl mb-0.5">✏️</span>
                             Düzenle
                         </button>
-                        <button onClick={() => setMobileTab('preview')} className={`flex-1 flex flex-col items-center justify-center h-full text-xs font-bold ${mobileTab === 'preview' ? 'text-blue-600' : 'text-gray-500'}`}>
-                            <span className="text-2xl">👁️</span>
+                        <button onClick={() => setMobileTab('preview')} className={`flex-1 flex flex-col items-center justify-center h-full text-xs font-bold transition-colors ${mobileTab === 'preview' ? 'text-blue-600 bg-blue-50' : 'text-gray-500 hover:bg-gray-50'}`}>
+                            <span className="text-xl mb-0.5">👁️</span>
                             Önizle
                         </button>
-                        <button onClick={() => window.print()} className="flex-1 flex flex-col items-center justify-center h-full text-xs font-bold text-gray-500">
-                             <span className="text-2xl">🖨️</span>
+                        <button onClick={() => window.print()} className="flex-1 flex flex-col items-center justify-center h-full text-xs font-bold text-gray-500 hover:bg-gray-50 transition-colors">
+                             <span className="text-xl mb-0.5">🖨️</span>
                             İndir
                         </button>
-                        <button onClick={logout} className="flex-1 flex flex-col items-center justify-center h-full text-xs font-bold text-gray-500">
-                             <span className="text-2xl">🚪</span>
+                        <button onClick={logout} className="flex-1 flex flex-col items-center justify-center h-full text-xs font-bold text-gray-500 hover:bg-gray-50 transition-colors">
+                             <span className="text-xl mb-0.5">🚪</span>
                             Çıkış
                         </button>
                     </div>

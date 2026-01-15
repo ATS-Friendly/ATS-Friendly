@@ -12,6 +12,10 @@
     <style>
       body {
         font-family: 'Plus Jakarta Sans', sans-serif;
+        overflow-x: hidden; /* Prevent horizontal scroll on mobile */
+      }
+      * {
+        box-sizing: border-box;
       }
       .cv-preview-font {
         font-family: 'PT Serif', serif;
@@ -88,7 +92,7 @@
     <!-- Babel -->
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     
-    <!-- Import Map: FIXED VERSIONS -->
+    <!-- Import Map: STRICT VERSIONS ONLY (No wildcards for Firebase) -->
     <script type="importmap">
 {
   "imports": {
@@ -116,15 +120,16 @@
     <div id="root"></div>
     
     <!-- 
-      We use only 'react' preset. 
-      We removed 'typescript' preset and converted code to Pure JS to guarantee no parsing errors.
+      Scripts: 
+      Added 'typescript' preset back because files use TS syntax (interface, declare global).
+      Removed 'env' preset to avoid 'require' errors.
     -->
-    <script type="text/babel" data-type="module" data-presets="react" src="./services/firebaseService.ts"></script>
-    <script type="text/babel" data-type="module" data-presets="react" src="./components/TemplateView.tsx"></script>
-    <script type="text/babel" data-type="module" data-presets="react" src="./components/LandingView.tsx"></script>
-    <script type="text/babel" data-type="module" data-presets="react" src="./components/AuthView.tsx"></script>
-    <script type="text/babel" data-type="module" data-presets="react" src="./components/EditorView.tsx"></script>
-    <script type="text/babel" data-type="module" data-presets="react" src="./App.tsx"></script>
-    <script type="text/babel" data-type="module" data-presets="react" src="./index.tsx"></script>
+    <script type="text/babel" data-type="module" data-presets="typescript,react" src="./services/firebaseService.ts"></script>
+    <script type="text/babel" data-type="module" data-presets="typescript,react" src="./components/TemplateView.tsx"></script>
+    <script type="text/babel" data-type="module" data-presets="typescript,react" src="./components/LandingView.tsx"></script>
+    <script type="text/babel" data-type="module" data-presets="typescript,react" src="./components/AuthView.tsx"></script>
+    <script type="text/babel" data-type="module" data-presets="typescript,react" src="./components/EditorView.tsx"></script>
+    <script type="text/babel" data-type="module" data-presets="typescript,react" src="./App.tsx"></script>
+    <script type="text/babel" data-type="module" data-presets="typescript,react" src="./index.tsx"></script>
   </body>
 </html>
