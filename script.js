@@ -29,6 +29,13 @@ const db = getFirestore(app);
 const googleProvider = new GoogleAuthProvider();
 const appId = "mono-cv-app";
 
+// --- SERVICE WORKER REGISTRATION ---
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js').catch(err => console.log("SW Reg Error:", err));
+    });
+}
+
 let isLoginMode = true;
 let currentUser = null;
 let isSyncing = false;
@@ -199,8 +206,12 @@ window.setLanguage = (lang) => {
     });
 
     // Toggle Button Style
-    document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
-    document.querySelector(`.lang-btn[onclick="setLanguage('${lang}')"]`).classList.add('active');
+    document.querySelectorAll('.lang-btn-mini, .lang-btn-fab').forEach(btn => {
+        btn.classList.remove('active');
+        if (btn.getAttribute('onclick').includes(`'${lang}'`)) {
+            btn.classList.add('active');
+        }
+    });
 
     // Update Auth Labels Manually
     updateAuthUI();
@@ -258,7 +269,7 @@ window.resizePreview = () => {
     const originalWidth = 794; 
     
     // Calculate available width with padding
-    const padding = 20; 
+    const padding = 32; /* Increased padding for better mobile edge clearance */
     const availableWidth = window.innerWidth - padding;
 
     // Calculate Scale Factor
@@ -270,14 +281,20 @@ window.resizePreview = () => {
     
     // 2. Resize the OUTER wrapper (#cv-scale-container) to match the SCALED dimensions
     const scaledWidth = originalWidth * scale;
-    const scaledHeight = cvRoot.scrollHeight * scale;
+    // Use getBoundingClientRect to get exact scaled height
+    const scaledHeight = cvRoot.getBoundingClientRect().height;
 
     scaleContainer.style.width = `${scaledWidth}px`;
     scaleContainer.style.height = `${scaledHeight}px`;
     
-    // 3. Add margins for spacing
-    scaleContainer.style.marginTop = '20px';
-    scaleContainer.style.marginBottom = '120px'; // Extra space for FAB
+    // 3. Spacing
+    scaleContainer.style.marginTop = '10px';
+    scaleContainer.style.marginBottom = '100px'; 
+    
+    // Ensure parent is scrolled to top when scaling happens
+    if (previewPanel.scrollTop > 500) {
+        // Only if they were really far down
+    }
 };
 
 // Listen for window resize
@@ -288,8 +305,10 @@ window.addEventListener('resize', window.resizePreview);
 window.toggleFabMenu = () => {
     const items = document.getElementById('fab-items');
     const btn = document.getElementById('fab-trigger');
+    const overlay = document.getElementById('fab-overlay');
     items.classList.toggle('show');
     btn.classList.toggle('active');
+    overlay.classList.toggle('active');
 };
 
 
@@ -301,6 +320,7 @@ function openModal(modalId) {
     // Close FAB when opening modal
     document.getElementById('fab-items').classList.remove('show');
     document.getElementById('fab-trigger').classList.remove('active');
+    document.getElementById('fab-overlay').classList.remove('active');
 
     // Center modal or simple fixed positioning for mobile stability
     if(window.innerWidth > 1024) {
@@ -569,7 +589,7 @@ window.addFormExperience = (data = null) => {
     const t = translations[currentLang];
     
     div.innerHTML = `
-        <button class="remove-dynamic-btn" onclick="removeItemAndRefresh(this)">×</button>
+        <button class="remove-dynamic-btn" onclick="removeItemAndRefresh(this)" aria-label="Remove item">×</button>
         <div class="input-grid">
             <div class="input-group">
                 <label>${t.lbl_job_title}</label>
@@ -600,7 +620,7 @@ window.addFormEducation = (data = null) => {
     const t = translations[currentLang];
     
     div.innerHTML = `
-        <button class="remove-dynamic-btn" onclick="removeItemAndRefresh(this)">×</button>
+        <button class="remove-dynamic-btn" onclick="removeItemAndRefresh(this)" aria-label="Remove item">×</button>
         <div class="input-grid">
             <div class="input-group">
                 <label>${t.lbl_school}</label>
@@ -627,7 +647,7 @@ window.addFormCustomSection = (data = null) => {
     const t = translations[currentLang];
     
     div.innerHTML = `
-        <button class="remove-dynamic-btn" onclick="removeItemAndRefresh(this)">×</button>
+        <button class="remove-dynamic-btn" onclick="removeItemAndRefresh(this)" aria-label="Remove item">×</button>
         <div class="input-group" style="margin-bottom:10px;">
             <label>${t.lbl_section_title}</label>
             <input type="text" class="form-input custom-title" placeholder="Ex: Certificates" value="${data ? data.title : ''}" oninput="generateCVFromForm()">

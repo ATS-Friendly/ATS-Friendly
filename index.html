@@ -13,6 +13,10 @@
     
     <!-- CSS Link -->
     <link rel="stylesheet" href="style.css">
+    
+    <!-- PWA -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#3498db">
 </head>
 <body>
 
@@ -23,7 +27,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h3 data-i18n="modal_theme_title">Tasarım Ayarları</h3>
-                <button class="close-modal" onclick="closeThemeModal()">×</button>
+                <button class="close-modal" onclick="closeThemeModal()" aria-label="Close modal">×</button>
             </div>
             <div class="modal-body">
                 <div class="setting-group">
@@ -65,7 +69,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h3 data-i18n="modal_layout_title">Sayfa Düzeni</h3>
-                <button class="close-modal" onclick="closeLayoutModal()">×</button>
+                <button class="close-modal" onclick="closeLayoutModal()" aria-label="Close modal">×</button>
             </div>
             <div class="modal-body">
                 <div class="setting-group">
@@ -114,6 +118,10 @@
                 <div class="brand-text" style="color:#2d3436;">ATS-Friendly</div>
             </div>
             <div class="header-actions">
+                <div class="lang-switcher-minimal">
+                    <button class="lang-btn-mini active" onclick="setLanguage('tr')">TR</button>
+                    <button class="lang-btn-mini" onclick="setLanguage('en')">EN</button>
+                </div>
                 <button class="btn-text" onclick="showAuth(true)">Giriş Yap</button>
                 <button class="btn-primary-small" onclick="showAuth(false)">Kayıt Ol</button>
             </div>
@@ -387,6 +395,7 @@
         </div>
 
         <!-- NEW MOBILE FLOATING ACTION MENU -->
+        <div id="fab-overlay" class="fab-overlay" onclick="toggleFabMenu()"></div>
         <div class="mobile-fab-container">
             <div class="fab-menu-items" id="fab-items">
                 <button class="fab-item" onclick="openThemeModal()">
@@ -407,8 +416,12 @@
                  <button class="fab-item" onclick="logout()">
                     <span class="fab-label">Çıkış</span> 🚪
                 </button>
+                <div class="fab-item lang-selector-fab">
+                    <button class="lang-btn-fab" onclick="setLanguage('tr')">TR</button>
+                    <button class="lang-btn-fab" onclick="setLanguage('en')">EN</button>
+                </div>
             </div>
-            <button class="fab-main-btn" onclick="toggleFabMenu()" id="fab-trigger">
+            <button class="fab-main-btn" onclick="toggleFabMenu()" id="fab-trigger" aria-label="Open settings menu">
                 ⚙️
             </button>
         </div>
