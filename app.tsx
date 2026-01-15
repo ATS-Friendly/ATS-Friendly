@@ -1,12 +1,9 @@
-
 import React, { useState, useEffect } from 'react';
-import { onAuthStateChanged, User } from 'firebase/auth';
+import { onAuthStateChanged } from 'firebase/auth';
 
-export type View = 'landing' | 'auth' | 'editor';
-
-const App: React.FC = () => {
-  const [view, setView] = useState<View>('landing');
-  const [currentUser, setCurrentUser] = useState<User | null>(null);
+const App = () => {
+  const [view, setView] = useState('landing');
+  const [currentUser, setCurrentUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
   // Access globals
@@ -60,4 +57,4 @@ const App: React.FC = () => {
   return <div className="min-h-screen bg-slate-100">{renderView()}</div>;
 };
 
-(window as any).App = App;
+window.App = App;

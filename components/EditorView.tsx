@@ -1,58 +1,4 @@
-
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { User } from 'firebase/auth';
-
-// --- Type definitions (inlined to avoid import issues in no-build env) ---
-// We can't import interfaces at runtime in this setup.
-interface Experience {
-  id: string;
-  title: string;
-  company: string;
-  date: string;
-  desc: string;
-}
-
-interface Education {
-  id: string;
-  school: string;
-  degree: string;
-  date: string;
-}
-
-interface CustomSection {
-  id: string;
-  title: string;
-  content: string;
-}
-
-interface CvFormData {
-  fullname: string;
-  title: string;
-  email: string;
-  phone: string;
-  address: string;
-  birthplace: string;
-  license: string;
-  summary: string;
-  experiences: Experience[];
-  education: Education[];
-  customSections: CustomSection[];
-}
-
-interface CvDocument {
-  formData: CvFormData;
-  template: 'tpl-classic' | 'tpl-compact';
-  theme: {
-    color: string;
-    font: string;
-  };
-  layout: {
-    fontSize: number;
-    lineHeight: number;
-    margin: number;
-    sectionGap: number;
-  };
-}
 
 // Access globals
 const { getCvDocument, saveCvDocument, logout } = (window as any).FirebaseService;
@@ -61,7 +7,7 @@ const TemplateView = (window as any).TemplateView;
 // Helper to generate unique IDs for new items
 const generateId = () => `id_${new Date().getTime()}_${Math.random()}`;
 
-const initialFormData: CvFormData = {
+const initialFormData = {
   fullname: "Adınız Soyadınız",
   title: "Unvanınız",
   email: "email@adresiniz.com",
@@ -75,7 +21,7 @@ const initialFormData: CvFormData = {
   customSections: [],
 };
 
-const initialCvDoc: CvDocument = {
+const initialCvDoc = {
   formData: initialFormData,
   template: 'tpl-classic',
   theme: { color: '#2c3e50', font: 'ptserif' },
@@ -83,7 +29,7 @@ const initialCvDoc: CvDocument = {
 };
 
 
-const CVPreview: React.FC<{ cvData: CvDocument, cvRootRef: React.RefObject<HTMLDivElement> }> = ({ cvData, cvRootRef }) => {
+const CVPreview = ({ cvData, cvRootRef }) => {
     const { formData, template } = cvData;
     const isCompact = template === 'tpl-compact';
 
@@ -168,18 +114,18 @@ const CVPreview: React.FC<{ cvData: CvDocument, cvRootRef: React.RefObject<HTMLD
     );
 };
 
-const EditorView: React.FC<{ user: User; setView: any; }> = ({ user }) => {
-    const [cvData, setCvData] = useState<CvDocument | null>(null);
-    const [mobileTab, setMobileTab] = useState<'edit' | 'preview'>('edit');
+const EditorView = ({ user, setView }) => {
+    const [cvData, setCvData] = useState(null);
+    const [mobileTab, setMobileTab] = useState('edit');
     const [isMobile, setIsMobile] = useState(window.innerWidth <= 1024);
 
-    const cvScaleContainerRef = useRef<HTMLDivElement>(null);
-    const cvRootRef = useRef<HTMLDivElement>(null);
+    const cvScaleContainerRef = useRef(null);
+    const cvRootRef = useRef(null);
 
-    const debounceTimeoutRef = useRef<number | null>(null);
+    const debounceTimeoutRef = useRef(null);
 
     // Debounced save function
-    const debouncedSave = useCallback((data: CvDocument) => {
+    const debouncedSave = useCallback((data) => {
         if (debounceTimeoutRef.current) {
             clearTimeout(debounceTimeoutRef.current);
         }
@@ -201,7 +147,7 @@ const EditorView: React.FC<{ user: User; setView: any; }> = ({ user }) => {
     }, [user.uid]);
     
     // Update state and trigger save
-    const updateCvData = (updates: Partial<CvDocument> | ((prev: CvDocument) => Partial<CvDocument>)) => {
+    const updateCvData = (updates) => {
         setCvData(prevData => {
             if (!prevData) return null;
             const newPartialData = typeof updates === 'function' ? updates(prevData) : updates;
@@ -211,7 +157,7 @@ const EditorView: React.FC<{ user: User; setView: any; }> = ({ user }) => {
         });
     };
 
-    const updateFormData = (updates: Partial<CvFormData> | ((prev: CvFormData) => Partial<CvFormData>)) => {
+    const updateFormData = (updates) => {
         updateCvData(prev => {
             const newPartialForm = typeof updates === 'function' ? updates(prev.formData) : updates;
             return { formData: { ...prev.formData, ...newPartialForm } };
@@ -272,7 +218,7 @@ const EditorView: React.FC<{ user: User; setView: any; }> = ({ user }) => {
 
 
     if (cvData === null) {
-        return <TemplateView onSelectTemplate={(template: any) => {
+        return <TemplateView onSelectTemplate={(template) => {
             const newData = { ...initialCvDoc, template };
             setCvData(newData);
             saveCvDocument(user.uid, newData);
@@ -368,4 +314,4 @@ const EditorView: React.FC<{ user: User; setView: any; }> = ({ user }) => {
     );
 };
 
-(window as any).EditorView = EditorView;
+window.EditorView = EditorView;

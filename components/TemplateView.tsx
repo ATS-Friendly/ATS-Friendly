@@ -1,7 +1,7 @@
 
 import React from 'react';
 
-const TemplateView = ({ onSelectTemplate }: { onSelectTemplate: any }) => {
+const TemplateView = ({ onSelectTemplate }) => {
   return (
     <div className="flex flex-col items-center justify-center min-h-screen p-4 bg-gray-50">
       <div className="text-center">
@@ -38,4 +38,4 @@ const TemplateView = ({ onSelectTemplate }: { onSelectTemplate: any }) => {
   );
 };
 
-(window as any).TemplateView = TemplateView;
+window.TemplateView = TemplateView;

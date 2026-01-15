@@ -1,7 +1,7 @@
 
 import React from 'react';
 
-const LandingView = ({ setView }: { setView: any }) => {
+const LandingView = ({ setView }) => {
   const scrollToFeatures = () => {
     document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' });
   };
@@ -79,4 +79,4 @@ const LandingView = ({ setView }: { setView: any }) => {
   );
 };
 
-(window as any).LandingView = LandingView;
+window.LandingView = LandingView;
