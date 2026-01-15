@@ -419,13 +419,6 @@ body {
     display: flex; 
 }
 
-/* --- LANGUAGE SWITCHER --- */
-/* Hide on landing page usually, or position absolute top right */
-.lang-switcher {
-    /* If on landing page, maybe style differently or hide if clashing */
-    /* Keeping existing logic */
-}
-
 /* --- TEMPLATE SELECTION --- */
 #template-view { 
     flex-direction: column; 
@@ -492,7 +485,7 @@ body {
     color: #636e72;
 }
 
-/* --- MODERN DASHBOARD SIDEBAR --- */
+/* --- MODERN DASHBOARD SIDEBAR (DESKTOP) --- */
 .sidebar {
     background-color: var(--sidebar-bg);
     color: var(--sidebar-text);
@@ -512,8 +505,8 @@ body {
     }
 }
 
+/* HIDE SIDEBAR ON MOBILE - KEY CHANGE */
 @media screen and (max-width: 1024px) {
-    /* HIDE SIDEBAR ON MOBILE */
     .sidebar { display: none !important; }
 }
 
@@ -634,22 +627,32 @@ body {
     box-sizing: border-box;
 }
 
-/* MOBILE VIEW TOGGLE - REMOVED */
-.mobile-view-toggle { display: none; }
-
-
+/* --- MOBILE SPECIFIC OVERRIDES --- */
 @media screen and (max-width: 1024px) {
     .editor-layout {
         flex-direction: column; /* Vertical Stack */
         padding-left: 0;
         padding-bottom: 0; 
         height: auto;
-        overflow-y: auto; /* Allow scrolling the whole page */
+        overflow-y: hidden; /* Stop page scroll */
+        background: #f0f2f5;
+        height: 100vh;
     }
     
-    /* Show both panels vertically stacked */
-    .editor-panel-form { display: block; width: 100%; }
-    .editor-panel-preview { display: block; width: 100%; }
+    /* Hide tabs initially */
+    .editor-panel-form, .editor-panel-preview { 
+        display: none !important; 
+        width: 100% !important; 
+        height: calc(100vh - 60px) !important; /* Fixed height minus nav */
+        overflow-y: auto; 
+        padding-bottom: 20px;
+    }
+    
+    /* Active tab visible */
+    .editor-panel-form.active-mobile-tab, 
+    .editor-panel-preview.active-mobile-tab { 
+        display: block !important; 
+    }
 }
 
 /* LEFT PANEL: FORM */
@@ -667,8 +670,7 @@ body {
     .editor-panel-form {
         width: 100%;
         border-right: none;
-        border-bottom: 1px solid #eee;
-        padding-bottom: 20px; 
+        padding: 20px;
     }
 }
 
@@ -683,21 +685,22 @@ body {
     overflow-x: auto; /* Prevent lock on mobile */
     padding: 40px;
     
-    /* RESET FLEXBOX CENTERING FOR MOBILE PREVIEW TO AVOID ALIGNMENT BUGS */
+    /* Centering */
     display: flex;
     justify-content: center;
     align-items: flex-start;
 }
 @media screen and (max-width: 1024px) {
     .editor-panel-preview {
-        padding: 40px 10px; /* Some padding */
-        min-height: auto;
-        display: block; /* Standard block layout for mobile */
-        text-align: center; /* Center inline-block children */
+        padding: 10px; 
+        background: #dcdde1; /* Darker bg for contrast */
+        display: flex; 
+        justify-content: center;
+        align-items: flex-start;
     }
 }
 
-/* --- FORM STYLES (Adapted for Side Panel) --- */
+/* --- FORM STYLES --- */
 .form-block {
     margin-bottom: 25px;
     padding-bottom: 25px;
@@ -779,13 +782,12 @@ textarea.form-input { resize: vertical; }
     color: var(--primary-color);
 }
 
-/* --- THEME & LAYOUT MODAL (Floating on Desktop, Bottom Sheet on Mobile) --- */
+/* --- THEME & LAYOUT MODAL --- */
 #theme-modal, #layout-modal {
     display: none;
     position: fixed;
     top: 0; left: 0;
     width: 0; height: 0;
-    /* Increase Z-index to cover FAB (2800) */
     z-index: 3000;
 }
 #theme-modal.active, #layout-modal.active { display: block; }
@@ -799,33 +801,6 @@ textarea.form-input { resize: vertical; }
     border: 1px solid rgba(0,0,0,0.05);
     overflow: hidden;
     animation: fadeInScale 0.2s ease-out;
-}
-
-/* MOBILE BOTTOM SHEET STYLE WITH TRANSPARENCY */
-@media screen and (max-width: 1024px) {
-    #theme-modal .modal-content, #layout-modal .modal-content {
-        width: 100% !important;
-        max-width: 100% !important;
-        left: 0 !important;
-        top: auto !important;
-        bottom: 0 !important;
-        border-radius: 20px 20px 0 0;
-        transform: none !important; /* Disable drag position */
-        animation: slideUp 0.3s ease-out;
-        max-height: 60vh; /* Limit height so users can see CV behind */
-        overflow-y: auto;
-        box-shadow: 0 -5px 25px rgba(0,0,0,0.2);
-        
-        /* Glassmorphism attempt for transparency */
-        background: rgba(255, 255, 255, 0.95); /* Slightly less transparent for readability */
-        backdrop-filter: blur(10px);
-        -webkit-backdrop-filter: blur(10px);
-    }
-}
-
-@keyframes slideUp {
-    from { transform: translateY(100%); }
-    to { transform: translateY(0); }
 }
 
 @keyframes fadeInScale { 
@@ -843,14 +818,6 @@ textarea.form-input { resize: vertical; }
     cursor: move; 
     user-select: none;
 }
-/* Disable drag cursor on mobile */
-@media screen and (max-width: 1024px) {
-    .modal-header { 
-        cursor: default; 
-        background: rgba(248, 249, 250, 0.8);
-    }
-}
-
 .modal-header h3 { margin: 0; font-size: 16px; color: #2d3436; }
 .close-modal {
     background: none; border: none; font-size: 20px; cursor: pointer; color: #999;
@@ -876,10 +843,6 @@ textarea.form-input { resize: vertical; }
 }
 .font-btn:hover { border-color: var(--primary-color); background: #f0faff; }
 .modal-footer { padding: 15px; border-top: 1px solid #eee; background: #fff; }
-
-@media screen and (max-width: 1024px) {
-    .modal-footer { background: rgba(255, 255, 255, 0.8); }
-}
 
 /* Range Sliders */
 .range-header {
@@ -917,10 +880,13 @@ input[type=range] {
         transform-origin: top center;
     }
 }
+
+/* MOBILE SCALING FIX */
 @media screen and (max-width: 1024px) {
     #cv-scale-container {
-        display: block; /* Standard block */
-        margin: 0 auto !important; /* Auto margins to center */
+        /* JS sets width/height, we just ensure no margins mess it up */
+        margin: 0; 
+        box-shadow: 0 5px 10px rgba(0,0,0,0.2);
     }
 }
 
@@ -1043,7 +1009,7 @@ body.tpl-compact .entry .right-col { width: 100%; padding-right: 130px; }
         -webkit-print-color-adjust: exact;
         print-color-adjust: exact;
     }
-    .sidebar, #auth-view, #template-view, #landing-view, .editor-panel-form, .lang-switcher, #toast, .modal-overlay, #theme-modal, #layout-modal, .mobile-view-toggle, .mobile-fab-container { display: none !important; }
+    .sidebar, #auth-view, #template-view, #landing-view, .editor-panel-form, .lang-switcher, #toast, .modal-overlay, #theme-modal, #layout-modal, .mobile-view-toggle, .mobile-fab-container, .mobile-bottom-nav { display: none !important; }
     
     /* RESET EDITOR LAYOUT FOR PRINT */
     .editor-layout { display: block; padding: 0; width: 100%; height: auto; }
@@ -1081,89 +1047,41 @@ body.tpl-compact .entry .right-col { width: 100%; padding-right: 130px; }
     }
 }
 
-/* --- MOBILE FLOATING ACTION MENU --- */
-.mobile-fab-container {
+/* --- MOBILE BOTTOM NAVIGATION --- */
+.mobile-bottom-nav {
     display: none;
     position: fixed;
-    bottom: 30px;
-    left: 20px;
-    /* Z-index below modal (3000) but high enough above content */
-    z-index: 2800;
-    flex-direction: column-reverse;
-    align-items: flex-start;
-    gap: 15px;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 60px;
+    background: white;
+    box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+    z-index: 5000;
+    justify-content: space-around;
+    align-items: center;
+    border-top: 1px solid #eee;
 }
 
 @media screen and (max-width: 1024px) {
-    .mobile-fab-container { display: flex; }
+    .mobile-bottom-nav { display: flex; }
+    /* Hide desktop FAB if it exists */
+    .mobile-fab-container { display: none !important; } 
 }
 
-.fab-main-btn {
-    width: 56px;
-    height: 56px;
-    border-radius: 50%;
-    background: var(--primary-color);
-    color: white;
+.nav-tab {
+    background: none;
     border: none;
-    font-size: 24px;
-    box-shadow: 0 4px 15px rgba(52, 152, 219, 0.4);
-    cursor: pointer;
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
-    transition: transform 0.3s ease;
-    z-index: 2802;
-}
-.fab-main-btn.active {
-    transform: rotate(45deg);
-    background: #e74c3c;
-}
-
-.fab-menu-items {
-    display: flex;
-    flex-direction: column-reverse; /* Bottom to top */
-    gap: 12px;
-    opacity: 0;
-    pointer-events: none;
-    transform: translateY(20px);
-    transition: all 0.3s ease;
-    align-items: flex-start;
-}
-.fab-menu-items.show {
-    opacity: 1;
-    pointer-events: auto;
-    transform: translateY(0);
-}
-
-/* TRANSPARENT MENU ITEM STYLE */
-.fab-item {
-    /* Glassmorphism background */
-    background: rgba(255, 255, 255, 0.65);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-    
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    padding: 10px 15px;
-    border-radius: 30px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-    cursor: pointer;
-    font-size: 14px;
-    color: #2d3436;
+    color: #95a5a6;
+    font-size: 10px;
     font-weight: 700;
-    transition: 0.2s;
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
 }
-.fab-item:active {
-    transform: scale(0.95);
-    background: rgba(255, 255, 255, 0.85);
-}
-.fab-label {
-    margin-right: 5px;
-}
-.fab-item.danger {
-    color: #c0392b;
-    background: rgba(255, 230, 230, 0.7);
-    border-color: rgba(255, 0, 0, 0.1);
-}
+.nav-tab .tab-icon { font-size: 20px; margin-bottom: 3px; }
+.nav-tab.active { color: var(--primary-color); }

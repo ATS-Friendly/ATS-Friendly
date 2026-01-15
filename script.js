@@ -115,7 +115,12 @@ const translations = {
         lbl_school: "Okul / Üniversite",
         lbl_degree: "Bölüm / Derece",
         lbl_section_title: "Bölüm Başlığı",
-        lbl_section_content: "İçerik / Açıklama"
+        lbl_section_content: "İçerik / Açıklama",
+        
+        // Mobile Tabs
+        tab_edit: "Düzenle",
+        tab_preview: "Önizle",
+        tab_download: "İndir"
     },
     en: {
         auth_title: "Login to your account",
@@ -183,7 +188,11 @@ const translations = {
         lbl_school: "School / University",
         lbl_degree: "Degree / Field",
         lbl_section_title: "Section Title",
-        lbl_section_content: "Content / Description"
+        lbl_section_content: "Content / Description",
+        
+        tab_edit: "Edit",
+        tab_preview: "Preview",
+        tab_download: "Download"
     }
 };
 
@@ -198,14 +207,7 @@ window.setLanguage = (lang) => {
         }
     });
 
-    // Toggle Button Style
-    document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
-    document.querySelector(`.lang-btn[onclick="setLanguage('${lang}')"]`).classList.add('active');
-
-    // Update Auth Labels Manually
     updateAuthUI();
-    
-    // Refresh CV Preview to apply language changes (e.g. section headers)
     generateCVFromForm();
 };
 
@@ -231,17 +233,44 @@ function updateAuthUI() {
 window.showView = (viewId) => {
     document.querySelectorAll('.view-section').forEach(v => v.classList.remove('active'));
     const target = document.getElementById(viewId);
-    if (target) target.classList.add('active');
+    if (target) {
+        target.classList.add('active');
+        if (viewId === 'editor-view') {
+            // Default to Edit tab on Mobile when entering editor
+            window.switchMobileTab('edit');
+        }
+    }
+};
+
+// --- MOBILE TAB SYSTEM ---
+window.switchMobileTab = (tabName) => {
+    // 1. Reset Tabs UI
+    document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+    
+    // 2. Hide both Panels
+    document.querySelectorAll('.editor-panel-form, .editor-panel-preview').forEach(p => p.classList.remove('active-mobile-tab'));
+    
+    if (tabName === 'edit') {
+        document.querySelector('.nav-tab[onclick*="edit"]').classList.add('active');
+        document.querySelector('.editor-panel-form').classList.add('active-mobile-tab');
+    } else if (tabName === 'preview') {
+        document.querySelector('.nav-tab[onclick*="preview"]').classList.add('active');
+        document.querySelector('.editor-panel-preview').classList.add('active-mobile-tab');
+        
+        // Trigger resize calculation when preview becomes visible
+        setTimeout(() => {
+            window.resizePreview();
+        }, 50);
+    }
 };
 
 
-// --- AUTO SCALE PREVIEW FOR MOBILE ---
+// --- AUTO SCALE PREVIEW ---
 window.resizePreview = () => {
-    const previewPanel = document.getElementById('panel-preview');
     const scaleContainer = document.getElementById('cv-scale-container');
     const cvRoot = document.getElementById('cv-root');
 
-    if (!previewPanel || !scaleContainer || !cvRoot) return;
+    if (!scaleContainer || !cvRoot) return;
 
     if (window.innerWidth > 1024) {
         // Desktop Reset
@@ -253,38 +282,39 @@ window.resizePreview = () => {
         return;
     }
 
-    // --- NEW MOBILE LOGIC ---
-    // 210mm @ 96dpi approx 794px wide.
+    // --- MOBILE SCALING LOGIC ---
+    // A4 Width at 96 DPI is approx 794px.
     const originalWidth = 794; 
     
-    // Calculate available width with padding
+    // Available width minus a small padding (e.g., 20px total)
     const padding = 20; 
     const availableWidth = window.innerWidth - padding;
 
     // Calculate Scale Factor
     const scale = Math.min(1, availableWidth / originalWidth);
     
-    // 1. Transform the INNER content (#cv-root)
-    cvRoot.style.transformOrigin = 'top center'; 
+    // 1. Scale the content
+    cvRoot.style.transformOrigin = 'top left'; // Important: Anchor to top left
     cvRoot.style.transform = `scale(${scale})`;
     
-    // 2. Resize the OUTER wrapper (#cv-scale-container) to match the SCALED dimensions
+    // 2. Adjust Container Dimensions
+    // This is crucial: the container must shrink to match the visually scaled content
+    // so scrolling works naturally.
     const scaledWidth = originalWidth * scale;
     const scaledHeight = cvRoot.scrollHeight * scale;
 
     scaleContainer.style.width = `${scaledWidth}px`;
     scaleContainer.style.height = `${scaledHeight}px`;
     
-    // 3. Add margins for spacing
-    scaleContainer.style.marginTop = '20px';
-    scaleContainer.style.marginBottom = '120px'; // Extra space for FAB
+    // 3. Center it
+    scaleContainer.style.margin = '0 auto';
 };
 
 // Listen for window resize
 window.addEventListener('resize', window.resizePreview);
 
 
-// --- MOBILE FAB MENU ---
+// --- MOBILE FAB MENU (REMOVED/HIDDEN BY CSS, BUT KEEP JS FOR SAFETY) ---
 window.toggleFabMenu = () => {
     const items = document.getElementById('fab-items');
     const btn = document.getElementById('fab-trigger');
@@ -295,14 +325,11 @@ window.toggleFabMenu = () => {
 
 // --- MODAL YÖNETİMİ (TEMA & LAYOUT) ---
 function openModal(modalId) {
+    if(window.innerWidth <= 1024) return; // Disable modals on mobile (we will add embedded controls later if needed)
+    
     const modal = document.getElementById(modalId);
     modal.classList.add('active');
     
-    // Close FAB when opening modal
-    document.getElementById('fab-items').classList.remove('show');
-    document.getElementById('fab-trigger').classList.remove('active');
-
-    // Center modal or simple fixed positioning for mobile stability
     if(window.innerWidth > 1024) {
         if (!modal.style.top || !modal.style.left) {
             modal.style.top = "100px";
@@ -310,24 +337,16 @@ function openModal(modalId) {
             modal.style.left = initialLeft + "px";
         }
         initDragElement(modal.querySelector('.modal-content'));
-    } else {
-        // Mobile positioning handled by CSS (bottom sheet)
-        const content = modal.querySelector('.modal-content');
-        content.style.top = '';
-        content.style.left = '';
-        content.style.transform = '';
     }
 }
 
 window.openThemeModal = () => openModal('theme-modal');
 window.closeThemeModal = () => {
     document.getElementById('theme-modal').classList.remove('active');
-    // Save happens via debounce or explicit change
     saveToCloud(); 
 };
 
 window.openLayoutModal = () => {
-    // Sync slider values with current state
     document.getElementById('rng-fontsize').value = currentLayout.fontSize;
     document.getElementById('val-fontsize').innerText = currentLayout.fontSize + 'pt';
 
@@ -422,9 +441,6 @@ window.updateLayout = () => {
     document.documentElement.style.setProperty('--cv-line-height', lh);
     document.documentElement.style.setProperty('--cv-padding', mg + 'mm');
     document.documentElement.style.setProperty('--cv-section-gap', sg + 'px');
-    
-    // Note: Layout changes are usually saved when modal closes, but we can debounce here too if desired
-    // For performance, we wait for modal close or manual save
 };
 
 function applySavedLayout(layout) {
@@ -450,17 +466,10 @@ window.showAuth = (loginMode) => {
 
 window.loginWithGoogle = async () => {
     try {
-        updateStatus('syncing'); 
         await signInWithPopup(auth, googleProvider);
     } catch (e) {
         let msg = "Google Giriş Hatası: " + e.message;
-        if(e.code === 'auth/popup-blocked') {
-            msg = "Tarayıcınız açılır pencereyi engelledi. Lütfen izin verin.";
-        } else if (e.code === 'auth/popup-closed-by-user') {
-            msg = "Giriş işlemi iptal edildi.";
-        }
         alert(msg);
-        updateStatus('error');
     }
 };
 
@@ -473,8 +482,6 @@ window.handleAuth = async () => {
     const email = document.getElementById('auth-email').value;
     const password = document.getElementById('auth-password').value;
     const terms = document.getElementById('auth-terms').checked;
-    const btnTextSpan = document.getElementById('auth-btn-text');
-    const btn = document.querySelector('.auth-btn');
     
     if (!email || !password) return alert("Lütfen tüm alanları doldurun.");
     
@@ -483,21 +490,14 @@ window.handleAuth = async () => {
         return alert("Kayıt olmak için Kullanım Koşulları ve Gizlilik Politikasını kabul etmelisiniz.");
     }
 
-    const originalText = btnTextSpan.innerText;
-    btnTextSpan.innerText = translations[currentLang].auth_processing;
-    btn.disabled = true;
-
     try {
         if (isLoginMode) {
             await signInWithEmailAndPassword(auth, email, password);
         } else {
             await createUserWithEmailAndPassword(auth, email, password);
         }
-        // Success is handled by onAuthStateChanged
     } catch (e) { 
         alert("Hata: " + e.message);
-        btnTextSpan.innerText = originalText;
-        btn.disabled = false;
     }
 };
 
@@ -532,15 +532,11 @@ onAuthStateChanged(auth, async (user) => {
             }
             
             window.showView('editor-view');
-            generateCVFromForm(false); // Render CV, false = don't save immediately
-            updateStatus('online');
+            generateCVFromForm(false); 
         } else {
             window.showView('template-view');
         }
     } else {
-        // Not Logged In - Show Landing Page by default unless manually navigated to Auth
-        // If we are already on Auth view (e.g. failed login), stay there.
-        // Otherwise, show Landing.
         const currentView = document.querySelector('.view-section.active');
         if (!currentView || currentView.id === 'editor-view' || currentView.id === 'template-view') {
             window.showView('landing-view');
@@ -691,7 +687,6 @@ window.generateCVFromForm = (triggerSave = true) => {
     const isCompact = document.body.classList.contains('tpl-compact');
     let html = "";
     
-    // Labels based on Lang
     const labels = {
         exp: currentLang === 'tr' ? 'İŞ DENEYİMİ' : 'EMPLOYMENT HISTORY',
         edu: currentLang === 'tr' ? 'EĞİTİM' : 'EDUCATION',
@@ -700,8 +695,6 @@ window.generateCVFromForm = (triggerSave = true) => {
         lic: translations[currentLang].cv_label_license
     };
 
-    // GENERATE SECTION CONTENT (Grouped)
-    // -- EXPERIENCES --
     let expContent = "";
     if (data.experiences.length > 0) {
         let entries = data.experiences.map(exp => `
@@ -709,15 +702,9 @@ window.generateCVFromForm = (triggerSave = true) => {
                 <div class="left-col">${exp.date}</div>
                 <div class="right-col"><h3>${exp.title}, ${exp.company}</h3><p>${exp.desc.replace(/\n/g, '<br>')}</p></div>
             </div>`).join('');
-        
-        expContent = `
-            <div class="section">
-                <div class="section-header"><span class="section-title">${labels.exp}</span></div>
-                ${entries}
-            </div>`;
+        expContent = `<div class="section"><div class="section-header"><span class="section-title">${labels.exp}</span></div>${entries}</div>`;
     }
 
-    // -- EDUCATION --
     let eduContent = "";
     if (data.education.length > 0) {
         let entries = data.education.map(edu => `
@@ -725,28 +712,20 @@ window.generateCVFromForm = (triggerSave = true) => {
                 <div class="left-col">${edu.date}</div>
                 <div class="right-col"><h3>${edu.degree}</h3><p>${edu.school}</p></div>
             </div>`).join('');
-
-        eduContent = `
-            <div class="section">
-                <div class="section-header"><span class="section-title">${labels.edu}</span></div>
-                ${entries}
-            </div>`;
+        eduContent = `<div class="section"><div class="section-header"><span class="section-title">${labels.edu}</span></div>${entries}</div>`;
     }
 
-    // -- CUSTOM SECTIONS --
     let customContent = "";
     if (data.customSections.length > 0) {
         customContent = data.customSections.map(sec => `
             <div class="section">
                 <div class="section-header"><span class="section-title">${sec.title}</span></div>
-                <div class="entry">
-                    <div class="right-col"><p>${sec.content.replace(/\n/g, '<br>')}</p></div>
-                </div>
+                <div class="entry"><div class="right-col"><p>${sec.content.replace(/\n/g, '<br>')}</p></div></div>
             </div>
         `).join('');
     }
 
-
+    // HTML Structure
     if (isCompact) {
         html = `
         <header>
@@ -765,11 +744,8 @@ window.generateCVFromForm = (triggerSave = true) => {
                 <div class="section-header"><span class="section-title">${labels.prof}</span></div>
                 <div class="entry"><div class="right-col">${data.summary}</div></div>
             </div>
-            ${expContent}
-            ${eduContent}
-            ${customContent}
+            ${expContent} ${eduContent} ${customContent}
         </div>`;
-
     } else {
         html = `
         <header>
@@ -778,36 +754,25 @@ window.generateCVFromForm = (triggerSave = true) => {
             <div class="contact-info">
                 <span>📍 ${data.address}</span> | <span>📞 ${data.phone}</span> | <span>✉️ ${data.email}</span>
             </div>
-            <!-- Hidden Fields for switch compatibility -->
-            <div class="address-line" style="display:none">${data.address}</div>
-            <div class="contact-row" style="display:none"><span>${data.phone}</span><span>${data.email}</span></div>
-            <div class="personal-details" style="display:none">
-                 <div class="detail-item"><span class="lbl">${labels.birth}</span><span class="dots"></span><span class="val">${data.birthplace}</span></div>
-                <div class="detail-item"><span class="lbl">${labels.lic}</span><span class="dots"></span><span class="val">${data.license}</span></div>
-            </div>
         </header>
         <div id="main-content">
              <div class="section">
                 <div class="section-header"><span class="section-title">${labels.prof}</span></div>
                 <div class="entry"><div class="right-col">${data.summary}</div></div>
             </div>
-            ${expContent}
-            ${eduContent}
-            ${customContent}
+            ${expContent} ${eduContent} ${customContent}
         </div>`;
     }
 
     document.getElementById('cv-root').innerHTML = html;
     
-    // Trigger scale update if on mobile preview
+    // Trigger scale update specifically if on mobile preview tab
     if(window.innerWidth <= 1024) {
-        setTimeout(window.resizePreview, 10);
+        // Debounce slightly to allow DOM paint
+        setTimeout(() => window.resizePreview(), 10);
     }
 
-    // Trigger Debounce Save
-    if (triggerSave) {
-        triggerDebounceSave(data);
-    }
+    if (triggerSave) triggerDebounceSave(data);
 };
 
 function loadUserDataIntoForm(data) {
@@ -820,52 +785,29 @@ function loadUserDataIntoForm(data) {
     document.getElementById('inp-license').value = data.license || '';
     document.getElementById('inp-summary').value = data.summary || '';
 
-    const expList = document.getElementById('form-experiences-list');
-    expList.innerHTML = '';
-    if (data.experiences) {
-        data.experiences.forEach(exp => addFormExperience(exp));
-    }
+    document.getElementById('form-experiences-list').innerHTML = '';
+    if (data.experiences) data.experiences.forEach(exp => addFormExperience(exp));
 
-    const eduList = document.getElementById('form-education-list');
-    eduList.innerHTML = '';
-    if (data.education) {
-        data.education.forEach(edu => addFormEducation(edu));
-    }
+    document.getElementById('form-education-list').innerHTML = '';
+    if (data.education) data.education.forEach(edu => addFormEducation(edu));
 
-    const customList = document.getElementById('form-custom-list');
-    customList.innerHTML = '';
-    if (data.customSections) {
-        data.customSections.forEach(sec => addFormCustomSection(sec));
-    }
+    document.getElementById('form-custom-list').innerHTML = '';
+    if (data.customSections) data.customSections.forEach(sec => addFormCustomSection(sec));
 }
 
 
 // --- DEBOUNCE SAVE ---
 function triggerDebounceSave(data = null) {
-    // Clear existing timer
     if (saveTimeout) clearTimeout(saveTimeout);
-    
     updateStatus('syncing');
-
-    // Set new timer for 2 seconds
-    saveTimeout = setTimeout(() => {
-        saveToCloud(data);
-    }, 2000);
+    saveTimeout = setTimeout(() => { saveToCloud(data); }, 2000);
 }
-
 
 // --- SAVE / LOAD ---
 async function saveToCloud(formData = null) {
     if (!currentUser) return;
-    
-    // If saving explicitly without formData (e.g. template change), assume it's a direct state save
-    // But better to grab current form data if null to be safe, 
-    // though `generateCVFromForm` usually passes it.
-    
     isSyncing = true;
-    
     const docRef = doc(db, 'artifacts', appId, 'users', currentUser.uid, 'data', 'cvContent');
-    
     try {
         await setDoc(docRef, { 
             formData: formData, 
@@ -874,15 +816,11 @@ async function saveToCloud(formData = null) {
             layout: currentLayout,
             updatedAt: new Date().toISOString() 
         }, { merge: true });
-        
         updateStatus('online');
-        
-        // Only show toast AFTER successful save
         const t = document.getElementById('toast');
         t.innerText = translations[currentLang].status_saved;
         t.classList.add('show');
         setTimeout(() => t.classList.remove('show'), 2000);
-
     } catch (e) { 
         updateStatus('error'); 
         console.error("Save failed:", e);
@@ -895,41 +833,19 @@ function updateStatus(state) {
     const dot = document.getElementById('status-dot');
     const text = document.getElementById('status-text');
     if (!dot || !text) return;
-
     dot.className = 'status-dot';
     const t = translations[currentLang];
-    
-    if (state === 'online') {
-        dot.classList.add('status-online');
-        text.innerText = t.status_online;
-    } else if (state === 'syncing') {
-        dot.classList.add('status-syncing');
-        text.innerText = t.status_syncing;
-    } else {
-        text.innerText = t.status_offline;
-    }
+    if (state === 'online') { dot.classList.add('status-online'); text.innerText = t.status_online; }
+    else if (state === 'syncing') { dot.classList.add('status-syncing'); text.innerText = t.status_syncing; }
+    else { text.innerText = t.status_offline; }
 }
 
 // --- RESET ---
 window.resetAll = async (skipConfirm = false) => {
     if(!skipConfirm && !confirm(translations[currentLang].confirm_reset)) return;
-    
-    // Clear Form Inputs
-    const inputs = document.querySelectorAll('.form-input');
-    inputs.forEach(i => i.value = '');
+    document.querySelectorAll('.form-input').forEach(i => i.value = '');
     document.getElementById('form-experiences-list').innerHTML = '';
     document.getElementById('form-education-list').innerHTML = '';
     document.getElementById('form-custom-list').innerHTML = '';
-    
     generateCVFromForm();
-    if(!skipConfirm) {
-        const t = document.getElementById('toast');
-        t.innerText = translations[currentLang].toast_reset;
-        t.classList.add('show');
-        setTimeout(() => t.classList.remove('show'), 3000);
-    }
-};
-
-window.createNewSection = () => {
-    alert("Yeni sistemde 'Özel Bölümler' alanını kullanarak ekleme yapabilirsiniz.");
 };
