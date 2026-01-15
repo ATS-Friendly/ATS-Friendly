@@ -40,7 +40,6 @@
     
     <script>
       window.onerror = function(msg, url, line, col, error) {
-        // Ignore ResizeObserver errors which are harmless
         if(msg && msg.includes && msg.includes('ResizeObserver')) return;
 
         const overlay = document.getElementById('debug-overlay');
@@ -48,7 +47,6 @@
         if (overlay && content) {
           overlay.style.display = 'block';
           const time = new Date().toLocaleTimeString();
-          // Clean up the URL to just show filename
           const filename = url ? url.split('/').pop() : 'inline';
           content.innerText += `[${time}] ${msg}\nFile: ${filename}:${line}\n\n`;
         }
@@ -62,21 +60,16 @@
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     
     <!-- 
-      CRITICAL: Import Map 
-      This is the ONLY place where versions are defined. 
-      All .ts/.tsx files must use these exact names (e.g. "firebase/app") 
+      Clean Import Map (NO FIREBASE)
+      We are running in Mock Mode.
     -->
     <script type="importmap">
 {
   "imports": {
     "react": "https://esm.sh/react@18.2.0",
     "react-dom/client": "https://esm.sh/react-dom@18.2.0/client",
-    "firebase/app": "https://esm.sh/firebase@10.12.2/app",
-    "firebase/auth": "https://esm.sh/firebase@10.12.2/auth",
-    "firebase/firestore": "https://esm.sh/firebase@10.12.2/firestore",
     "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
-    "react/": "https://esm.sh/react@^19.2.3/",
-    "firebase/": "https://esm.sh/firebase@^12.8.0/"
+    "react/": "https://esm.sh/react@^19.2.3/"
   }
 }
 </script>
@@ -91,13 +84,6 @@
 
     <div id="root"></div>
     
-    <!-- 
-      LOAD ORDER IS CRITICAL 
-      1. Services (No dependencies on View)
-      2. Components (No dependencies on App)
-      3. App (Depends on Components)
-      4. Index (Mounts App)
-    -->
     <script type="text/babel" data-type="module" data-presets="typescript,react" src="./services/firebaseService.ts"></script>
     <script type="text/babel" data-type="module" data-presets="typescript,react" src="./components/TemplateView.tsx"></script>
     <script type="text/babel" data-type="module" data-presets="typescript,react" src="./components/LandingView.tsx"></script>

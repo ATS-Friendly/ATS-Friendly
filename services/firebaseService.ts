@@ -1,117 +1,112 @@
 
-// FIX: Use module names that match the "imports" in index.html
-// DO NOT use https:// URLs here. The browser handles mapping via importmap.
-import { initializeApp } from "firebase/app";
-import { 
-    getAuth, 
-    signInWithEmailAndPassword, 
-    createUserWithEmailAndPassword, 
-    signOut,
-    GoogleAuthProvider,
-    signInWithPopup,
-    onAuthStateChanged
-} from "firebase/auth";
-import { getFirestore, doc, getDoc, setDoc } from "firebase/firestore";
+console.log("🛠️ Mock Service initializing (Frontend Only Mode)...");
 
-console.log("🔥 Firebase Service initializing...");
+// --- Mock State ---
+const LOCAL_STORAGE_USER_KEY = 'ats_mock_user';
+const LOCAL_STORAGE_DATA_KEY = 'ats_mock_data';
 
-const firebaseConfig = {
-    apiKey: "AIzaSyBbxgCMw5dO5T-kt7Njapo5ST04MRp7JKU",
-    authDomain: "ats-friendly-93377.firebaseapp.com",
-    projectId: "ats-friendly-93377",
-    storageBucket: "ats-friendly-93377.appspot.com",
-    messagingSenderId: "542738169697",
-    appId: "1:542738169697:web:a999680a273fdd90ab4f20",
+// Observers for onAuthStateChanged
+const authObservers: Function[] = [];
+
+// Helper to get current user
+const getMockUser = () => {
+    const stored = localStorage.getItem(LOCAL_STORAGE_USER_KEY);
+    return stored ? JSON.parse(stored) : null;
 };
 
-let app;
-let auth;
-let db;
-let googleProvider;
+// --- Mock Auth Methods ---
 
-try {
-    app = initializeApp(firebaseConfig);
-    auth = getAuth(app);
-    db = getFirestore(app);
-    googleProvider = new GoogleAuthProvider();
-    console.log("✅ Firebase Service Modules Loaded");
-} catch (e) {
-    console.error("❌ Firebase Initialization Error:", e);
-    throw e;
-}
+const auth = {
+    currentUser: getMockUser()
+};
 
-const CV_COLLECTION = 'cv-data';
+const notifyObservers = (user: any) => {
+    auth.currentUser = user;
+    authObservers.forEach(cb => cb(user));
+};
 
-// --- Authentication ---
+const onAuthStateChanged = (authInstance: any, callback: Function) => {
+    authObservers.push(callback);
+    // Immediately call with current state
+    callback(getMockUser());
+    // Return unsubscribe function
+    return () => {
+        const index = authObservers.indexOf(callback);
+        if (index > -1) authObservers.splice(index, 1);
+    };
+};
 
 const handleEmailAuth = async (isLogin: boolean, email: string, password: string) => {
-    try {
-        if (isLogin) {
-            return await signInWithEmailAndPassword(auth, email, password);
-        } else {
-            return await createUserWithEmailAndPassword(auth, email, password);
-        }
-    } catch (error) {
-        console.error("Auth Error:", error);
-        throw error;
-    }
+    console.log(`[MockAuth] ${isLogin ? 'Login' : 'Register'} with ${email}`);
+    
+    // Simulate network delay
+    await new Promise(resolve => setTimeout(resolve, 800));
+
+    // Create a fake user object
+    const user = {
+        uid: 'mock-user-' + Math.random().toString(36).substr(2, 9),
+        email: email,
+        displayName: email.split('@')[0]
+    };
+
+    // "Login" the user
+    localStorage.setItem(LOCAL_STORAGE_USER_KEY, JSON.stringify(user));
+    notifyObservers(user);
+    
+    return user;
 };
 
 const loginWithGoogle = async () => {
-    try {
-        return await signInWithPopup(auth, googleProvider);
-    } catch (error) {
-        console.error("Google Auth Error:", error);
-        throw error;
-    }
+    console.log("[MockAuth] Google Login");
+    await new Promise(resolve => setTimeout(resolve, 800));
+    
+    const user = {
+        uid: 'mock-google-user-123',
+        email: 'google-user@example.com',
+        displayName: 'Google User'
+    };
+    
+    localStorage.setItem(LOCAL_STORAGE_USER_KEY, JSON.stringify(user));
+    notifyObservers(user);
+    return user;
 };
 
 const logout = async () => {
-    try {
-        await signOut(auth);
-    } catch (error) {
-        console.error("Logout Error:", error);
-    }
+    console.log("[MockAuth] Logout");
+    localStorage.removeItem(LOCAL_STORAGE_USER_KEY);
+    notifyObservers(null);
 };
 
 
-// --- Firestore Database ---
+// --- Mock Database (LocalStorage) ---
 
 const saveCvDocument = async (userId: string, data: any) => {
-    try {
-        const docRef = doc(db, CV_COLLECTION, userId);
-        await setDoc(docRef, data, { merge: true });
-        console.log("💾 Document saved successfully");
-    } catch (error) {
-        console.error("❌ Error saving document: ", error);
-        throw error;
-    }
+    console.log(`[MockDB] Saving data for ${userId}`, data);
+    await new Promise(resolve => setTimeout(resolve, 500));
+    
+    // Store in a dictionary by User ID
+    const allData = JSON.parse(localStorage.getItem(LOCAL_STORAGE_DATA_KEY) || '{}');
+    allData[userId] = data;
+    localStorage.setItem(LOCAL_STORAGE_DATA_KEY, JSON.stringify(allData));
 };
 
 const getCvDocument = async (userId: string) => {
-    try {
-        const docRef = doc(db, CV_COLLECTION, userId);
-        const docSnap = await getDoc(docRef);
+    console.log(`[MockDB] Fetching data for ${userId}`);
+    await new Promise(resolve => setTimeout(resolve, 300));
 
-        if (docSnap.exists()) {
-            return docSnap.data();
-        } else {
-            console.log("ℹ️ No existing document found, returning null");
-            return null;
-        }
-    } catch (error) {
-        console.error("❌ Error getting document:", error);
-        return null;
-    }
+    const allData = JSON.parse(localStorage.getItem(LOCAL_STORAGE_DATA_KEY) || '{}');
+    return allData[userId] || null;
 };
 
-// Expose to window for other components
-// We attach 'auth' directly so onAuthStateChanged can be used in App.tsx
+// Expose the Mock Service
 window.FirebaseService = {
-    auth,
+    auth, // Mock object
+    onAuthStateChanged, // Mock implementation
     handleEmailAuth,
     loginWithGoogle,
     logout,
     saveCvDocument,
     getCvDocument
 };
+
+console.log("✅ Mock Service Ready. Using LocalStorage.");

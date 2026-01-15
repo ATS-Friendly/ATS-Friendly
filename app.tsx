@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { onAuthStateChanged } from 'firebase/auth';
+
+// REMOVED: import { onAuthStateChanged } from 'firebase/auth'; 
+// Reason: We are using a mock service now, so we shouldn't import from firebase packages.
 
 declare global {
   interface Window {
@@ -13,11 +15,10 @@ declare global {
 
 const App = () => {
   const [view, setView] = useState('landing');
-  const [currentUser, setCurrentUser] = useState(null);
+  const [currentUser, setCurrentUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [servicesReady, setServicesReady] = useState(false);
 
-  // Safely access globals inside effect/render
   useEffect(() => {
     const checkServices = () => {
       // Check if critical services and components are loaded
@@ -28,9 +29,11 @@ const App = () => {
         window.EditorView
       ) {
         setServicesReady(true);
-        const { auth } = window.FirebaseService;
+        // Get auth methods from the global service (Mock or Real)
+        const { auth, onAuthStateChanged } = window.FirebaseService;
         
-        const unsubscribe = onAuthStateChanged(auth, (user) => {
+        const unsubscribe = onAuthStateChanged(auth, (user: any) => {
+          console.log("Auth State Changed:", user ? "User Logged In" : "User Logged Out");
           setCurrentUser(user);
           if (user) {
             setView('editor');
@@ -41,7 +44,6 @@ const App = () => {
         });
         return unsubscribe;
       } else {
-        // Retry shortly if not ready
         setTimeout(checkServices, 100);
       }
     };
@@ -54,13 +56,12 @@ const App = () => {
     return (
       <div className="flex items-center justify-center h-screen bg-slate-100">
         <div className="text-xl font-semibold text-slate-600">
-            {!servicesReady ? 'Yükleniyor...' : 'Oturum açılıyor...'}
+            {!servicesReady ? 'Sistem Hazırlanıyor...' : 'Oturum Kontrol Ediliyor...'}
         </div>
       </div>
     );
   }
 
-  // Safe to access now
   const LandingView = window.LandingView;
   const AuthView = window.AuthView;
   const EditorView = window.EditorView;
