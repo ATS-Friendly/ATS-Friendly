@@ -1309,21 +1309,7 @@ body.tpl-compact .entry { display: block; position: relative; margin-bottom: 15p
 body.tpl-compact .entry .left-col { position: absolute; top: 0; right: 0; width: auto; text-align: right; font-weight: 600; font-size: 0.9em; color: var(--cv-accent-color); }
 body.tpl-compact .entry .right-col { width: 100%; padding-right: 130px; }
 
-@media print {
-    @page {
-        margin: 0;
-        size: A4;
-    }
-    html, body { 
-        background: white !important; 
-        padding: 0 !important; 
-        margin: 0 !important; 
-        display: block !important; 
-        width: 100% !important;
-        height: auto !important;
-        -webkit-print-color-adjust: exact;
-        print-color-adjust: exact;
-    }
+
     
     .sidebar, #auth-view, #template-view, #landing-view, .editor-panel-form, 
     .lang-switcher, #toast, .modal-overlay, #theme-modal, #layout-modal, 
@@ -1489,7 +1475,7 @@ body.tpl-compact .entry .right-col { width: 100%; padding-right: 130px; }
     background: rgba(255, 230, 230, 0.7);
     border-color: rgba(255, 0, 0, 0.1);
 }
-/* --- PRINT (YAZDIRMA) AYARLARI --- */
+
 @media print {
     /* 1. Sayfa Kenar Boşluklarını Sıfırla */
     @page {
