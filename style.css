@@ -26,7 +26,7 @@
     
     --cv-font-size: 11pt;
     --cv-line-height: 1.4;
-    --cv-padding: 95px;
+    --cv-padding: 20mm;
     --cv-section-gap: 15px;
 }
 
@@ -1210,11 +1210,13 @@ input[type=range] {
 }
 
     .page { 
-    width: 794px;
-    min-height: 1123px; 
+    width: 210mm;
+    min-height: 297mm; 
     padding: var(--cv-padding); 
     position: relative; 
     margin: 0;
+    background: white;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
 }
 
 .cv-content { 
@@ -1238,7 +1240,7 @@ input[type=range] {
 
 #cv-root header { 
     text-align: center; 
-    padding-top: 75px !important;
+    padding-top: 20mm !important;
     margin-bottom: 30px; 
     border-bottom: 2px solid var(--cv-accent-color); 
     padding-bottom: 25px; 
@@ -1292,7 +1294,7 @@ body.tpl-compact .compact-separator,
 body.tpl-compact .personal-details { display: block; }
 body.tpl-compact .contact-row,
 body.tpl-compact .personal-details { display: flex; }
-body.tpl-compact #cv-root header { border-bottom: none; margin-bottom: 20px; padding-bottom: 0; padding-top: 75px !important; text-align: center; }
+body.tpl-compact #cv-root header { border-bottom: none; margin-bottom: 20px; padding-bottom: 0; padding-top: 20mm !important; text-align: center; }
 body.tpl-compact h1 { font-size: 2.0em; letter-spacing: 2px; margin-bottom: 8px; }
 body.tpl-compact .subtitle { font-size: 1.0em; font-weight: 700; color: #222; margin-bottom: 8px; }
 body.tpl-compact .address-line { font-size: 1em; color: #222; margin-bottom: 20px; }

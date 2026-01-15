@@ -730,7 +730,6 @@ window.generateCVFromForm = (triggerSave = true) => {
         email: document.getElementById('inp-email').value,
         phone: document.getElementById('inp-phone').value,
         address: document.getElementById('inp-address').value,
-        birthplace: document.getElementById('inp-birthplace').value,
         license: document.getElementById('inp-license').value,
         summary: document.getElementById('inp-summary').value,
         experiences: [],
@@ -771,7 +770,6 @@ window.generateCVFromForm = (triggerSave = true) => {
         exp: currentLang === 'tr' ? 'İŞ DENEYİMİ' : 'EMPLOYMENT HISTORY',
         edu: currentLang === 'tr' ? 'EĞİTİM' : 'EDUCATION',
         prof: currentLang === 'tr' ? 'PROFİL' : 'PROFILE',
-        birth: translations[currentLang].cv_label_birth,
         lic: translations[currentLang].cv_label_license
     };
 
@@ -831,7 +829,6 @@ window.generateCVFromForm = (triggerSave = true) => {
             <div class="contact-row"><span>${data.phone}</span><span>${data.email}</span></div>
             <div class="compact-separator"></div>
             <div class="personal-details">
-                <div class="detail-item"><span class="lbl">${labels.birth}</span><span class="dots"></span><span class="val">${data.birthplace}</span></div>
                 <div class="detail-item"><span class="lbl">${labels.lic}</span><span class="dots"></span><span class="val">${data.license}</span></div>
             </div>
         </header>
@@ -857,7 +854,6 @@ window.generateCVFromForm = (triggerSave = true) => {
             <div class="address-line" style="display:none">${data.address}</div>
             <div class="contact-row" style="display:none"><span>${data.phone}</span><span>${data.email}</span></div>
             <div class="personal-details" style="display:none">
-                 <div class="detail-item"><span class="lbl">${labels.birth}</span><span class="dots"></span><span class="val">${data.birthplace}</span></div>
                 <div class="detail-item"><span class="lbl">${labels.lic}</span><span class="dots"></span><span class="val">${data.license}</span></div>
             </div>
         </header>
@@ -891,7 +887,6 @@ function loadUserDataIntoForm(data) {
     document.getElementById('inp-email').value = data.email || '';
     document.getElementById('inp-phone').value = data.phone || '';
     document.getElementById('inp-address').value = data.address || '';
-    document.getElementById('inp-birthplace').value = data.birthplace || '';
     document.getElementById('inp-license').value = data.license || '';
     document.getElementById('inp-summary').value = data.summary || '';
 
