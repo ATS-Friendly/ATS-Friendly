@@ -59,7 +59,7 @@
       }
     </style>
     
-    <!-- Error Handler Script (Must be first) -->
+    <!-- Error Handler Script -->
     <script>
       window.onerror = function(msg, url, line, col, error) {
         const overlay = document.getElementById('debug-overlay');
@@ -88,7 +88,7 @@
     <!-- Babel -->
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     
-    <!-- Import Map -->
+    <!-- Import Map: FIXED VERSIONS -->
     <script type="importmap">
 {
   "imports": {
@@ -116,17 +116,15 @@
     <div id="root"></div>
     
     <!-- 
-      CRITICAL FIX: 
-      Removed 'env' from presets. 'env' transpiles imports to 'require()', 
-      which browsers don't support. We only need 'react' (for JSX) and 
-      'typescript' (for type stripping). Browsers handle ES modules natively.
+      We use only 'react' preset. 
+      We removed 'typescript' preset and converted code to Pure JS to guarantee no parsing errors.
     -->
-    <script type="text/babel" data-type="module" data-presets="typescript,react" src="./services/firebaseService.ts"></script>
-    <script type="text/babel" data-type="module" data-presets="typescript,react" src="./components/TemplateView.tsx"></script>
-    <script type="text/babel" data-type="module" data-presets="typescript,react" src="./components/LandingView.tsx"></script>
-    <script type="text/babel" data-type="module" data-presets="typescript,react" src="./components/AuthView.tsx"></script>
-    <script type="text/babel" data-type="module" data-presets="typescript,react" src="./components/EditorView.tsx"></script>
-    <script type="text/babel" data-type="module" data-presets="typescript,react" src="./App.tsx"></script>
-    <script type="text/babel" data-type="module" data-presets="typescript,react" src="./index.tsx"></script>
+    <script type="text/babel" data-type="module" data-presets="react" src="./services/firebaseService.ts"></script>
+    <script type="text/babel" data-type="module" data-presets="react" src="./components/TemplateView.tsx"></script>
+    <script type="text/babel" data-type="module" data-presets="react" src="./components/LandingView.tsx"></script>
+    <script type="text/babel" data-type="module" data-presets="react" src="./components/AuthView.tsx"></script>
+    <script type="text/babel" data-type="module" data-presets="react" src="./components/EditorView.tsx"></script>
+    <script type="text/babel" data-type="module" data-presets="react" src="./App.tsx"></script>
+    <script type="text/babel" data-type="module" data-presets="react" src="./index.tsx"></script>
   </body>
 </html>

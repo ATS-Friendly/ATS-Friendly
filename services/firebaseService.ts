@@ -77,7 +77,7 @@ const getCvDocument = async (userId) => {
 };
 
 // Expose to window for other components
-(window as any).FirebaseService = {
+window.FirebaseService = {
     auth,
     handleEmailAuth,
     loginWithGoogle,
