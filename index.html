@@ -66,6 +66,52 @@
         </div>
     </div>
 
+    <!-- LAYOUT MODAL -->
+    <div id="layout-modal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 data-i18n="modal_layout_title">Sayfa Düzeni</h3>
+                <button class="close-modal" onclick="closeLayoutModal()">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="setting-group">
+                    <div class="range-header">
+                        <label data-i18n="lbl_fontsize">Yazı Boyutu</label>
+                        <span id="val-fontsize">11pt</span>
+                    </div>
+                    <input type="range" id="rng-fontsize" min="9" max="14" step="0.5" value="11" oninput="updateLayout()">
+                </div>
+                
+                <div class="setting-group">
+                    <div class="range-header">
+                        <label data-i18n="lbl_lineheight">Satır Aralığı</label>
+                        <span id="val-lineheight">1.4</span>
+                    </div>
+                    <input type="range" id="rng-lineheight" min="1.0" max="2.0" step="0.1" value="1.4" oninput="updateLayout()">
+                </div>
+
+                <div class="setting-group">
+                    <div class="range-header">
+                        <label data-i18n="lbl_margin">Kenar Boşluğu</label>
+                        <span id="val-margin">20mm</span>
+                    </div>
+                    <input type="range" id="rng-margin" min="10" max="35" step="1" value="20" oninput="updateLayout()">
+                </div>
+
+                <div class="setting-group">
+                    <div class="range-header">
+                        <label data-i18n="lbl_sectiongap">Bölüm Aralığı</label>
+                        <span id="val-sectiongap">15px</span>
+                    </div>
+                    <input type="range" id="rng-sectiongap" min="5" max="40" step="1" value="15" oninput="updateLayout()">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" onclick="closeLayoutModal()" style="width:100%" data-i18n="btn_save_close">Kaydet & Kapat</button>
+            </div>
+        </div>
+    </div>
+
     <!-- 1. GİRİŞ EKRANI -->
     <section id="auth-view" class="view-section active">
         <div class="auth-card">
@@ -132,6 +178,11 @@
                     <span class="nav-label" data-i18n="nav_design">TASARIM & ŞABLON</span>
                     <button class="nav-item" onclick="openThemeModal()">
                         <span class="icon">🎨</span> <span data-i18n="btn_design">Tasarım Ayarları</span>
+                    </button>
+                    <!-- NEW LAYOUT BUTTON -->
+                    <button class="nav-item" onclick="openLayoutModal()">
+                        <span class="icon">📐</span> <span data-i18n="btn_layout">Sayfa Düzeni</span>
+                        <span class="badge-new">YENİ</span>
                     </button>
                     <button class="nav-item" onclick="backToTemplates()">
                         <span class="icon">💠</span> <span data-i18n="btn_change_tpl">Şablonu Değiştir</span>
@@ -224,7 +275,7 @@
                     <div class="form-block">
                         <h3 data-i18n="form_custom">Özel Bölümler</h3>
                         <div id="form-custom-list"></div>
-                        <button class="btn-secondary-dashed" onclick="addFormCustomSection()">+ <span data-i18n="btn_add_custom">Bölüm Ekle (Örn: Sertifikalar, Yetenekler)</span></button>
+                        <button class="btn-secondary-dashed" onclick="addFormCustomSection()">+ <span data-i18n="btn_add_custom">Bölüm Ekle (Örn: Sertifikalar)</span></button>
                     </div>
                 </div>
             </div>
