@@ -231,53 +231,48 @@ window.toggleMobileView = (mode) => {
 
 // --- AUTO SCALE PREVIEW FOR MOBILE ---
 window.resizePreview = () => {
+    const previewPanel = document.getElementById('panel-preview');
+    const scaleContainer = document.getElementById('cv-scale-container');
+    const cvRoot = document.getElementById('cv-root');
+
+    if (!previewPanel || !scaleContainer || !cvRoot) return;
+
     if (window.innerWidth > 1024) {
-        // Desktop: Reset
-        const container = document.getElementById('cv-scale-container');
-        if(container) {
-            container.style.transform = 'none';
-            container.style.marginLeft = '0'; // Reset margin
-        }
+        // Desktop Reset
+        cvRoot.style.transform = 'none';
+        scaleContainer.style.width = 'auto';
+        scaleContainer.style.height = 'auto';
+        scaleContainer.style.marginTop = '0';
+        scaleContainer.style.marginBottom = '0';
         return;
     }
 
-    const previewPanel = document.getElementById('panel-preview');
-    const scaleContainer = document.getElementById('cv-scale-container');
+    // --- NEW MOBILE LOGIC ---
+    // 210mm @ 96dpi approx 794px wide.
+    const originalWidth = 794; 
     
-    if (!previewPanel || !scaleContainer) return;
+    // Calculate available width with padding
+    const padding = 20; 
+    const availableWidth = previewPanel.clientWidth - padding;
 
-    // A4 Width approx 794px
-    const pageWidth = 794; 
-    const availableWidth = previewPanel.clientWidth - 20; // Padding
+    // Calculate Scale Factor
+    const scale = Math.min(1, availableWidth / originalWidth);
     
-    let scale = availableWidth / pageWidth;
+    // 1. Transform the INNER content (#cv-root)
+    cvRoot.style.transformOrigin = 'top left';
+    cvRoot.style.transform = `scale(${scale})`;
     
-    // If scaled width is larger than screen (rare on mobile portrait), cap it
-    // But usually pageWidth(794) > screen(390), so scale < 1.
+    // 2. Resize the OUTER wrapper (#cv-scale-container) to match the SCALED dimensions
+    // This allows Flexbox in the parent to center this smaller box perfectly
+    const scaledWidth = originalWidth * scale;
+    const scaledHeight = cvRoot.scrollHeight * scale;
+
+    scaleContainer.style.width = `${scaledWidth}px`;
+    scaleContainer.style.height = `${scaledHeight}px`;
     
-    // Reset any previous transform
-    scaleContainer.style.transformOrigin = 'top left'; // Align to top left to prevent right-shift
-    scaleContainer.style.transform = `scale(${scale})`;
-    
-    // Fix dimensions so parent can scroll if needed
-    scaleContainer.style.width = pageWidth + 'px';
-    const scaledHeight = 1123 * scale;
-    scaleContainer.style.height = 1123 + 'px'; // Keep original height in DOM, but visually scaled? 
-    // Actually, to make the parent container have the correct scroll height, we should set height to original, 
-    // but then there is a lot of empty space if scaled down.
-    // Better strategy: Wrapper with overflow hidden or auto.
-    // Let's set the wrapper height to the scaled height to avoid extra scroll space.
-    scaleContainer.parentElement.style.height = 'auto'; // ensure parent isn't fixed
-    
-    // Add margin to center horizontally
-    const scaledWidth = pageWidth * scale;
-    const margin = (previewPanel.clientWidth - scaledWidth) / 2;
-    scaleContainer.style.marginLeft = Math.max(0, margin) + 'px';
+    // 3. Add margins for spacing (Center alignment is handled by CSS flex)
     scaleContainer.style.marginTop = '20px';
-    scaleContainer.style.marginBottom = '100px'; // Space for FAB
-    
-    // IMPORTANT: To allow native zoom, the container shouldn't be rigidly locked
-    // But for initial view, this fits it. 
+    scaleContainer.style.marginBottom = '120px'; // Extra space for FAB
 };
 
 // Listen for window resize
