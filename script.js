@@ -769,7 +769,7 @@ window.generateCVFromForm = (triggerSave = true) => {
     const labels = {
         exp: currentLang === 'tr' ? 'İŞ DENEYİMİ' : 'EMPLOYMENT HISTORY',
         edu: currentLang === 'tr' ? 'EĞİTİM' : 'EDUCATION',
-        prof: currentLang === 'tr' ? 'PROFİL' : 'PROFILE',
+        prof: currentLang === 'tr' ? 'ÖZET' : 'SUMMARY',
         lic: translations[currentLang].cv_label_license
     };
 
@@ -841,7 +841,46 @@ window.generateCVFromForm = (triggerSave = true) => {
             ${eduContent}
             ${customContent}
         </div>`;
-
+    } else if (document.body.classList.contains('tpl-modern')) {
+        html = `
+        <aside class="cv-sidebar">
+            <div class="contact-sidebar">
+                <p>✉️ ${data.email}</p>
+                <p>📞 ${data.phone}</p>
+                <p>📍 ${data.address}</p>
+            </div>
+        </aside>
+        <main class="cv-main">
+            <header>
+                <h1>${data.fullname || 'ADINIZ SOYADINIZ'}</h1>
+                <div class="subtitle">${data.title}</div>
+            </header>
+            <div class="section">
+                <div class="section-header"><span class="section-title">${labels.prof}</span></div>
+                <p>${data.summary}</p>
+            </div>
+            ${expContent}
+            ${eduContent}
+            ${customContent}
+        </main>`;
+    } else if (document.body.classList.contains('tpl-elegant')) {
+        html = `
+        <header>
+            <h1>${data.fullname || 'ADINIZ SOYADINIZ'}</h1>
+            <div class="subtitle">${data.title}</div>
+            <div class="contact-info">
+                <span>✉️ ${data.email}</span> | <span>📞 ${data.phone}</span> | <span>📍 ${data.address}</span>
+            </div>
+        </header>
+        <div id="main-content">
+             <div class="section">
+                <div class="section-header"><span class="section-title">${labels.prof}</span></div>
+                <div class="entry"><div class="right-col">${data.summary}</div></div>
+            </div>
+            ${expContent}
+            ${eduContent}
+            ${customContent}
+        </div>`;
     } else {
         html = `
         <header>

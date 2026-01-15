@@ -1187,7 +1187,19 @@ input[type=range] {
 }
 
 
+.editor-panel-preview { 
+    flex: 1;
+    background: #f1f2f6;
+    overflow-y: auto;
+    display: flex;
+    justify-content: center;
+    padding: 60px 40px;
+    scroll-behavior: smooth;
+}
+
 #cv-scale-container {
+    width: 210mm;
+    min-height: 297mm;
     transform-origin: top left;
     transition: transform 0.2s;
     margin: 0; 
@@ -1216,7 +1228,7 @@ input[type=range] {
     position: relative; 
     margin: 0;
     background: white;
-    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
 }
 
 .cv-content { 
@@ -1313,7 +1325,72 @@ body.tpl-compact .section-header {
 body.tpl-compact .section-title { font-size: 1.0em; font-weight: 700; letter-spacing: 2px; color: var(--cv-accent-color); }
 body.tpl-compact .entry { display: block; position: relative; margin-bottom: 15px; }
 body.tpl-compact .entry .left-col { position: absolute; top: 0; right: 0; width: auto; text-align: right; font-weight: 600; font-size: 0.9em; color: var(--cv-accent-color); }
-body.tpl-compact .entry .right-col { width: 100%; padding-right: 130px; }
+/* Template 3: Modern */
+body.tpl-modern #cv-root {
+    background: white;
+    display: grid;
+    grid-template-columns: 240px 1fr;
+    min-height: 297mm;
+}
+
+body.tpl-modern .page {
+    padding: 0 !important;
+    display: grid;
+    grid-template-columns: 240px 1fr;
+}
+
+body.tpl-modern aside.cv-sidebar {
+    background: #2c3e50;
+    color: white;
+    padding: 40px 25px;
+    height: 100%;
+}
+
+body.tpl-modern main.cv-main {
+    padding: 40px 35px;
+    background: white;
+}
+
+body.tpl-modern header {
+    text-align: left !important;
+    padding-top: 0 !important;
+    border-bottom: none !important;
+    margin-bottom: 30px !important;
+}
+
+body.tpl-modern h1 {
+    color: #2c3e50;
+    font-size: 2.2em;
+    margin-bottom: 5px;
+}
+
+body.tpl-modern .section-header {
+    border-bottom: 2px solid #eee;
+}
+
+body.tpl-modern .section-title {
+    color: #2c3e50;
+}
+
+/* Template 4: Elegant */
+body.tpl-elegant #cv-root {
+    padding: 40px 50px;
+    border-top: 15px solid var(--cv-accent-color);
+}
+
+body.tpl-elegant header {
+    border-bottom: 1px solid #eee;
+    padding-bottom: 20px;
+    margin-bottom: 40px;
+}
+
+body.tpl-elegant .section-title {
+    background: var(--cv-accent-color);
+    color: white;
+    padding: 5px 15px;
+    display: inline-block;
+}
+
 
 .fab-overlay {
     display: none;
