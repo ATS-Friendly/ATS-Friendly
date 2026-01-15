@@ -311,9 +311,6 @@
                     const mobile = window.innerWidth < 1024;
                     setIsMobile(mobile);
                     
-                    // --- THE MAGIC CALCULATION (RESUME.IO STYLE) ---
-                    // 794px is A4 width. We want it to fit in the screen minus padding.
-                    // We only scale on mobile view mode.
                     if (mobile) {
                         const availableWidth = window.innerWidth - 32; // 16px padding on each side
                         const newScale = Math.min(1, availableWidth / 794);
@@ -377,28 +374,26 @@
                         </div>
                     </div>
 
-                    {/* RIGHT PANEL: PREVIEW (The Resume.io Style Container) */}
+                    {/* RIGHT PANEL: PREVIEW */}
                     <div className={`lg:flex-1 bg-gray-500 overflow-y-auto flex justify-center lg:items-start lg:pt-10 ${isMobile && activeTab === 'edit' ? 'hidden' : 'flex'}`}>
                         {/* 
-                           THIS IS THE WRAPPER 
-                           On Mobile: It calculates the EXACT height needed for the scaled A4.
-                           It acts as a window/iframe.
+                           WRAPPER DÜZELTMESİ:
+                           Wrapper genişliği (width) artık dinamik olarak ölçeklenen genişliğe (794 * scale) eşitleniyor.
+                           Ve 'margin: 0 auto' ile ortalanıyor. Böylece sola yaslama veya boşluk sorunu kalkıyor.
                         */}
                         <div style={{
-                            width: isMobile ? '100%' : 'auto', 
-                            height: isMobile ? `${1123 * scale + 40}px` : 'auto', // +40 for margins
-                            display: 'flex',
-                            justifyContent: 'center',
-                            alignItems: isMobile ? 'start' : 'start',
+                            width: isMobile ? `${794 * scale}px` : 'auto', // <--- DÜZELTME BURADA
+                            height: isMobile ? `${1123 * scale + 40}px` : 'auto',
+                            margin: isMobile ? '0 auto' : '0', // <--- VE BURADA
+                            overflow: 'hidden',
+                            display: 'block', // Flex yerine block + margin auto daha güvenli
                             paddingTop: isMobile ? '20px' : '0'
                         }}>
                              <div style={{
                                 width: '794px',
                                 height: '1123px',
                                 transform: isMobile ? `scale(${scale})` : 'scale(1)',
-                                transformOrigin: 'top left', // <--- THE KEY FIX: Anchors it to the corner
-                                position: isMobile ? 'relative' : 'static',
-                                left: isMobile ? `calc(50% - ${(794 * scale) / 2}px)` : 'auto', // Centering logic for top-left origin
+                                transformOrigin: 'top left',
                              }}>
                                 <CVPreview cvData={cvData} />
                              </div>
