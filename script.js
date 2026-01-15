@@ -250,28 +250,34 @@ window.resizePreview = () => {
     const pageWidth = 794; 
     const availableWidth = previewPanel.clientWidth - 20; // Padding
     
-    const scale = availableWidth / pageWidth;
+    let scale = availableWidth / pageWidth;
     
-    if (scale < 1) {
-        // IMPORTANT: Calculate the margin needed to center it after scaling
-        // (Screen Width - (Scaled Width)) / 2
-        // Actually, transforming with 'top center' origin + flex parent usually centers it,
-        // but explicit margin is safer to prevent left alignment.
-        
-        scaleContainer.style.transform = `scale(${scale})`;
-        
-        // Adjust height for scroll
-        const scaledHeight = 1123 * scale;
-        scaleContainer.style.height = scaledHeight + 'px';
-        scaleContainer.style.width = pageWidth + 'px';
-        
-        // Center alignment is handled by CSS flex on .editor-panel-preview
-        // coupled with transform-origin: top center;
-    } else {
-        scaleContainer.style.transform = 'none';
-        scaleContainer.style.height = 'auto';
-        scaleContainer.style.width = 'auto';
-    }
+    // If scaled width is larger than screen (rare on mobile portrait), cap it
+    // But usually pageWidth(794) > screen(390), so scale < 1.
+    
+    // Reset any previous transform
+    scaleContainer.style.transformOrigin = 'top left'; // Align to top left to prevent right-shift
+    scaleContainer.style.transform = `scale(${scale})`;
+    
+    // Fix dimensions so parent can scroll if needed
+    scaleContainer.style.width = pageWidth + 'px';
+    const scaledHeight = 1123 * scale;
+    scaleContainer.style.height = 1123 + 'px'; // Keep original height in DOM, but visually scaled? 
+    // Actually, to make the parent container have the correct scroll height, we should set height to original, 
+    // but then there is a lot of empty space if scaled down.
+    // Better strategy: Wrapper with overflow hidden or auto.
+    // Let's set the wrapper height to the scaled height to avoid extra scroll space.
+    scaleContainer.parentElement.style.height = 'auto'; // ensure parent isn't fixed
+    
+    // Add margin to center horizontally
+    const scaledWidth = pageWidth * scale;
+    const margin = (previewPanel.clientWidth - scaledWidth) / 2;
+    scaleContainer.style.marginLeft = Math.max(0, margin) + 'px';
+    scaleContainer.style.marginTop = '20px';
+    scaleContainer.style.marginBottom = '100px'; // Space for FAB
+    
+    // IMPORTANT: To allow native zoom, the container shouldn't be rigidly locked
+    // But for initial view, this fits it. 
 };
 
 // Listen for window resize

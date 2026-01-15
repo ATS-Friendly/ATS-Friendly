@@ -492,10 +492,7 @@ body {
     .editor-panel-preview {
         padding: 10px;
         min-height: calc(100vh - 120px); 
-        display: flex;
-        flex-direction: column;
-        align-items: center; /* Center horizontally */
-        justify-content: flex-start;
+        display: block; /* Remove flex centering that conflicts with manual margin centering */
     }
 }
 
@@ -704,11 +701,17 @@ input[type=range] {
 /* --- CV PAPER STYLES --- */
 /* Wrapper to handle scaling */
 #cv-scale-container {
-    transform-origin: top center;
+    transform-origin: top left; /* Changed from top center to left */
     transition: transform 0.2s;
-    /* IMPORTANT for centering: let it take natural width, flex parent handles alignment */
-    margin: 0 auto; 
+    margin: 0; /* Reset auto margin, managed via JS for mobile */
     box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+}
+
+@media screen and (min-width: 1025px) {
+    #cv-scale-container {
+        margin: 0 auto; /* Keep centered on desktop */
+        transform-origin: top center;
+    }
 }
 
 .page { 
@@ -925,4 +928,3 @@ body.tpl-compact .entry .right-col { width: 100%; padding-right: 130px; }
     color: #e74c3c;
     background: rgba(255, 230, 230, 0.9);
 }
-
