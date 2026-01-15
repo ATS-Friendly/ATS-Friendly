@@ -364,7 +364,7 @@ window.onbeforeprint = () => {
         cvRoot.style.width = '210mm';
         cvRoot.style.margin = '0 auto';
         scaleContainer.style.transform = 'none';
-        scaleContainer.style.width = '100%';
+        scaleContainer.style.width = '85%';
         scaleContainer.style.height = 'auto';
     }
 };
