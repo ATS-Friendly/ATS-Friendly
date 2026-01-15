@@ -481,19 +481,21 @@ body {
 .editor-panel-preview {
     flex-grow: 1;
     background: #f0f2f5;
-    overflow-y: auto;
-    overflow-x: hidden; /* Prevent horizontal scroll causing alignment issues */
+    overflow-y: auto; /* Allow scrolling for desktop */
+    overflow-x: auto; /* Prevent lock on mobile */
     padding: 40px;
     
-    /* FLEXBOX CENTERING FOR MOBILE PREVIEW */
+    /* RESET FLEXBOX CENTERING FOR MOBILE PREVIEW TO AVOID ALIGNMENT BUGS */
     display: flex;
     justify-content: center;
     align-items: flex-start;
 }
 @media screen and (max-width: 1024px) {
     .editor-panel-preview {
-        padding: 10px;
+        padding: 10px 0; /* Remove side padding on mobile to max width */
         min-height: calc(100vh - 120px); 
+        display: block; /* Standard block layout for mobile */
+        text-align: center; /* Center inline-block children */
     }
 }
 
@@ -714,6 +716,12 @@ input[type=range] {
     #cv-scale-container {
         margin: 0 auto; /* Keep centered on desktop */
         transform-origin: top center;
+    }
+}
+@media screen and (max-width: 1024px) {
+    #cv-scale-container {
+        display: block; /* Standard block */
+        margin: 0 auto !important; /* Auto margins to center */
     }
 }
 

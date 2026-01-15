@@ -253,13 +253,13 @@ window.resizePreview = () => {
     
     // Calculate available width with padding
     const padding = 20; 
-    const availableWidth = previewPanel.clientWidth - padding;
+    const availableWidth = window.innerWidth - padding;
 
     // Calculate Scale Factor
     const scale = Math.min(1, availableWidth / originalWidth);
     
     // 1. Transform the INNER content (#cv-root)
-    cvRoot.style.transformOrigin = 'top left';
+    cvRoot.style.transformOrigin = 'top center'; // Changed from 'top left' to 'top center' for standard alignment
     cvRoot.style.transform = `scale(${scale})`;
     
     // 2. Resize the OUTER wrapper (#cv-scale-container) to match the SCALED dimensions
@@ -270,7 +270,7 @@ window.resizePreview = () => {
     scaleContainer.style.width = `${scaledWidth}px`;
     scaleContainer.style.height = `${scaledHeight}px`;
     
-    // 3. Add margins for spacing (Center alignment is handled by CSS flex)
+    // 3. Add margins for spacing (Center alignment is handled by CSS auto margin)
     scaleContainer.style.marginTop = '20px';
     scaleContainer.style.marginBottom = '120px'; // Extra space for FAB
 };
