@@ -1,5 +1,12 @@
 import React, { useState } from 'react';
 
+declare global {
+  interface Window {
+    FirebaseService: any;
+    AuthView: any;
+  }
+}
+
 const AuthView = ({ setView }) => {
   const [isLoginMode, setIsLoginMode] = useState(true);
   const [email, setEmail] = useState('');
@@ -13,7 +20,7 @@ const AuthView = ({ setView }) => {
     setLoading(true);
     
     // Access global service here
-    const { handleEmailAuth } = (window as any).FirebaseService;
+    const { handleEmailAuth } = window.FirebaseService;
 
     try {
       await handleEmailAuth(isLoginMode, email, password);
@@ -26,7 +33,7 @@ const AuthView = ({ setView }) => {
 
   const onGoogleLogin = async () => {
     setError('');
-    const { loginWithGoogle } = (window as any).FirebaseService;
+    const { loginWithGoogle } = window.FirebaseService;
     
     try {
       await loginWithGoogle();
@@ -89,4 +96,4 @@ const AuthView = ({ setView }) => {
   );
 };
 
-(window as any).AuthView = AuthView;
+window.AuthView = AuthView;

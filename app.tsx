@@ -1,24 +1,34 @@
 import React, { useState, useEffect } from 'react';
 import { onAuthStateChanged } from 'firebase/auth';
 
+declare global {
+  interface Window {
+    FirebaseService: any;
+    LandingView: React.ComponentType<any>;
+    AuthView: React.ComponentType<any>;
+    EditorView: React.ComponentType<any>;
+    App: any;
+  }
+}
+
 const App = () => {
   const [view, setView] = useState('landing');
   const [currentUser, setCurrentUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [servicesReady, setServicesReady] = useState(false);
 
-  // Safely access globals inside effect/render, not at top level
+  // Safely access globals inside effect/render
   useEffect(() => {
     const checkServices = () => {
       // Check if critical services and components are loaded
       if (
-        (window as any).FirebaseService && 
-        (window as any).LandingView && 
-        (window as any).AuthView && 
-        (window as any).EditorView
+        window.FirebaseService && 
+        window.LandingView && 
+        window.AuthView && 
+        window.EditorView
       ) {
         setServicesReady(true);
-        const { auth } = (window as any).FirebaseService;
+        const { auth } = window.FirebaseService;
         
         const unsubscribe = onAuthStateChanged(auth, (user) => {
           setCurrentUser(user);
@@ -51,9 +61,9 @@ const App = () => {
   }
 
   // Safe to access now
-  const LandingView = (window as any).LandingView;
-  const AuthView = (window as any).AuthView;
-  const EditorView = (window as any).EditorView;
+  const LandingView = window.LandingView;
+  const AuthView = window.AuthView;
+  const EditorView = window.EditorView;
 
   switch (view) {
     case 'auth':
@@ -70,4 +80,4 @@ const App = () => {
   }
 };
 
-(window as any).App = App;
+window.App = App;

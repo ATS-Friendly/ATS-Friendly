@@ -3,6 +3,14 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 // Helper to generate unique IDs
 const generateId = () => `id_${new Date().getTime()}_${Math.random()}`;
 
+declare global {
+  interface Window {
+    FirebaseService: any;
+    TemplateView: React.ComponentType<any>;
+    EditorView: any;
+  }
+}
+
 const initialFormData = {
   fullname: "Adınız Soyadınız",
   title: "Unvanınız",
@@ -102,8 +110,8 @@ const CVPreview = ({ cvData, cvRootRef }) => {
 
 const EditorView = ({ user, setView }) => {
     // Globals accessed here safely
-    const { getCvDocument, saveCvDocument, logout } = (window as any).FirebaseService;
-    const TemplateView = (window as any).TemplateView;
+    const { getCvDocument, saveCvDocument, logout } = window.FirebaseService;
+    const TemplateView = window.TemplateView;
 
     const [cvData, setCvData] = useState(null);
     const [mobileTab, setMobileTab] = useState('edit');
@@ -285,4 +293,4 @@ const EditorView = ({ user, setView }) => {
     );
 };
 
-(window as any).EditorView = EditorView;
+window.EditorView = EditorView;
