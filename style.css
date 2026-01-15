@@ -860,10 +860,13 @@ body {
 }
 @media screen and (max-width: 1024px) {
     .editor-panel-preview {
-        padding: 40px 10px; /* Some padding */
+        padding: 40px 0; /* No horizontal padding here, we handle it in JS */
         min-height: auto;
-        display: block; /* Standard block layout for mobile */
-        text-align: center; /* Center inline-block children */
+        display: flex; /* Use flex for centering */
+        justify-content: center;
+        align-items: flex-start;
+        background: #f8f9fd;
+        position: relative;
     }
 }
 
@@ -1143,8 +1146,8 @@ input[type=range] {
 }
 @media screen and (max-width: 1024px) {
     #cv-scale-container {
-        display: block; /* Standard block */
-        margin: 0 auto !important; /* Auto margins to center */
+        display: block;
+        margin: 0 !important; /* Flex handles centering now */
     }
 }
 
@@ -1154,7 +1157,7 @@ input[type=range] {
     min-height: 297mm; 
     padding: var(--cv-padding); 
     position: relative; 
-    /* Box shadow removed here, applied to container for better visual when scaled */
+    margin: 0;
 }
 
 .cv-content { 

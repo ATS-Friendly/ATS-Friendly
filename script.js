@@ -303,19 +303,19 @@ window.resizePreview = () => {
     const originalWidth = 794; 
     
     // Calculate available width with padding
-    const padding = 32; /* Increased padding for better mobile edge clearance */
-    const availableWidth = window.innerWidth - padding;
+    const horizontalPadding = 30; 
+    const availableWidth = window.innerWidth - horizontalPadding;
 
     // Calculate Scale Factor
     const scale = Math.min(1, availableWidth / originalWidth);
     
     // 1. Transform the INNER content (#cv-root)
-    cvRoot.style.transformOrigin = 'top center'; 
+    cvRoot.style.transformOrigin = 'top left'; 
     cvRoot.style.transform = `scale(${scale})`;
+    cvRoot.style.width = originalWidth + 'px'; // Explicit width to prevent any flex/block shrinking
     
     // 2. Resize the OUTER wrapper (#cv-scale-container) to match the SCALED dimensions
     const scaledWidth = originalWidth * scale;
-    // Use getBoundingClientRect to get exact scaled height
     const scaledHeight = cvRoot.getBoundingClientRect().height;
 
     scaleContainer.style.width = `${scaledWidth}px`;
@@ -324,11 +324,8 @@ window.resizePreview = () => {
     // 3. Spacing
     scaleContainer.style.marginTop = '10px';
     scaleContainer.style.marginBottom = '100px'; 
-    
-    // Ensure parent is scrolled to top when scaling happens
-    if (previewPanel.scrollTop > 500) {
-        // Only if they were really far down
-    }
+    scaleContainer.style.marginLeft = '0';
+    scaleContainer.style.marginRight = '0';
 };
 
 // Listen for window resize
