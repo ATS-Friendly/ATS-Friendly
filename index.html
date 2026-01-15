@@ -18,45 +18,50 @@
 
     <div id="toast">Kaydedildi!</div>
 
-    <!-- LANGUAGE SWITCHER (Global) -->
-    <div class="global-lang-switcher">
-        <span class="globe-icon">🌐</span>
-        <select onchange="setLanguage(this.value)" id="lang-select">
-            <option value="tr">Türkçe</option>
-            <option value="en">English</option>
-        </select>
-    </div>
-
-    <!-- THEME MODAL (Desktop Only - Mobile uses embedded panel) -->
-    <div id="theme-modal" class="modal-overlay desktop-only-modal">
+    <!-- THEME MODAL -->
+    <div id="theme-modal" class="modal-overlay">
         <div class="modal-content">
             <div class="modal-header">
                 <h3 data-i18n="modal_theme_title">Tasarım Ayarları</h3>
                 <button class="close-modal" onclick="closeThemeModal()">×</button>
             </div>
             <div class="modal-body">
-                <!-- Content injected via JS or static -->
                 <div class="setting-group">
                     <label data-i18n="lbl_color">Vurgu Rengi</label>
-                    <div class="color-options" id="desktop-color-opts">
-                        <!-- Colors injected here -->
+                    <div class="color-options">
+                        <button class="color-btn" style="background-color: #2c3e50;" onclick="applyColor('#2c3e50')" title="Midnight Blue"></button>
+                        <button class="color-btn" style="background-color: #3498db;" onclick="applyColor('#3498db')" title="Classic Blue"></button>
+                        <button class="color-btn" style="background-color: #27ae60;" onclick="applyColor('#27ae60')" title="Emerald Green"></button>
+                        <button class="color-btn" style="background-color: #c0392b;" onclick="applyColor('#c0392b')" title="Crimson Red"></button>
+                        <button class="color-btn" style="background-color: #8e44ad;" onclick="applyColor('#8e44ad')" title="Royal Purple"></button>
+                        <button class="color-btn" style="background-color: #000000;" onclick="applyColor('#000000')" title="Elegant Black"></button>
+                        <button class="color-btn" style="background-color: #d35400;" onclick="applyColor('#d35400')" title="Pumpkin Orange"></button>
+                        <button class="color-btn" style="background-color: #7f8c8d;" onclick="applyColor('#7f8c8d')" title="Concrete Grey"></button>
                     </div>
                 </div>
                 <div class="setting-group">
                     <label data-i18n="lbl_font">Yazı Tipi</label>
-                    <div class="font-options-grid" id="desktop-font-opts">
-                        <!-- Fonts injected here -->
+                    <div class="font-options-grid">
+                        <button class="font-btn" style="font-family: 'Roboto', sans-serif;" onclick="applyFont('roboto')">Roboto</button>
+                        <button class="font-btn" style="font-family: 'Open Sans', sans-serif;" onclick="applyFont('opensans')">Open Sans</button>
+                        <button class="font-btn" style="font-family: 'Montserrat', sans-serif;" onclick="applyFont('montserrat')">Montserrat</button>
+                        <button class="font-btn" style="font-family: 'Lato', sans-serif;" onclick="applyFont('lato')">Lato</button>
+                        <button class="font-btn" style="font-family: 'Raleway', sans-serif;" onclick="applyFont('raleway')">Raleway</button>
+                        <button class="font-btn" style="font-family: 'PT Serif', serif;" onclick="applyFont('ptserif')">PT Serif</button>
+                        <button class="font-btn" style="font-family: 'Playfair Display', serif;" onclick="applyFont('playfair')">Playfair</button>
+                        <button class="font-btn" style="font-family: 'Lora', serif;" onclick="applyFont('lora')">Lora</button>
+                        <button class="font-btn" style="font-family: 'Merriweather', serif;" onclick="applyFont('merriweather')">Merriweather</button>
                     </div>
                 </div>
             </div>
             <div class="modal-footer">
-                <button class="btn btn-primary" onclick="closeThemeModal()" style="width:100%" data-i18n="btn_save_close">Kapat</button>
+                <button class="btn btn-primary" onclick="closeThemeModal()" style="width:100%" data-i18n="btn_save_close">Kaydet & Kapat</button>
             </div>
         </div>
     </div>
 
-    <!-- LAYOUT MODAL (Desktop Only) -->
-    <div id="layout-modal" class="modal-overlay desktop-only-modal">
+    <!-- LAYOUT MODAL -->
+    <div id="layout-modal" class="modal-overlay">
         <div class="modal-content">
             <div class="modal-header">
                 <h3 data-i18n="modal_layout_title">Sayfa Düzeni</h3>
@@ -96,12 +101,12 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button class="btn btn-primary" onclick="closeLayoutModal()" style="width:100%" data-i18n="btn_save_close">Kapat</button>
+                <button class="btn btn-primary" onclick="closeLayoutModal()" style="width:100%" data-i18n="btn_save_close">Kaydet & Kapat</button>
             </div>
         </div>
     </div>
 
-    <!-- 0. LANDING PAGE -->
+    <!-- 0. LANDING PAGE (DEFAULT VIEW) -->
     <section id="landing-view" class="view-section active">
         <header class="landing-header">
             <div class="brand-container">
@@ -109,21 +114,22 @@
                 <div class="brand-text" style="color:#2d3436;">ATS-Friendly</div>
             </div>
             <div class="header-actions">
-                <button class="btn-text" onclick="showAuth(true)" data-i18n="land_login">Giriş Yap</button>
-                <button class="btn-primary-small" onclick="showAuth(false)" data-i18n="land_signup">Kayıt Ol</button>
+                <button class="btn-text" onclick="showAuth(true)">Giriş Yap</button>
+                <button class="btn-primary-small" onclick="showAuth(false)">Kayıt Ol</button>
             </div>
         </header>
 
         <main class="landing-hero">
             <div class="hero-content">
-                <h1 data-i18n="land_hero_title">İşe Alım Robotlarını<br><span class="highlight-text">Yenecek CV'nizi Oluşturun</span></h1>
-                <p class="hero-subtitle" data-i18n="land_hero_sub">Modern işe alım sistemleri (ATS) ile %100 uyumlu, profesyonel ve sade CV'ler hazırlayın. Üstelik tamamen ücretsiz.</p>
+                <h1>İşe Alım Robotlarını<br><span class="highlight-text">Yenecek CV'nizi Oluşturun</span></h1>
+                <p class="hero-subtitle">Modern işe alım sistemleri (ATS) ile %100 uyumlu, profesyonel ve sade CV'ler hazırlayın. Üstelik tamamen ücretsiz.</p>
                 <div class="hero-buttons">
-                    <button class="btn-hero-primary" onclick="showAuth(false)" data-i18n="land_cta_start">Hemen Ücretsiz Başla</button>
-                    <button class="btn-hero-secondary" onclick="scrollToFeatures()" data-i18n="land_cta_how">Nasıl Çalışır?</button>
+                    <button class="btn-hero-primary" onclick="showAuth(false)">Hemen Ücretsiz Başla</button>
+                    <button class="btn-hero-secondary" onclick="scrollToFeatures()">Nasıl Çalışır?</button>
                 </div>
             </div>
             <div class="hero-image">
+                <!-- Abstract visual representation of ATS filtering -->
                 <div class="mockup-card">
                     <div class="mockup-header">
                         <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
@@ -144,34 +150,35 @@
         <section id="features" class="features-section">
             <div class="feature-card">
                 <div class="f-icon">🤖</div>
-                <h3 data-i18n="feat_ats_title">ATS Dostu Format</h3>
-                <p data-i18n="feat_ats_desc">Karmaşık grafikler yok. İnsan kaynakları yazılımlarının (ATS) kolayca okuyabileceği temiz kod yapısı.</p>
+                <h3>ATS Dostu Format</h3>
+                <p>Karmaşık grafikler yok. İnsan kaynakları yazılımlarının (ATS) kolayca okuyabileceği temiz kod yapısı.</p>
             </div>
             <div class="feature-card">
                 <div class="f-icon">💸</div>
-                <h3 data-i18n="feat_free_title">%100 Ücretsiz</h3>
-                <p data-i18n="feat_free_desc">Gizli ödeme yok, filigran yok. Sınırsız düzenleme ve PDF indirme hakkı.</p>
+                <h3>%100 Ücretsiz</h3>
+                <p>Gizli ödeme yok, filigran yok. Sınırsız düzenleme ve PDF indirme hakkı.</p>
             </div>
             <div class="feature-card">
                 <div class="f-icon">☁️</div>
-                <h3 data-i18n="feat_cloud_title">Bulut Kayıt</h3>
-                <p data-i18n="feat_cloud_desc">CV'niz bulutta güvende. İstediğiniz cihazdan (PC veya Mobil) kaldığınız yerden devam edin.</p>
+                <h3>Bulut Kayıt</h3>
+                <p>CV'niz bulutta güvende. İstediğiniz cihazdan (PC veya Mobil) kaldığınız yerden devam edin.</p>
             </div>
         </section>
 
         <footer class="landing-footer">
-            <p>&copy; 2024 ATS-Friendly CV Maker. <span data-i18n="footer_rights">Tüm hakları saklıdır.</span></p>
+            <p>&copy; 2024 ATS-Friendly CV Maker. Tüm hakları saklıdır.</p>
             <div class="footer-links">
-                <a href="#" data-i18n="footer_privacy">Gizlilik Politikası</a>
-                <a href="#" data-i18n="footer_terms">Kullanım Koşulları</a>
-                <a href="#" data-i18n="footer_contact">İletişim</a>
+                <a href="#">Gizlilik Politikası</a>
+                <a href="#">Kullanım Koşulları</a>
+                <a href="#">İletişim</a>
             </div>
         </footer>
     </section>
 
-    <!-- 1. AUTH SCREEN -->
+    <!-- 1. AUTH SCREEN (GİRİŞ/KAYIT) -->
     <section id="auth-view" class="view-section">
-        <button class="back-to-home" onclick="showView('landing-view')">← <span data-i18n="back_home">Ana Sayfa</span></button>
+        <!-- Back Button for Mobile -->
+        <button class="back-to-home" onclick="showView('landing-view')">← Ana Sayfa</button>
         
         <div class="auth-card professional">
             <div class="auth-header">
@@ -182,23 +189,21 @@
 
             <form onsubmit="event.preventDefault(); handleAuth();">
                 <div class="input-group">
-                    <label data-i18n="lbl_email_addr">E-posta Adresi</label>
+                    <label>E-posta Adresi</label>
                     <input type="email" id="auth-email" class="auth-input" placeholder="ornek@email.com" autocomplete="email" required>
                 </div>
                 
                 <div class="input-group">
-                    <label data-i18n="lbl_password">Şifre</label>
+                    <label>Şifre</label>
                     <input type="password" id="auth-password" class="auth-input" placeholder="••••••••" autocomplete="current-password" required>
                 </div>
 
+                <!-- Terms Checkbox (Visible only on Signup) -->
                 <div id="terms-container" style="display:none;" class="terms-check">
                     <label class="checkbox-container">
                         <input type="checkbox" id="auth-terms">
                         <span class="checkmark"></span>
-                        <span class="terms-text">
-                            <a href="#" data-i18n="terms_link">Kullanım Koşulları</a> <span data-i18n="terms_and">ve</span> 
-                            <a href="#" data-i18n="privacy_link">Gizlilik Politikasını</a> <span data-i18n="terms_agree">okudum, kabul ediyorum.</span>
-                        </span>
+                        <span class="terms-text"><a href="#">Kullanım Koşulları</a>'nı ve <a href="#">Gizlilik Politikasını</a> okudum, kabul ediyorum.</span>
                     </label>
                 </div>
                 
@@ -207,11 +212,11 @@
                 </button>
             </form>
             
-            <div class="divider"><span data-i18n="divider_or">VEYA</span></div>
+            <div class="divider"><span>VEYA</span></div>
 
             <button class="auth-btn google-btn" onclick="loginWithGoogle()" type="button">
                 <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#FFC107" d="M43.611 20.083H42V20H24v8h11.303c-1.649 4.657-6.08 8-11.303 8-6.627 0-12-5.373-12-12s5.373-12 12-12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4 12.955 4 4 12.955 4 24s8.955 20 20 20 20-8.955 20-20c0-1.341-.138-2.65-.389-3.917z"/><path fill="#FF3D00" d="m6.306 14.691 6.571 4.819C14.655 15.108 18.961 12 24 12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4c-7.305 0-13.782 3.914-17.694 9.691z"/><path fill="#4CAF50" d="M24 44c5.166 0 9.86-1.977 13.409-5.192l-6.19-5.238A11.91 11.91 0 0 1 24 36c-5.202 0-9.619-3.317-11.283-7.946l-6.522 5.025C10.111 38.971 16.51 44 24 44z"/><path fill="#1976D2" d="M43.611 20.083H42V20H24v8h11.303a12.04 12.04 0 0 1-4.087 5.571l.003-.002 6.19 5.238C36.971 39.205 44 34 44 24c0-1.341-.138-2.65-.389-3.917z"/></svg>
-                <span data-i18n="auth_google_continue">Google ile Devam Et</span>
+                <span>Google ile Devam Et</span>
             </button>
             
             <p class="auth-toggle" onclick="toggleAuthMode()">
@@ -221,9 +226,36 @@
         </div>
     </section>
 
+    <!-- 2. ŞABLON SEÇİMİ -->
+    <section id="template-view" class="view-section">
+        <div class="template-header">
+            <h1 data-i18n="tpl_select_header">Profesyonel Bir Şablon Seçin</h1>
+        </div>
+        <div class="template-grid">
+            <div class="template-card" onclick="selectTemplate('tpl-classic')">
+                <div class="template-preview">
+                    <img src="https://cdn.prod.website-files.com/62f0854c1cef28185535ab61/65f992db51efa92ea7d033b5_Compact-1.png" alt="Klasik Şablon Önizleme">
+                </div>
+                <div class="template-info">
+                    <h3 data-i18n="tpl_classic">Klasik</h3>
+                    <p data-i18n="tpl_classic_desc">🏛️ Geleneksel & Akademik</p>
+                </div>
+            </div>
+            
+            <div class="template-card" onclick="selectTemplate('tpl-compact')">
+                <div class="template-preview">
+                    <img src="https://imgv2-2-f.scribdassets.com/img/document/649557521/original/ce87161cab/1?v=1g" alt="Kompakt Şablon Önizleme">
+                </div>
+                <div class="template-info">
+                    <h3 data-i18n="tpl_compact">Kompakt</h3>
+                    <p data-i18n="tpl_compact_desc">📄 Minimal & Tek Sayfa</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <!-- 3. SPLIT EDİTÖR (FORM + PREVIEW) -->
     <section id="editor-view" class="view-section">
-        
         <!-- Sidebar Navigation (Desktop Only) -->
         <aside class="sidebar">
             <div class="brand-container">
@@ -242,8 +274,10 @@
                     <button class="nav-item" onclick="openThemeModal()">
                         <span class="icon">🎨</span> <span data-i18n="btn_design">Tasarım Ayarları</span>
                     </button>
+                    <!-- NEW LAYOUT BUTTON -->
                     <button class="nav-item" onclick="openLayoutModal()">
                         <span class="icon">📐</span> <span data-i18n="btn_layout">Sayfa Düzeni</span>
+                        <span class="badge-new">YENİ</span>
                     </button>
                     <button class="nav-item" onclick="backToTemplates()">
                         <span class="icon">💠</span> <span data-i18n="btn_change_tpl">Şablonu Değiştir</span>
@@ -268,11 +302,11 @@
             </div>
         </aside>
 
-        <!-- MAIN EDITOR LAYOUT -->
+        <!-- SPLIT CONTAINER -->
         <div class="editor-layout">
             
-            <!-- 1. FORM PANEL (Mobile Tab: Edit) -->
-            <div class="editor-panel-form active-mobile-tab" id="panel-form">
+            <!-- LEFT PANEL: DATA ENTRY FORM -->
+            <div class="editor-panel-form" id="panel-form">
                 <div class="form-header-mini">
                     <h2 data-i18n="form_title">Bilgilerinizi Düzenleyin</h2>
                 </div>
@@ -333,78 +367,49 @@
                         <button class="btn-secondary-dashed" onclick="addFormEducation()">+ <span data-i18n="btn_add_edu">Okul Ekle</span></button>
                     </div>
 
-                    <!-- NEW: Sertifikalar -->
+                    <!-- Özel Bölümler -->
                     <div class="form-block">
-                        <h3 data-i18n="form_certificates">Sertifikalar</h3>
-                        <div id="form-certificates-list"></div>
-                        <button class="btn-secondary-dashed" onclick="addFormCertificate()">+ <span data-i18n="btn_add_cert">Sertifika Ekle</span></button>
-                    </div>
-
-                    <!-- NEW: Referanslar -->
-                    <div class="form-block">
-                        <h3 data-i18n="form_references">Referanslar</h3>
-                        <div id="form-references-list"></div>
-                        <button class="btn-secondary-dashed" onclick="addFormReference()">+ <span data-i18n="btn_add_ref">Referans Ekle</span></button>
-                    </div>
-
-                    <!-- Diğer Özel Bölümler -->
-                    <div class="form-block">
-                        <h3 data-i18n="form_custom">Diğer (Yetkinlikler, Diller vb.)</h3>
+                        <h3 data-i18n="form_custom">Özel Bölümler</h3>
                         <div id="form-custom-list"></div>
-                        <button class="btn-secondary-dashed" onclick="addFormCustomSection()">+ <span data-i18n="btn_add_custom">Bölüm Ekle</span></button>
+                        <button class="btn-secondary-dashed" onclick="addFormCustomSection()">+ <span data-i18n="btn_add_custom">Bölüm Ekle (Örn: Sertifikalar)</span></button>
                     </div>
-                    
-                    <!-- Space for bottom nav on mobile -->
-                    <div style="height: 100px; display: block; md:display: none;"></div>
                 </div>
             </div>
 
-            <!-- 2. PREVIEW PANEL (Mobile Tab: Preview) -->
+            <!-- RIGHT PANEL: PREVIEW -->
             <div class="editor-panel-preview" id="panel-preview">
-                
-                <!-- Mobile Design Settings (Embedded) -->
-                <div class="mobile-design-controls">
-                    <div class="design-control-header" data-i18n="mobile_design_settings">Tasarım Ayarları</div>
-                    <div class="design-scroll-container">
-                        <!-- Colors (Copied via JS) -->
-                        <div class="design-row" id="mobile-color-row"></div>
-                        <!-- Fonts (Copied via JS) -->
-                        <div class="design-row" id="mobile-font-row"></div>
-                        <!-- Layout Sliders -->
-                        <div class="design-row">
-                            <label>Size</label>
-                            <input type="range" min="9" max="14" step="0.5" id="mob-rng-fontsize" oninput="syncMobileSlider('fontsize', this.value)">
-                        </div>
-                        <div class="design-row">
-                            <label>Gap</label>
-                            <input type="range" min="5" max="40" step="1" id="mob-rng-sectiongap" oninput="syncMobileSlider('sectiongap', this.value)">
-                        </div>
-                    </div>
-                </div>
-
                 <div id="cv-scale-container">
                     <div class="page cv-content" id="cv-root">
                         <!-- CV Content generated here -->
                     </div>
                 </div>
-                <!-- Space for bottom nav -->
-                <div style="height: 120px;"></div>
             </div>
         </div>
 
-        <!-- NEW MOBILE BOTTOM NAVIGATION -->
-        <div class="mobile-bottom-nav">
-            <button class="nav-tab active" onclick="switchMobileTab('edit')">
-                <span class="tab-icon">✏️</span>
-                <span class="tab-text" data-i18n="tab_edit">Düzenle</span>
-            </button>
-            <button class="nav-tab" onclick="switchMobileTab('preview')">
-                <span class="tab-icon">👁️</span>
-                <span class="tab-text" data-i18n="tab_preview">Önizle</span>
-            </button>
-            <button class="nav-tab action-tab" onclick="window.print()">
-                <span class="tab-icon">⬇️</span>
-                <span class="tab-text" data-i18n="tab_download">İndir</span>
+        <!-- NEW MOBILE FLOATING ACTION MENU -->
+        <div class="mobile-fab-container">
+            <div class="fab-menu-items" id="fab-items">
+                <button class="fab-item" onclick="openThemeModal()">
+                    <span class="fab-label">Tasarım</span> 🎨 
+                </button>
+                <button class="fab-item" onclick="openLayoutModal()">
+                    <span class="fab-label">Düzen</span> 📐
+                </button>
+                <button class="fab-item" onclick="backToTemplates()">
+                    <span class="fab-label">Şablonlar</span> 💠
+                </button>
+                <button class="fab-item" onclick="window.print()">
+                    <span class="fab-label">PDF İndir</span> 🖨️
+                </button>
+                <button class="fab-item danger" onclick="resetAll()">
+                    <span class="fab-label">Temizle</span> 🗑️
+                </button>
+                 <button class="fab-item" onclick="logout()">
+                    <span class="fab-label">Çıkış</span> 🚪
+                </button>
+            </div>
+            <button class="fab-main-btn" onclick="toggleFabMenu()" id="fab-trigger">
+                ⚙️
             </button>
         </div>
 
