@@ -1309,65 +1309,78 @@ body.tpl-compact .entry { display: block; position: relative; margin-bottom: 15p
 body.tpl-compact .entry .left-col { position: absolute; top: 0; right: 0; width: auto; text-align: right; font-weight: 600; font-size: 0.9em; color: var(--cv-accent-color); }
 body.tpl-compact .entry .right-col { width: 100%; padding-right: 130px; }
 
-/* --- PRINT (YAZDIRMA) AYARLARI (GÜNCELLENMİŞ VERSİYON) --- */
+/* --- KESİN ÇÖZÜM PRINT AYARLARI --- */
 @media print {
-    /* 1. Önce sayfadaki HER ŞEYİ gizle */
-    body * {
-        visibility: hidden;
+    /* 1. Tüm Arayüz Elemanlarını Gizle */
+    .sidebar, 
+    .editor-panel-form, 
+    .fab-container, 
+    .mobile-editor-tabs, 
+    .mobile-bottom-bar,
+    .nav-buttons,
+    .landing-header,
+    #toast,
+    button,
+    .lang-switcher,
+    .mobile-view-toggle,
+    .mobile-fab-container {
+        display: none !important;
     }
 
-    /* 2. Sadece CV Kapsayıcısını ve içindekileri görünür yap */
-    #cv-scale-container, 
-    #cv-scale-container * {
-        visibility: visible;
-    }
-
-    /* 3. Ana Gövde Ayarları */
-    html, body {
+    /* 2. SUÇLUYU ETKİSİZ HALE GETİR: Kapsayıcıların kilidini aç */
+    html, body, .view-section, .editor-layout, .editor-panel-preview {
         height: auto !important;
-        overflow: visible !important;
-        background: white !important;
-        margin: 0 !important;
-        padding: 0 !important;
-    }
-
-    /* 4. CV'yi sayfanın akışından (layout) kopar ve en başa yapıştır */
-    #cv-scale-container {
-        position: absolute;
-        left: 0;
-        top: 0;
         width: 100% !important;
         margin: 0 !important;
         padding: 0 !important;
-        transform: none !important;
         overflow: visible !important;
+        position: static !important;
+        display: block !important;
         background: white !important;
     }
 
-    /* 5. CV Sayfa Yapısı */
-    .page {
+    /* 3. CV Kağıdını Sayfaya Yerleştir */
+    #cv-scale-container {
+        position: absolute !important;
+        left: 0 !important;
+        top: 0 !important;
+        width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        height: auto !important;
+        overflow: visible !important;
+        z-index: 9999;
+        transform: none !important;
+    }
+
+    /* 4. İçeriğin Bölünmesini Yönet */
+    #cv-root {
+        width: 794px !important;
         margin: 0 auto !important;
-        width: 794px !important; /* Keep fixed width for A4 consistency */
+        background: white !important;
+        height: auto !important;
+        min-height: auto !important;
+        overflow: visible !important;
+    }
+
+    .page {
+        width: 794px !important;
         max-width: 794px !important;
-        height: auto !important; 
+        height: auto !important;
         min-height: 1120px !important;
         overflow: visible !important;
         box-shadow: none !important;
         border: none !important;
-        padding: 140px 95px 95px 95px !important; /* Professional spacing preserved */
+        margin: 0 auto !important;
+        padding: 140px 95px 95px 95px !important;
         background: white !important;
         box-sizing: border-box !important;
     }
-
-    /* 6. İçeriklerin bölünmesini yönet */
-    .section, .entry {
-        page-break-inside: avoid;
-    }
-
-    /* 7. Kağıt ayarı */
+    
+    /* 5. Kağıt Ayarı */
     @page {
         margin: 0;
-        size: A4;
+        size: auto;
     }
 }
 
