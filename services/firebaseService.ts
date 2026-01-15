@@ -10,6 +10,8 @@ import {
 } from "firebase/auth";
 import { getFirestore, doc, getDoc, setDoc } from "firebase/firestore";
 
+console.log("🔥 Firebase Service initializing...");
+
 // Config
 const firebaseConfig = {
     apiKey: "AIzaSyBbxgCMw5dO5T-kt7Njapo5ST04MRp7JKU",
@@ -29,7 +31,7 @@ const CV_COLLECTION = 'cv-data';
 
 // --- Authentication ---
 
-const handleEmailAuth = (isLogin: boolean, email: string, password: string) => {
+const handleEmailAuth = (isLogin, email, password) => {
     if (isLogin) {
         return signInWithEmailAndPassword(auth, email, password);
     } else {
@@ -48,7 +50,7 @@ const logout = () => {
 
 // --- Firestore Database ---
 
-const saveCvDocument = async (userId: string, data: any) => {
+const saveCvDocument = async (userId, data) => {
     try {
         const docRef = doc(db, CV_COLLECTION, userId);
         await setDoc(docRef, data, { merge: true });
@@ -57,7 +59,7 @@ const saveCvDocument = async (userId: string, data: any) => {
     }
 };
 
-const getCvDocument = async (userId: string) => {
+const getCvDocument = async (userId) => {
     try {
         const docRef = doc(db, CV_COLLECTION, userId);
         const docSnap = await getDoc(docRef);
@@ -83,3 +85,5 @@ const getCvDocument = async (userId: string) => {
     saveCvDocument,
     getCvDocument
 };
+
+console.log("✅ Firebase Service Loaded");

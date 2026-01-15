@@ -16,6 +16,28 @@
       .cv-preview-font {
         font-family: 'PT Serif', serif;
       }
+      /* Debug Console Styles */
+      #debug-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(185, 28, 28, 0.95);
+        color: white;
+        z-index: 9999;
+        overflow: auto;
+        padding: 2rem;
+        font-family: monospace;
+      }
+      #debug-content {
+        background: #000;
+        border: 1px solid #444;
+        padding: 1rem;
+        border-radius: 0.5rem;
+        white-space: pre-wrap;
+      }
       @media print {
         body * {
           visibility: hidden;
@@ -36,7 +58,34 @@
         }
       }
     </style>
-    <!-- Babel for JSX -->
+    
+    <!-- Error Handler Script (Must be first) -->
+    <script>
+      window.onerror = function(msg, url, line, col, error) {
+        const overlay = document.getElementById('debug-overlay');
+        const content = document.getElementById('debug-content');
+        if (overlay && content) {
+          overlay.style.display = 'block';
+          const time = new Date().toLocaleTimeString();
+          content.innerText += `[${time}] ERROR: ${msg}\nFile: ${url}:${line}:${col}\nStack: ${error?.stack || 'N/A'}\n\n`;
+        }
+        console.error('Global Error Caught:', msg, error);
+        return false; 
+      };
+
+      window.onunhandledrejection = function(event) {
+        const overlay = document.getElementById('debug-overlay');
+        const content = document.getElementById('debug-content');
+        if (overlay && content) {
+          overlay.style.display = 'block';
+          content.innerText += `[Promise Rejection]: ${event.reason}\n\n`;
+        }
+      };
+      
+      console.log("System initializing...");
+    </script>
+
+    <!-- Babel -->
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     
     <!-- Import Map -->
@@ -56,15 +105,28 @@
 </script>
   </head>
   <body>
+    <!-- Debug Overlay -->
+    <div id="debug-overlay">
+      <h1 class="text-2xl font-bold mb-4">⚠️ Uygulama Hatası (Debug Modu)</h1>
+      <p class="mb-4">Uygulama yüklenirken kritik bir hata oluştu. Aşağıdaki logları geliştiriciye iletin.</p>
+      <div id="debug-content"></div>
+      <button onclick="window.location.reload()" class="mt-4 px-4 py-2 bg-white text-red-900 font-bold rounded">Sayfayı Yenile</button>
+    </div>
+
     <div id="root"></div>
     
-    <!-- Scripts loaded as modules with Babel -->
-    <script type="text/babel" data-type="module" data-presets="env,react" src="./services/firebaseService.ts"></script>
-    <script type="text/babel" data-type="module" data-presets="env,react" src="./components/TemplateView.tsx"></script>
-    <script type="text/babel" data-type="module" data-presets="env,react" src="./components/LandingView.tsx"></script>
-    <script type="text/babel" data-type="module" data-presets="env,react" src="./components/AuthView.tsx"></script>
-    <script type="text/babel" data-type="module" data-presets="env,react" src="./components/EditorView.tsx"></script>
-    <script type="text/babel" data-type="module" data-presets="env,react" src="./App.tsx"></script>
-    <script type="text/babel" data-type="module" data-presets="env,react" src="./index.tsx"></script>
+    <!-- 
+      CRITICAL FIX: 
+      Removed 'env' from presets. 'env' transpiles imports to 'require()', 
+      which browsers don't support. We only need 'react' (for JSX) and 
+      'typescript' (for type stripping). Browsers handle ES modules natively.
+    -->
+    <script type="text/babel" data-type="module" data-presets="typescript,react" src="./services/firebaseService.ts"></script>
+    <script type="text/babel" data-type="module" data-presets="typescript,react" src="./components/TemplateView.tsx"></script>
+    <script type="text/babel" data-type="module" data-presets="typescript,react" src="./components/LandingView.tsx"></script>
+    <script type="text/babel" data-type="module" data-presets="typescript,react" src="./components/AuthView.tsx"></script>
+    <script type="text/babel" data-type="module" data-presets="typescript,react" src="./components/EditorView.tsx"></script>
+    <script type="text/babel" data-type="module" data-presets="typescript,react" src="./App.tsx"></script>
+    <script type="text/babel" data-type="module" data-presets="typescript,react" src="./index.tsx"></script>
   </body>
 </html>
