@@ -50,13 +50,18 @@ let currentLayout = {
 // --- DİL YÖNETİMİ (LOCALIZATION) ---
 const translations = {
     tr: {
-        auth_title: "Giriş Yap",
-        auth_signup_title: "Hesap Oluştur",
-        auth_continue: "Devam Et",
+        auth_title: "Hesabınıza Giriş Yapın",
+        auth_subtitle_login: "CV'nizi düzenlemeye devam edin",
+        auth_title_signup: "Hemen Ücretsiz Hesap Oluşturun",
+        auth_subtitle_signup: "Kredi kartı gerekmez",
+        auth_btn_login: "Giriş Yap",
+        auth_btn_signup: "Kayıt Ol",
+        auth_toggle_msg_login: "Hesabın yok mu?",
+        auth_toggle_link_login: "Hemen Kayıt Ol",
+        auth_toggle_msg_signup: "Zaten hesabın var mı?",
+        auth_toggle_link_signup: "Giriş Yap",
+        
         auth_processing: "İşleniyor...",
-        auth_google: "Google ile Giriş",
-        auth_toggle_signup: "Hesabın yok mu? Kayıt Ol",
-        auth_toggle_login: "Zaten hesabın var mı? Giriş Yap",
         tpl_select_header: "Profesyonel Bir Şablon Seçin",
         tpl_classic: "Klasik",
         tpl_classic_desc: "🏛️ Geleneksel & Akademik",
@@ -113,13 +118,18 @@ const translations = {
         lbl_section_content: "İçerik / Açıklama"
     },
     en: {
-        auth_title: "Login",
-        auth_signup_title: "Create Account",
-        auth_continue: "Continue",
+        auth_title: "Login to your account",
+        auth_subtitle_login: "Continue editing your CV",
+        auth_title_signup: "Create your free account",
+        auth_subtitle_signup: "No credit card required",
+        auth_btn_login: "Login",
+        auth_btn_signup: "Sign Up",
+        auth_toggle_msg_login: "Don't have an account?",
+        auth_toggle_link_login: "Sign Up Now",
+        auth_toggle_msg_signup: "Already have an account?",
+        auth_toggle_link_signup: "Login",
+
         auth_processing: "Processing...",
-        auth_google: "Login with Google",
-        auth_toggle_signup: "Don't have an account? Sign Up",
-        auth_toggle_login: "Already have an account? Login",
         tpl_select_header: "Select a Professional Template",
         tpl_classic: "Classic",
         tpl_classic_desc: "🏛️ Traditional & Academic",
@@ -192,23 +202,37 @@ window.setLanguage = (lang) => {
     document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
     document.querySelector(`.lang-btn[onclick="setLanguage('${lang}')"]`).classList.add('active');
 
-    // Update Form Labels that might be dynamic
-    const authTitleKey = isLoginMode ? 'auth_title' : 'auth_signup_title';
-    document.getElementById('auth-title').innerText = translations[lang][authTitleKey];
-    document.getElementById('auth-toggle-text').innerText = isLoginMode ? translations[lang].auth_toggle_signup : translations[lang].auth_toggle_login;
+    // Update Auth Labels Manually
+    updateAuthUI();
     
     // Refresh CV Preview to apply language changes (e.g. section headers)
     generateCVFromForm();
 };
 
+function updateAuthUI() {
+    const t = translations[currentLang];
+    const title = isLoginMode ? t.auth_title : t.auth_title_signup;
+    const sub = isLoginMode ? t.auth_subtitle_login : t.auth_subtitle_signup;
+    const btnText = isLoginMode ? t.auth_btn_login : t.auth_btn_signup;
+    const toggleMsg = isLoginMode ? t.auth_toggle_msg_login : t.auth_toggle_msg_signup;
+    const toggleLink = isLoginMode ? t.auth_toggle_link_login : t.auth_toggle_link_signup;
+
+    document.getElementById('auth-title').innerText = title;
+    document.getElementById('auth-subtitle').innerText = sub;
+    document.getElementById('auth-btn-text').innerText = btnText;
+    document.getElementById('auth-toggle-msg').innerText = toggleMsg;
+    document.getElementById('auth-toggle-link').innerText = toggleLink;
+    
+    // Toggle Terms Checkbox visibility
+    document.getElementById('terms-container').style.display = isLoginMode ? 'none' : 'block';
+}
+
 // --- EKRAN YÖNETİMİ ---
-function showView(viewId) {
+window.showView = (viewId) => {
     document.querySelectorAll('.view-section').forEach(v => v.classList.remove('active'));
     const target = document.getElementById(viewId);
     if (target) target.classList.add('active');
-    
-    // No special mobile view handling needed anymore as we are stacking vertically
-}
+};
 
 
 // --- AUTO SCALE PREVIEW FOR MOBILE ---
@@ -412,7 +436,18 @@ function applySavedLayout(layout) {
     document.documentElement.style.setProperty('--cv-section-gap', layout.sectionGap + 'px');
 }
 
-// --- AUTH ---
+// --- AUTH & LANDING LOGIC ---
+
+window.scrollToFeatures = () => {
+    document.getElementById('features').scrollIntoView({ behavior: 'smooth' });
+};
+
+window.showAuth = (loginMode) => {
+    isLoginMode = loginMode;
+    updateAuthUI();
+    window.showView('auth-view');
+};
+
 window.loginWithGoogle = async () => {
     try {
         updateStatus('syncing'); 
@@ -431,21 +466,25 @@ window.loginWithGoogle = async () => {
 
 window.toggleAuthMode = () => {
     isLoginMode = !isLoginMode;
-    const t = translations[currentLang];
-    const authTitleKey = isLoginMode ? 'auth_title' : 'auth_signup_title';
-    document.getElementById('auth-title').innerText = t[authTitleKey];
-    window.setLanguage(currentLang);
+    updateAuthUI();
 };
 
 window.handleAuth = async () => {
     const email = document.getElementById('auth-email').value;
     const password = document.getElementById('auth-password').value;
+    const terms = document.getElementById('auth-terms').checked;
+    const btnTextSpan = document.getElementById('auth-btn-text');
     const btn = document.querySelector('.auth-btn');
     
     if (!email || !password) return alert("Lütfen tüm alanları doldurun.");
     
-    const originalText = btn.innerText;
-    btn.innerText = translations[currentLang].auth_processing;
+    // Validate Terms on Signup
+    if (!isLoginMode && !terms) {
+        return alert("Kayıt olmak için Kullanım Koşulları ve Gizlilik Politikasını kabul etmelisiniz.");
+    }
+
+    const originalText = btnTextSpan.innerText;
+    btnTextSpan.innerText = translations[currentLang].auth_processing;
     btn.disabled = true;
 
     try {
@@ -457,7 +496,7 @@ window.handleAuth = async () => {
         // Success is handled by onAuthStateChanged
     } catch (e) { 
         alert("Hata: " + e.message);
-        btn.innerText = originalText;
+        btnTextSpan.innerText = originalText;
         btn.disabled = false;
     }
 };
@@ -469,6 +508,7 @@ window.logout = () => signOut(auth).then(() => {
 
 onAuthStateChanged(auth, async (user) => {
     if (user) {
+        // Logged In
         currentUser = user;
         const docRef = doc(db, 'artifacts', appId, 'users', user.uid, 'data', 'cvContent');
         const snap = await getDoc(docRef);
@@ -491,27 +531,33 @@ onAuthStateChanged(auth, async (user) => {
                 applySavedLayout(data.layout);
             }
             
-            showView('editor-view');
+            window.showView('editor-view');
             generateCVFromForm(false); // Render CV, false = don't save immediately
             updateStatus('online');
         } else {
-            showView('template-view');
+            window.showView('template-view');
         }
     } else {
-        showView('auth-view');
+        // Not Logged In - Show Landing Page by default unless manually navigated to Auth
+        // If we are already on Auth view (e.g. failed login), stay there.
+        // Otherwise, show Landing.
+        const currentView = document.querySelector('.view-section.active');
+        if (!currentView || currentView.id === 'editor-view' || currentView.id === 'template-view') {
+            window.showView('landing-view');
+        }
     }
 });
 
 // --- EDITOR LOGIC ---
 window.selectTemplate = (tpl) => {
     document.body.className = tpl;
-    showView('editor-view');
+    window.showView('editor-view');
     generateCVFromForm();
 };
 
 window.backToTemplates = () => {
     saveToCloud(); 
-    showView('template-view');
+    window.showView('template-view');
 };
 
 // --- DYNAMIC FORM HANDLERS ---
@@ -763,6 +809,35 @@ window.generateCVFromForm = (triggerSave = true) => {
         triggerDebounceSave(data);
     }
 };
+
+function loadUserDataIntoForm(data) {
+    document.getElementById('inp-fullname').value = data.fullname || '';
+    document.getElementById('inp-title').value = data.title || '';
+    document.getElementById('inp-email').value = data.email || '';
+    document.getElementById('inp-phone').value = data.phone || '';
+    document.getElementById('inp-address').value = data.address || '';
+    document.getElementById('inp-birthplace').value = data.birthplace || '';
+    document.getElementById('inp-license').value = data.license || '';
+    document.getElementById('inp-summary').value = data.summary || '';
+
+    const expList = document.getElementById('form-experiences-list');
+    expList.innerHTML = '';
+    if (data.experiences) {
+        data.experiences.forEach(exp => addFormExperience(exp));
+    }
+
+    const eduList = document.getElementById('form-education-list');
+    eduList.innerHTML = '';
+    if (data.education) {
+        data.education.forEach(edu => addFormEducation(edu));
+    }
+
+    const customList = document.getElementById('form-custom-list');
+    customList.innerHTML = '';
+    if (data.customSections) {
+        data.customSections.forEach(sec => addFormCustomSection(sec));
+    }
+}
 
 
 // --- DEBOUNCE SAVE ---
