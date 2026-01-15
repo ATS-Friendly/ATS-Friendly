@@ -32,389 +32,288 @@ const appId = "mono-cv-app";
 let isLoginMode = true;
 let currentUser = null;
 let isSyncing = false;
-let saveTimeout = null; // For debouncing save
+let isLoadingData = false; // CRITICAL FIX for Race Condition
+let saveTimeout = null; 
 let currentLang = 'tr';
-// Theme Defaults
-let currentTheme = {
-    color: '#2c3e50',
-    font: 'ptserif' 
-};
-// Layout Defaults
-let currentLayout = {
-    fontSize: 11,
-    lineHeight: 1.4,
-    margin: 20,
-    sectionGap: 15
-};
 
-// --- DİL YÖNETİMİ (LOCALIZATION) ---
+let currentTheme = { color: '#2c3e50', font: 'ptserif' };
+let currentLayout = { fontSize: 11, lineHeight: 1.4, margin: 20, sectionGap: 15 };
+
+// --- DİL YÖNETİMİ ---
 const translations = {
     tr: {
-        // LANDING PAGE
         land_login: "Giriş Yap",
         land_signup: "Kayıt Ol",
         land_hero_title: "İşe Alım Robotlarını<br><span class='highlight-text'>Yenecek CV'nizi Oluşturun</span>",
-        land_hero_sub: "Modern işe alım sistemleri (ATS) ile %100 uyumlu, profesyonel ve sade CV'ler hazırlayın. Üstelik tamamen ücretsiz.",
+        land_hero_sub: "Modern işe alım sistemleri (ATS) ile %100 uyumlu.",
         land_cta_start: "Hemen Ücretsiz Başla",
         land_cta_how: "Nasıl Çalışır?",
         feat_ats_title: "ATS Dostu Format",
-        feat_ats_desc: "Karmaşık grafikler yok. İnsan kaynakları yazılımlarının (ATS) kolayca okuyabileceği temiz kod yapısı.",
+        feat_ats_desc: "Okunabilir temiz kod yapısı.",
         feat_free_title: "%100 Ücretsiz",
-        feat_free_desc: "Gizli ödeme yok, filigran yok. Sınırsız düzenleme ve PDF indirme hakkı.",
+        feat_free_desc: "Gizli ödeme yok.",
         feat_cloud_title: "Bulut Kayıt",
-        feat_cloud_desc: "CV'niz bulutta güvende. İstediğiniz cihazdan (PC veya Mobil) kaldığınız yerden devam edin.",
+        feat_cloud_desc: "Her yerden erişim.",
         footer_rights: "Tüm hakları saklıdır.",
-        footer_privacy: "Gizlilik Politikası",
-        footer_terms: "Kullanım Koşulları",
+        footer_privacy: "Gizlilik",
+        footer_terms: "Koşullar",
         footer_contact: "İletişim",
-
-        // AUTH
+        
         back_home: "Ana Sayfa",
-        auth_title: "Hesabınıza Giriş Yapın",
-        auth_subtitle_login: "CV'nizi düzenlemeye devam edin",
-        auth_title_signup: "Hemen Ücretsiz Hesap Oluşturun",
-        auth_subtitle_signup: "Kredi kartı gerekmez",
-        auth_btn_login: "Giriş Yap",
+        auth_title: "Giriş Yap",
+        auth_subtitle_login: "Devam et",
+        auth_title_signup: "Hesap Oluştur",
+        auth_subtitle_signup: "Hemen başla",
+        auth_btn_login: "Giriş",
         auth_btn_signup: "Kayıt Ol",
         auth_toggle_msg_login: "Hesabın yok mu?",
-        auth_toggle_link_login: "Hemen Kayıt Ol",
+        auth_toggle_link_login: "Kayıt Ol",
         auth_toggle_msg_signup: "Zaten hesabın var mı?",
         auth_toggle_link_signup: "Giriş Yap",
-        lbl_email_addr: "E-posta Adresi",
+        lbl_email_addr: "E-posta",
         lbl_password: "Şifre",
-        terms_link: "Kullanım Koşulları",
-        privacy_link: "Gizlilik Politikası",
-        terms_and: "ve",
-        terms_agree: "nı okudum, kabul ediyorum.",
-        divider_or: "VEYA",
-        auth_google_continue: "Google ile Devam Et",
-        
+        auth_google_continue: "Google ile Devam",
         auth_processing: "İşleniyor...",
-        tpl_select_header: "Profesyonel Bir Şablon Seçin",
-        tpl_classic: "Klasik",
-        tpl_classic_desc: "🏛️ Geleneksel & Akademik",
-        tpl_compact: "Kompakt",
-        tpl_compact_desc: "📄 Minimal & Tek Sayfa",
-        btn_design: "Tasarım Ayarları",
-        btn_layout: "Sayfa Düzeni",
-        btn_change_tpl: "Şablonu Değiştir",
-        btn_download_pdf: "PDF İndir",
-        btn_reset: "Sıfırla / Temizle",
-        btn_logout: "Çıkış Yap",
-        nav_design: "TASARIM",
-        nav_actions: "İŞLEMLER",
-        status_connecting: "Bağlanıyor...",
-        status_online: "Senkronize",
-        status_syncing: "Kaydediliyor...",
-        status_saved: "Kaydedildi!",
-        status_offline: "Çevrimdışı",
-        cv_label_birth: "Doğum Yeri",
-        cv_label_license: "Ehliyet",
-        confirm_reset: "DİKKAT: CV içeriğiniz tamamen silinecek ve başlangıç haline dönecektir. Devam etmek istiyor musunuz?",
-        toast_reset: "CV başarıyla sıfırlandı.",
-        modal_theme_title: "Tasarım Ayarları",
-        modal_layout_title: "Sayfa Düzeni",
-        lbl_color: "Vurgu Rengi",
-        lbl_font: "Yazı Tipi",
-        lbl_fontsize: "Yazı Boyutu",
-        lbl_lineheight: "Satır Aralığı",
-        lbl_margin: "Kenar Boşluğu",
-        lbl_sectiongap: "Bölüm Aralığı",
-        btn_save_close: "Kapat",
-        // Form Translations
-        form_title: "Bilgilerinizi Düzenleyin",
+
+        form_title: "Bilgileri Düzenle",
         form_personal: "Kişisel Bilgiler",
         form_profile: "Profil Özeti",
         form_experience: "İş Deneyimi",
         form_education: "Eğitim",
-        form_custom: "Özel Bölümler",
+        form_certificates: "Sertifikalar",
+        form_references: "Referanslar",
+        form_custom: "Diğer",
+        
         form_lbl_fullname: "Ad Soyad",
         form_lbl_title: "Unvan",
         form_lbl_email: "E-posta",
-        form_lbl_phone: "Telefon",
+        form_lbl_phone: "Tel",
         form_lbl_address: "Adres",
+        cv_label_birth: "Doğum Yeri",
+        cv_label_license: "Ehliyet",
+        
         btn_add_job: "İş Ekle",
         btn_add_edu: "Okul Ekle",
+        btn_add_cert: "Sertifika Ekle",
+        btn_add_ref: "Referans Ekle",
         btn_add_custom: "Bölüm Ekle",
-        lbl_job_title: "Pozisyon Adı",
+        
+        lbl_job_title: "Pozisyon",
         lbl_company: "Şirket",
         lbl_date: "Tarih",
         lbl_desc: "Açıklama",
-        lbl_school: "Okul / Üniversite",
-        lbl_degree: "Bölüm / Derece",
-        lbl_section_title: "Bölüm Başlığı",
-        lbl_section_content: "İçerik / Açıklama"
+        lbl_school: "Okul",
+        lbl_degree: "Bölüm",
+        lbl_cert_name: "Sertifika Adı",
+        lbl_cert_issuer: "Kurum",
+        lbl_ref_name: "Ad Soyad",
+        lbl_ref_phone: "Tel No",
+        
+        tab_edit: "Düzenle",
+        tab_preview: "Önizle",
+        tab_download: "İndir",
+        mobile_design_settings: "Tasarım Ayarları",
+        status_connecting: "Bağlanıyor...",
+        status_online: "Senkronize",
+        status_syncing: "Kaydediliyor..."
     },
     en: {
-        // LANDING PAGE
         land_login: "Login",
         land_signup: "Sign Up",
-        land_hero_title: "Create a CV That<br><span class='highlight-text'>Beats the Applicant Tracking Systems</span>",
-        land_hero_sub: "Prepare professional and clean CVs compatible with modern ATS software. And it's 100% free.",
-        land_cta_start: "Start for Free",
-        land_cta_how: "How it Works?",
+        land_hero_title: "Create a CV That<br><span class='highlight-text'>Beats ATS</span>",
+        land_hero_sub: "100% ATS compatible.",
+        land_cta_start: "Start Free",
+        land_cta_how: "How?",
         feat_ats_title: "ATS Friendly",
-        feat_ats_desc: "No complex graphics. Clean code structure that HR software can easily read.",
+        feat_ats_desc: "Clean code structure.",
         feat_free_title: "100% Free",
-        feat_free_desc: "No hidden fees, no watermarks. Unlimited editing and PDF downloads.",
+        feat_free_desc: "No hidden fees.",
         feat_cloud_title: "Cloud Save",
-        feat_cloud_desc: "Your CV is safe in the cloud. Continue where you left off from any device.",
+        feat_cloud_desc: "Access anywhere.",
         footer_rights: "All rights reserved.",
-        footer_privacy: "Privacy Policy",
-        footer_terms: "Terms of Use",
+        footer_privacy: "Privacy",
+        footer_terms: "Terms",
         footer_contact: "Contact",
-
-        // AUTH
+        
         back_home: "Home",
-        auth_title: "Login to your account",
-        auth_subtitle_login: "Continue editing your CV",
-        auth_title_signup: "Create your free account",
-        auth_subtitle_signup: "No credit card required",
+        auth_title: "Login",
+        auth_subtitle_login: "Welcome back",
+        auth_title_signup: "Create Account",
+        auth_subtitle_signup: "Start now",
         auth_btn_login: "Login",
         auth_btn_signup: "Sign Up",
-        auth_toggle_msg_login: "Don't have an account?",
-        auth_toggle_link_login: "Sign Up Now",
-        auth_toggle_msg_signup: "Already have an account?",
+        auth_toggle_msg_login: "No account?",
+        auth_toggle_link_login: "Sign Up",
+        auth_toggle_msg_signup: "Have account?",
         auth_toggle_link_signup: "Login",
-        lbl_email_addr: "Email Address",
+        lbl_email_addr: "Email",
         lbl_password: "Password",
-        terms_link: "Terms of Use",
-        privacy_link: "Privacy Policy",
-        terms_and: "and",
-        terms_agree: "I have read and agree.",
-        divider_or: "OR",
-        auth_google_continue: "Continue with Google",
-
+        auth_google_continue: "Continue w/ Google",
         auth_processing: "Processing...",
-        tpl_select_header: "Select a Professional Template",
-        tpl_classic: "Classic",
-        tpl_classic_desc: "🏛️ Traditional & Academic",
-        tpl_compact: "Compact",
-        tpl_compact_desc: "📄 Minimal & Single Page",
-        btn_design: "Design Settings",
-        btn_layout: "Page Layout",
-        btn_change_tpl: "Change Template",
-        btn_download_pdf: "Download PDF",
-        btn_reset: "Reset / Clear",
-        btn_logout: "Logout",
-        nav_design: "DESIGN",
-        nav_actions: "ACTIONS",
-        status_connecting: "Connecting...",
-        status_online: "Synced",
-        status_syncing: "Saving...",
-        status_saved: "Saved!",
-        status_offline: "Offline",
-        cv_label_birth: "Place of birth",
-        cv_label_license: "Driving license",
-        confirm_reset: "WARNING: Your CV content will be erased and reset to default. Do you want to continue?",
-        toast_reset: "CV successfully reset.",
-        modal_theme_title: "Design Settings",
-        modal_layout_title: "Page Layout",
-        lbl_color: "Accent Color",
-        lbl_font: "Font Family",
-        lbl_fontsize: "Font Size",
-        lbl_lineheight: "Line Height",
-        lbl_margin: "Margin",
-        lbl_sectiongap: "Section Gap",
-        btn_save_close: "Close",
-        // Form Translations
-        form_title: "Edit Your Details",
-        form_personal: "Personal Details",
-        form_profile: "Professional Summary",
-        form_experience: "Work Experience",
+
+        form_title: "Edit Details",
+        form_personal: "Personal Info",
+        form_profile: "Summary",
+        form_experience: "Experience",
         form_education: "Education",
-        form_custom: "Custom Sections",
+        form_certificates: "Certificates",
+        form_references: "References",
+        form_custom: "Other",
+        
         form_lbl_fullname: "Full Name",
         form_lbl_title: "Job Title",
         form_lbl_email: "Email",
         form_lbl_phone: "Phone",
         form_lbl_address: "Address",
+        cv_label_birth: "Birth Place",
+        cv_label_license: "License",
+        
         btn_add_job: "Add Job",
-        btn_add_edu: "Add Education",
+        btn_add_edu: "Add School",
+        btn_add_cert: "Add Cert",
+        btn_add_ref: "Add Ref",
         btn_add_custom: "Add Section",
-        lbl_job_title: "Job Title",
+        
+        lbl_job_title: "Title",
         lbl_company: "Company",
         lbl_date: "Date",
         lbl_desc: "Description",
-        lbl_school: "School / University",
-        lbl_degree: "Degree / Field",
-        lbl_section_title: "Section Title",
-        lbl_section_content: "Content / Description"
+        lbl_school: "School",
+        lbl_degree: "Degree",
+        lbl_cert_name: "Certificate Name",
+        lbl_cert_issuer: "Issuer",
+        lbl_ref_name: "Name",
+        lbl_ref_phone: "Phone",
+        
+        tab_edit: "Edit",
+        tab_preview: "Preview",
+        tab_download: "Download",
+        mobile_design_settings: "Design Settings",
+        status_connecting: "Connecting...",
+        status_online: "Synced",
+        status_syncing: "Saving..."
     }
 };
 
 window.setLanguage = (lang) => {
     currentLang = lang;
+    document.getElementById('lang-select').value = lang; // sync selector
     
-    // UI Güncelle
     document.querySelectorAll('[data-i18n]').forEach(el => {
         const key = el.getAttribute('data-i18n');
         if (translations[lang][key]) {
-            // Check if element has inner HTML structure (like hero title)
-            if (el.innerHTML.includes('<')) {
-                 el.innerHTML = translations[lang][key];
-            } else {
-                 el.innerText = translations[lang][key];
-            }
+            if (el.innerHTML.includes('<')) el.innerHTML = translations[lang][key];
+            else el.innerText = translations[lang][key];
         }
     });
-
-    // Toggle Button Style
-    document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
-    document.querySelector(`.lang-btn[onclick="setLanguage('${lang}')"]`).classList.add('active');
-
-    // Update Auth Labels Manually
     updateAuthUI();
-    
-    // Refresh CV Preview to apply language changes (e.g. section headers)
-    generateCVFromForm();
+    generateCVFromForm(false);
 };
-
-function updateAuthUI() {
-    const t = translations[currentLang];
-    const title = isLoginMode ? t.auth_title : t.auth_title_signup;
-    const sub = isLoginMode ? t.auth_subtitle_login : t.auth_subtitle_signup;
-    const btnText = isLoginMode ? t.auth_btn_login : t.auth_btn_signup;
-    const toggleMsg = isLoginMode ? t.auth_toggle_msg_login : t.auth_toggle_msg_signup;
-    const toggleLink = isLoginMode ? t.auth_toggle_link_login : t.auth_toggle_link_signup;
-
-    document.getElementById('auth-title').innerText = title;
-    document.getElementById('auth-subtitle').innerText = sub;
-    document.getElementById('auth-btn-text').innerText = btnText;
-    document.getElementById('auth-toggle-msg').innerText = toggleMsg;
-    document.getElementById('auth-toggle-link').innerText = toggleLink;
-    
-    // Toggle Terms Checkbox visibility
-    document.getElementById('terms-container').style.display = isLoginMode ? 'none' : 'block';
-}
 
 // --- EKRAN YÖNETİMİ ---
 window.showView = (viewId) => {
     document.querySelectorAll('.view-section').forEach(v => v.classList.remove('active'));
-    const target = document.getElementById(viewId);
-    if (target) target.classList.add('active');
+    document.getElementById(viewId).classList.add('active');
+    
+    if (viewId === 'editor-view') {
+        // Default mobile tab
+        window.switchMobileTab('edit');
+        
+        // Populate Mobile Design Controls
+        copyDesignControlsToMobile();
+    }
 };
 
+// --- MOBILE TAB SYSTEM ---
+window.switchMobileTab = (tabName) => {
+    // Reset tabs
+    document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.editor-panel-form, .editor-panel-preview').forEach(p => p.classList.remove('active-mobile-tab'));
+    
+    if (tabName === 'edit') {
+        document.querySelector('.nav-tab[onclick*="edit"]').classList.add('active');
+        document.querySelector('.editor-panel-form').classList.add('active-mobile-tab');
+    } else if (tabName === 'preview') {
+        document.querySelector('.nav-tab[onclick*="preview"]').classList.add('active');
+        document.querySelector('.editor-panel-preview').classList.add('active-mobile-tab');
+        setTimeout(window.resizePreview, 100); // Trigger resize check
+    }
+};
 
-// --- AUTO SCALE PREVIEW FOR MOBILE ---
+window.copyDesignControlsToMobile = () => {
+    // Copy Colors
+    const desktopColors = document.querySelector('.color-options').innerHTML;
+    document.getElementById('mobile-color-row').innerHTML = desktopColors;
+    
+    // Copy Fonts
+    const desktopFonts = document.querySelector('.font-options-grid').innerHTML;
+    document.getElementById('mobile-font-row').innerHTML = desktopFonts;
+    
+    // Sync Sliders
+    document.getElementById('mob-rng-fontsize').value = currentLayout.fontSize;
+    document.getElementById('mob-rng-sectiongap').value = currentLayout.sectionGap;
+};
+
+window.syncMobileSlider = (type, val) => {
+    if(type === 'fontsize') {
+        currentLayout.fontSize = val;
+        document.documentElement.style.setProperty('--cv-font-size', val + 'pt');
+        document.getElementById('rng-fontsize').value = val;
+    }
+    if(type === 'sectiongap') {
+        currentLayout.sectionGap = val;
+        document.documentElement.style.setProperty('--cv-section-gap', val + 'px');
+        document.getElementById('rng-sectiongap').value = val;
+    }
+    // Mobile change triggers save
+    triggerDebounceSave();
+};
+
+// --- AUTO SCALE PREVIEW ---
 window.resizePreview = () => {
-    const previewPanel = document.getElementById('panel-preview');
     const scaleContainer = document.getElementById('cv-scale-container');
     const cvRoot = document.getElementById('cv-root');
-
-    if (!previewPanel || !scaleContainer || !cvRoot) return;
+    if (!scaleContainer || !cvRoot) return;
 
     if (window.innerWidth > 1024) {
-        // Desktop Reset
         cvRoot.style.transform = 'none';
         scaleContainer.style.width = 'auto';
         scaleContainer.style.height = 'auto';
-        scaleContainer.style.marginTop = '0';
-        scaleContainer.style.marginBottom = '0';
         return;
     }
 
-    // --- NEW MOBILE LOGIC ---
-    // 210mm @ 96dpi approx 794px wide.
+    // Mobile Scale Logic
     const originalWidth = 794; 
-    
-    // Calculate available width with padding
     const padding = 20; 
     const availableWidth = window.innerWidth - padding;
-
-    // Calculate Scale Factor
     const scale = Math.min(1, availableWidth / originalWidth);
     
-    // 1. Transform the INNER content (#cv-root)
     cvRoot.style.transformOrigin = 'top center'; 
     cvRoot.style.transform = `scale(${scale})`;
     
-    // 2. Resize the OUTER wrapper (#cv-scale-container) to match the SCALED dimensions
-    const scaledWidth = originalWidth * scale;
     const scaledHeight = cvRoot.scrollHeight * scale;
-
-    scaleContainer.style.width = `${scaledWidth}px`;
+    scaleContainer.style.width = `${originalWidth * scale}px`;
     scaleContainer.style.height = `${scaledHeight}px`;
-    
-    // 3. Add margins for spacing
-    scaleContainer.style.marginTop = '20px';
-    scaleContainer.style.marginBottom = '120px'; // Extra space for FAB
 };
-
-// Listen for window resize
 window.addEventListener('resize', window.resizePreview);
 
-
-// --- MOBILE FAB MENU ---
-window.toggleFabMenu = () => {
-    const items = document.getElementById('fab-items');
-    const btn = document.getElementById('fab-trigger');
-    items.classList.toggle('show');
-    btn.classList.toggle('active');
+// --- MODALS ---
+window.openModal = (id) => {
+    if(window.innerWidth <= 1024) return; // Disable modals on mobile (using embedded controls)
+    document.getElementById(id).classList.add('active');
+    initDragElement(document.getElementById(id).querySelector('.modal-content'));
 };
-
-
-// --- MODAL YÖNETİMİ (TEMA & LAYOUT) ---
-function openModal(modalId) {
-    const modal = document.getElementById(modalId);
-    modal.classList.add('active');
-    
-    // Close FAB when opening modal
-    document.getElementById('fab-items').classList.remove('show');
-    document.getElementById('fab-trigger').classList.remove('active');
-
-    // Center modal or simple fixed positioning for mobile stability
-    if(window.innerWidth > 1024) {
-        if (!modal.style.top || !modal.style.left) {
-            modal.style.top = "100px";
-            const initialLeft = Math.max(20, window.innerWidth - 360);
-            modal.style.left = initialLeft + "px";
-        }
-        initDragElement(modal.querySelector('.modal-content'));
-    } else {
-        // Mobile positioning handled by CSS (bottom sheet)
-        const content = modal.querySelector('.modal-content');
-        content.style.top = '';
-        content.style.left = '';
-        content.style.transform = '';
-    }
-}
-
 window.openThemeModal = () => openModal('theme-modal');
-window.closeThemeModal = () => {
-    document.getElementById('theme-modal').classList.remove('active');
-    // Save happens via debounce or explicit change
-    saveToCloud(); 
-};
-
-window.openLayoutModal = () => {
-    // Sync slider values with current state
-    document.getElementById('rng-fontsize').value = currentLayout.fontSize;
-    document.getElementById('val-fontsize').innerText = currentLayout.fontSize + 'pt';
-
-    document.getElementById('rng-lineheight').value = currentLayout.lineHeight;
-    document.getElementById('val-lineheight').innerText = currentLayout.lineHeight;
-
-    document.getElementById('rng-margin').value = currentLayout.margin;
-    document.getElementById('val-margin').innerText = currentLayout.margin + 'mm';
-    
-    document.getElementById('rng-sectiongap').value = currentLayout.sectionGap;
-    document.getElementById('val-sectiongap').innerText = currentLayout.sectionGap + 'px';
-
-    openModal('layout-modal');
-};
-
-window.closeLayoutModal = () => {
-    document.getElementById('layout-modal').classList.remove('active');
-    saveToCloud();
-};
-
+window.openLayoutModal = () => openModal('layout-modal');
+window.closeThemeModal = () => { document.getElementById('theme-modal').classList.remove('active'); saveToCloud(); };
+window.closeLayoutModal = () => { document.getElementById('layout-modal').classList.remove('active'); saveToCloud(); };
 
 function initDragElement(elmnt) {
     let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
     const header = elmnt.querySelector(".modal-header");
-    if (header) header.onmousedown = dragMouseDown;
-
+    if (header) {
+        header.onmousedown = dragMouseDown;
+    }
     function dragMouseDown(e) {
         e = e || window.event;
         e.preventDefault();
@@ -439,217 +338,179 @@ function initDragElement(elmnt) {
     }
 }
 
-// --- TEMA VE STİL UYGULAMALARI ---
+// --- DESIGN ---
 window.applyColor = (color) => {
     currentTheme.color = color;
     document.documentElement.style.setProperty('--cv-accent-color', color);
-    triggerDebounceSave(); // Save when color changes
+    triggerDebounceSave();
 };
-
 window.applyFont = (fontType) => {
     currentTheme.font = fontType;
     let fontVal = "'PT Serif', serif";
-    switch(fontType) {
-        case 'roboto': fontVal = "'Roboto', sans-serif"; break;
-        case 'opensans': fontVal = "'Open Sans', sans-serif"; break;
-        case 'montserrat': fontVal = "'Montserrat', sans-serif"; break;
-        case 'lato': fontVal = "'Lato', sans-serif"; break;
-        case 'raleway': fontVal = "'Raleway', sans-serif"; break;
-        case 'playfair': fontVal = "'Playfair Display', serif"; break;
-        case 'lora': fontVal = "'Lora', serif"; break;
-        case 'merriweather': fontVal = "'Merriweather', serif"; break;
-        case 'ptserif': default: fontVal = "'PT Serif', serif"; break;
-    }
+    if(fontType === 'roboto') fontVal = "'Roboto', sans-serif";
+    if(fontType === 'opensans') fontVal = "'Open Sans', sans-serif";
+    if(fontType === 'montserrat') fontVal = "'Montserrat', sans-serif";
+    if(fontType === 'lato') fontVal = "'Lato', sans-serif";
+    if(fontType === 'raleway') fontVal = "'Raleway', sans-serif";
     document.documentElement.style.setProperty('--font-cv', fontVal);
-    triggerDebounceSave(); // Save when font changes
+    triggerDebounceSave();
 };
-
 window.updateLayout = () => {
-    const fs = document.getElementById('rng-fontsize').value;
-    const lh = document.getElementById('rng-lineheight').value;
-    const mg = document.getElementById('rng-margin').value;
-    const sg = document.getElementById('rng-sectiongap').value;
-
-    currentLayout = { fontSize: fs, lineHeight: lh, margin: mg, sectionGap: sg };
-
-    // Update UI Labels
-    document.getElementById('val-fontsize').innerText = fs + 'pt';
-    document.getElementById('val-lineheight').innerText = lh;
-    document.getElementById('val-margin').innerText = mg + 'mm';
-    document.getElementById('val-sectiongap').innerText = sg + 'px';
-
-    // Apply CSS Variables
-    document.documentElement.style.setProperty('--cv-font-size', fs + 'pt');
-    document.documentElement.style.setProperty('--cv-line-height', lh);
-    document.documentElement.style.setProperty('--cv-padding', mg + 'mm');
-    document.documentElement.style.setProperty('--cv-section-gap', sg + 'px');
+    currentLayout.fontSize = document.getElementById('rng-fontsize').value;
+    currentLayout.lineHeight = document.getElementById('rng-lineheight').value;
+    currentLayout.margin = document.getElementById('rng-margin').value;
+    currentLayout.sectionGap = document.getElementById('rng-sectiongap').value;
     
-    // Note: Layout changes are usually saved when modal closes, but we can debounce here too if desired
-    // For performance, we wait for modal close or manual save
+    document.documentElement.style.setProperty('--cv-font-size', currentLayout.fontSize + 'pt');
+    document.documentElement.style.setProperty('--cv-line-height', currentLayout.lineHeight);
+    document.documentElement.style.setProperty('--cv-padding', currentLayout.margin + 'mm');
+    document.documentElement.style.setProperty('--cv-section-gap', currentLayout.sectionGap + 'px');
 };
 
-function applySavedLayout(layout) {
-    if(!layout) return;
-    currentLayout = layout;
-    document.documentElement.style.setProperty('--cv-font-size', layout.fontSize + 'pt');
-    document.documentElement.style.setProperty('--cv-line-height', layout.lineHeight);
-    document.documentElement.style.setProperty('--cv-padding', layout.margin + 'mm');
-    document.documentElement.style.setProperty('--cv-section-gap', layout.sectionGap + 'px');
-}
-
-// --- AUTH & LANDING LOGIC ---
-
-window.scrollToFeatures = () => {
-    document.getElementById('features').scrollIntoView({ behavior: 'smooth' });
-};
-
-window.showAuth = (loginMode) => {
-    isLoginMode = loginMode;
-    updateAuthUI();
-    window.showView('auth-view');
-};
-
+// --- AUTH ---
 window.loginWithGoogle = async () => {
     try {
-        updateStatus('syncing'); 
         await signInWithPopup(auth, googleProvider);
-    } catch (e) {
-        let msg = "Google Giriş Hatası: " + e.message;
-        if(e.code === 'auth/popup-blocked') {
-            msg = "Tarayıcınız açılır pencereyi engelledi. Lütfen izin verin.";
-        } else if (e.code === 'auth/popup-closed-by-user') {
-            msg = "Giriş işlemi iptal edildi.";
-        }
-        alert(msg);
-        updateStatus('error');
-    }
+    } catch (e) { alert(e.message); }
 };
-
-window.toggleAuthMode = () => {
-    isLoginMode = !isLoginMode;
-    updateAuthUI();
-};
-
+window.toggleAuthMode = () => { isLoginMode = !isLoginMode; updateAuthUI(); };
 window.handleAuth = async () => {
     const email = document.getElementById('auth-email').value;
     const password = document.getElementById('auth-password').value;
-    const terms = document.getElementById('auth-terms').checked;
-    const btnTextSpan = document.getElementById('auth-btn-text');
-    const btn = document.querySelector('.auth-btn');
-    
-    if (!email || !password) return alert("Lütfen tüm alanları doldurun.");
-    
-    // Validate Terms on Signup
-    if (!isLoginMode && !terms) {
-        return alert("Kayıt olmak için Kullanım Koşulları ve Gizlilik Politikasını kabul etmelisiniz.");
-    }
-
-    const originalText = btnTextSpan.innerText;
-    btnTextSpan.innerText = translations[currentLang].auth_processing;
-    btn.disabled = true;
-
     try {
-        if (isLoginMode) {
-            await signInWithEmailAndPassword(auth, email, password);
-        } else {
-            await createUserWithEmailAndPassword(auth, email, password);
-        }
-        // Success is handled by onAuthStateChanged
-    } catch (e) { 
-        alert("Hata: " + e.message);
-        btnTextSpan.innerText = originalText;
-        btn.disabled = false;
-    }
+        if (isLoginMode) await signInWithEmailAndPassword(auth, email, password);
+        else await createUserWithEmailAndPassword(auth, email, password);
+    } catch (e) { alert(e.message); }
 };
+window.logout = () => signOut(auth).then(() => window.location.reload());
 
-window.logout = () => signOut(auth).then(() => {
-    localStorage.removeItem('monoCvData_v2');
-    location.reload();
-});
+function updateAuthUI() {
+    const t = translations[currentLang];
+    document.getElementById('auth-title').innerText = isLoginMode ? t.auth_title : t.auth_title_signup;
+    document.getElementById('auth-btn-text').innerText = isLoginMode ? t.auth_btn_login : t.auth_btn_signup;
+    document.getElementById('terms-container').style.display = isLoginMode ? 'none' : 'block';
+}
 
+// --- SYNC LOGIC ---
 onAuthStateChanged(auth, async (user) => {
     if (user) {
-        // Logged In
         currentUser = user;
+        // FLAG: Start Loading
+        isLoadingData = true; 
+        updateStatus('connecting');
+        
         const docRef = doc(db, 'artifacts', appId, 'users', user.uid, 'data', 'cvContent');
         const snap = await getDoc(docRef);
         
         if (snap.exists()) {
             const data = snap.data();
-            // Load saved data into form inputs
-            if (data.formData) {
-                loadUserDataIntoForm(data.formData);
-            }
-            
-            document.body.className = data.template || '';
+            if (data.formData) loadUserDataIntoForm(data.formData);
             if (data.theme) {
                 currentTheme = data.theme;
                 window.applyColor(currentTheme.color);
                 window.applyFont(currentTheme.font);
             }
-            
             if (data.layout) {
-                applySavedLayout(data.layout);
+                currentLayout = data.layout;
+                document.getElementById('rng-fontsize').value = currentLayout.fontSize;
+                document.getElementById('rng-sectiongap').value = currentLayout.sectionGap;
+                window.updateLayout();
             }
-            
             window.showView('editor-view');
-            generateCVFromForm(false); // Render CV, false = don't save immediately
-            updateStatus('online');
         } else {
             window.showView('template-view');
         }
+        
+        // FLAG: Done Loading
+        isLoadingData = false; 
+        generateCVFromForm(false); // Update Preview without saving
+        updateStatus('online');
     } else {
-        // Not Logged In - Show Landing Page by default unless manually navigated to Auth
-        // If we are already on Auth view (e.g. failed login), stay there.
-        // Otherwise, show Landing.
-        const currentView = document.querySelector('.view-section.active');
-        if (!currentView || currentView.id === 'editor-view' || currentView.id === 'template-view') {
-            window.showView('landing-view');
-        }
+        window.showView('landing-view');
     }
 });
 
-// --- EDITOR LOGIC ---
-window.selectTemplate = (tpl) => {
-    document.body.className = tpl;
-    window.showView('editor-view');
-    generateCVFromForm();
+// --- DYNAMIC FORMS ---
+// Helper for new sections
+window.addFormCertificate = (data = null) => {
+    const container = document.getElementById('form-certificates-list');
+    const div = document.createElement('div');
+    div.className = 'dynamic-item';
+    const t = translations[currentLang];
+    div.innerHTML = `
+        <button class="remove-dynamic-btn" onclick="removeItemAndRefresh(this)">×</button>
+        <div class="input-grid">
+            <div class="input-group">
+                <label>${t.lbl_cert_name}</label>
+                <input type="text" class="form-input cert-name" value="${data ? data.name : ''}" oninput="generateCVFromForm()">
+            </div>
+            <div class="input-group">
+                <label>${t.lbl_cert_issuer}</label>
+                <input type="text" class="form-input cert-issuer" value="${data ? data.issuer : ''}" oninput="generateCVFromForm()">
+            </div>
+            <div class="input-group full-width">
+                <label>${t.lbl_date}</label>
+                <input type="text" class="form-input cert-date" value="${data ? data.date : ''}" oninput="generateCVFromForm()">
+            </div>
+        </div>`;
+    container.appendChild(div);
+    if (!data) generateCVFromForm();
 };
 
-window.backToTemplates = () => {
-    saveToCloud(); 
-    window.showView('template-view');
+window.addFormReference = (data = null) => {
+    const container = document.getElementById('form-references-list');
+    const div = document.createElement('div');
+    div.className = 'dynamic-item';
+    const t = translations[currentLang];
+    div.innerHTML = `
+        <button class="remove-dynamic-btn" onclick="removeItemAndRefresh(this)">×</button>
+        <div class="input-grid">
+            <div class="input-group">
+                <label>${t.lbl_ref_name}</label>
+                <input type="text" class="form-input ref-name" value="${data ? data.name : ''}" oninput="generateCVFromForm()">
+            </div>
+            <div class="input-group">
+                <label>${t.lbl_company}</label>
+                <input type="text" class="form-input ref-company" value="${data ? data.company : ''}" oninput="generateCVFromForm()">
+            </div>
+            <div class="input-group">
+                <label>${t.lbl_job_title}</label>
+                <input type="text" class="form-input ref-position" value="${data ? data.position : ''}" oninput="generateCVFromForm()">
+            </div>
+            <div class="input-group">
+                <label>${t.lbl_ref_phone}</label>
+                <input type="text" class="form-input ref-phone" value="${data ? data.phone : ''}" oninput="generateCVFromForm()">
+            </div>
+        </div>`;
+    container.appendChild(div);
+    if (!data) generateCVFromForm();
 };
 
-// --- DYNAMIC FORM HANDLERS ---
-// All dynamic handlers now call generateCVFromForm() which will Debounce save
 window.addFormExperience = (data = null) => {
     const container = document.getElementById('form-experiences-list');
     const div = document.createElement('div');
     div.className = 'dynamic-item';
     const t = translations[currentLang];
-    
     div.innerHTML = `
         <button class="remove-dynamic-btn" onclick="removeItemAndRefresh(this)">×</button>
         <div class="input-grid">
             <div class="input-group">
                 <label>${t.lbl_job_title}</label>
-                <input type="text" class="form-input job-title" placeholder="Ex: Manager" value="${data ? data.title : ''}" oninput="generateCVFromForm()">
+                <input type="text" class="form-input job-title" value="${data ? data.title : ''}" oninput="generateCVFromForm()">
             </div>
             <div class="input-group">
                 <label>${t.lbl_company}</label>
-                <input type="text" class="form-input job-company" placeholder="Ex: Google" value="${data ? data.company : ''}" oninput="generateCVFromForm()">
+                <input type="text" class="form-input job-company" value="${data ? data.company : ''}" oninput="generateCVFromForm()">
             </div>
             <div class="input-group full-width">
                 <label>${t.lbl_date}</label>
-                <input type="text" class="form-input job-date" placeholder="Ex: Jan 2020 - Present" value="${data ? data.date : ''}" oninput="generateCVFromForm()">
+                <input type="text" class="form-input job-date" value="${data ? data.date : ''}" oninput="generateCVFromForm()">
             </div>
             <div class="input-group full-width">
                 <label>${t.lbl_desc}</label>
                 <textarea class="form-input job-desc" rows="3" oninput="generateCVFromForm()">${data ? data.desc : ''}</textarea>
             </div>
-        </div>
-    `;
+        </div>`;
     container.appendChild(div);
     if (!data) generateCVFromForm();
 };
@@ -659,24 +520,22 @@ window.addFormEducation = (data = null) => {
     const div = document.createElement('div');
     div.className = 'dynamic-item';
     const t = translations[currentLang];
-    
     div.innerHTML = `
         <button class="remove-dynamic-btn" onclick="removeItemAndRefresh(this)">×</button>
         <div class="input-grid">
             <div class="input-group">
                 <label>${t.lbl_school}</label>
-                <input type="text" class="form-input edu-school" placeholder="Ex: MIT" value="${data ? data.school : ''}" oninput="generateCVFromForm()">
+                <input type="text" class="form-input edu-school" value="${data ? data.school : ''}" oninput="generateCVFromForm()">
             </div>
             <div class="input-group">
                 <label>${t.lbl_degree}</label>
-                <input type="text" class="form-input edu-degree" placeholder="Ex: CS" value="${data ? data.degree : ''}" oninput="generateCVFromForm()">
+                <input type="text" class="form-input edu-degree" value="${data ? data.degree : ''}" oninput="generateCVFromForm()">
             </div>
             <div class="input-group full-width">
                 <label>${t.lbl_date}</label>
-                <input type="text" class="form-input edu-date" placeholder="Ex: 2015 - 2019" value="${data ? data.date : ''}" oninput="generateCVFromForm()">
+                <input type="text" class="form-input edu-date" value="${data ? data.date : ''}" oninput="generateCVFromForm()">
             </div>
-        </div>
-    `;
+        </div>`;
     container.appendChild(div);
     if (!data) generateCVFromForm();
 };
@@ -685,19 +544,16 @@ window.addFormCustomSection = (data = null) => {
     const container = document.getElementById('form-custom-list');
     const div = document.createElement('div');
     div.className = 'dynamic-item';
-    const t = translations[currentLang];
-    
     div.innerHTML = `
         <button class="remove-dynamic-btn" onclick="removeItemAndRefresh(this)">×</button>
         <div class="input-group" style="margin-bottom:10px;">
-            <label>${t.lbl_section_title}</label>
-            <input type="text" class="form-input custom-title" placeholder="Ex: Certificates" value="${data ? data.title : ''}" oninput="generateCVFromForm()">
+            <label>Başlık</label>
+            <input type="text" class="form-input custom-title" value="${data ? data.title : ''}" oninput="generateCVFromForm()">
         </div>
         <div class="input-group full-width">
-            <label>${t.lbl_section_content}</label>
-            <textarea class="form-input custom-content" rows="3" placeholder="Details..." oninput="generateCVFromForm()">${data ? data.content : ''}</textarea>
-        </div>
-    `;
+            <label>İçerik</label>
+            <textarea class="form-input custom-content" rows="3" oninput="generateCVFromForm()">${data ? data.content : ''}</textarea>
+        </div>`;
     container.appendChild(div);
     if (!data) generateCVFromForm();
 };
@@ -707,9 +563,9 @@ window.removeItemAndRefresh = (btn) => {
     generateCVFromForm();
 };
 
-// --- DATA BINDING ---
+// --- CORE GENERATION ---
 window.generateCVFromForm = (triggerSave = true) => {
-    // 1. Gather Data from DOM Inputs
+    // Collect Data
     const data = {
         fullname: document.getElementById('inp-fullname').value,
         title: document.getElementById('inp-title').value,
@@ -721,156 +577,101 @@ window.generateCVFromForm = (triggerSave = true) => {
         summary: document.getElementById('inp-summary').value,
         experiences: [],
         education: [],
+        certificates: [],
+        references: [],
         customSections: []
     };
 
-    document.querySelectorAll('#form-experiences-list .dynamic-item').forEach(item => {
-        data.experiences.push({
-            title: item.querySelector('.job-title').value,
-            company: item.querySelector('.job-company').value,
-            date: item.querySelector('.job-date').value,
-            desc: item.querySelector('.job-desc').value
-        });
-    });
+    // Helper to scrape dynamic lists
+    document.querySelectorAll('#form-experiences-list .dynamic-item').forEach(i => 
+        data.experiences.push({ title: i.querySelector('.job-title').value, company: i.querySelector('.job-company').value, date: i.querySelector('.job-date').value, desc: i.querySelector('.job-desc').value })
+    );
+    document.querySelectorAll('#form-education-list .dynamic-item').forEach(i => 
+        data.education.push({ school: i.querySelector('.edu-school').value, degree: i.querySelector('.edu-degree').value, date: i.querySelector('.edu-date').value })
+    );
+    document.querySelectorAll('#form-certificates-list .dynamic-item').forEach(i => 
+        data.certificates.push({ name: i.querySelector('.cert-name').value, issuer: i.querySelector('.cert-issuer').value, date: i.querySelector('.cert-date').value })
+    );
+    document.querySelectorAll('#form-references-list .dynamic-item').forEach(i => 
+        data.references.push({ name: i.querySelector('.ref-name').value, company: i.querySelector('.ref-company').value, position: i.querySelector('.ref-position').value, phone: i.querySelector('.ref-phone').value })
+    );
+    document.querySelectorAll('#form-custom-list .dynamic-item').forEach(i => 
+        data.customSections.push({ title: i.querySelector('.custom-title').value, content: i.querySelector('.custom-content').value })
+    );
 
-    document.querySelectorAll('#form-education-list .dynamic-item').forEach(item => {
-        data.education.push({
-            school: item.querySelector('.edu-school').value,
-            degree: item.querySelector('.edu-degree').value,
-            date: item.querySelector('.edu-date').value
-        });
-    });
-
-    document.querySelectorAll('#form-custom-list .dynamic-item').forEach(item => {
-        data.customSections.push({
-            title: item.querySelector('.custom-title').value,
-            content: item.querySelector('.custom-content').value
-        });
-    });
-
-    // 2. Generate HTML
-    const isCompact = document.body.classList.contains('tpl-compact');
-    let html = "";
-    
-    // Labels based on Lang
+    // Build HTML
     const labels = {
-        exp: currentLang === 'tr' ? 'İŞ DENEYİMİ' : 'EMPLOYMENT HISTORY',
+        exp: currentLang === 'tr' ? 'İŞ DENEYİMİ' : 'EXPERIENCE',
         edu: currentLang === 'tr' ? 'EĞİTİM' : 'EDUCATION',
+        cert: currentLang === 'tr' ? 'SERTİFİKALAR' : 'CERTIFICATES',
+        ref: currentLang === 'tr' ? 'REFERANSLAR' : 'REFERENCES',
         prof: currentLang === 'tr' ? 'PROFİL' : 'PROFILE',
         birth: translations[currentLang].cv_label_birth,
         lic: translations[currentLang].cv_label_license
     };
 
-    // GENERATE SECTION CONTENT (Grouped)
-    // -- EXPERIENCES --
-    let expContent = "";
-    if (data.experiences.length > 0) {
-        let entries = data.experiences.map(exp => `
-            <div class="entry">
-                <div class="left-col">${exp.date}</div>
-                <div class="right-col"><h3>${exp.title}, ${exp.company}</h3><p>${exp.desc.replace(/\n/g, '<br>')}</p></div>
-            </div>`).join('');
-        
-        expContent = `
-            <div class="section">
-                <div class="section-header"><span class="section-title">${labels.exp}</span></div>
-                ${entries}
-            </div>`;
-    }
+    // Sections HTML
+    const getSectionHTML = (title, content) => content ? `<div class="section"><div class="section-header"><span class="section-title">${title}</span></div>${content}</div>` : '';
 
-    // -- EDUCATION --
-    let eduContent = "";
-    if (data.education.length > 0) {
-        let entries = data.education.map(edu => `
-            <div class="entry">
-                <div class="left-col">${edu.date}</div>
-                <div class="right-col"><h3>${edu.degree}</h3><p>${edu.school}</p></div>
-            </div>`).join('');
+    let expHtml = data.experiences.map(e => `
+        <div class="entry">
+            <div class="left-col">${e.date}</div>
+            <div class="right-col"><h3>${e.title}, ${e.company}</h3><p>${e.desc.replace(/\n/g, '<br>')}</p></div>
+        </div>`).join('');
 
-        eduContent = `
-            <div class="section">
-                <div class="section-header"><span class="section-title">${labels.edu}</span></div>
-                ${entries}
-            </div>`;
-    }
+    let eduHtml = data.education.map(e => `
+        <div class="entry">
+            <div class="left-col">${e.date}</div>
+            <div class="right-col"><h3>${e.degree}</h3><p>${e.school}</p></div>
+        </div>`).join('');
 
-    // -- CUSTOM SECTIONS --
-    let customContent = "";
-    if (data.customSections.length > 0) {
-        customContent = data.customSections.map(sec => `
-            <div class="section">
-                <div class="section-header"><span class="section-title">${sec.title}</span></div>
-                <div class="entry">
-                    <div class="right-col"><p>${sec.content.replace(/\n/g, '<br>')}</p></div>
-                </div>
+    let certHtml = data.certificates.map(c => `
+        <div class="entry">
+            <div class="left-col">${c.date}</div>
+            <div class="right-col"><h3>${c.name}</h3><p>${c.issuer}</p></div>
+        </div>`).join('');
+
+    let refHtml = data.references.map(r => `
+        <div class="entry">
+            <div class="right-col" style="width:100%">
+                <h3>${r.name}</h3>
+                <p>${r.position} - ${r.company}</p>
+                <p>Tel: ${r.phone}</p>
             </div>
-        `).join('');
-    }
+        </div>`).join('');
 
+    let customHtml = data.customSections.map(s => getSectionHTML(s.title, `<div class="entry"><div class="right-col"><p>${s.content.replace(/\n/g, '<br>')}</p></div></div>`)).join('');
 
-    if (isCompact) {
-        html = `
+    // Combine
+    let finalHtml = `
         <header>
-            <h1>${data.fullname || 'ADINIZ SOYADINIZ'}</h1>
-            <div class="subtitle">${data.title}</div>
-            <div class="address-line">${data.address}</div>
-            <div class="contact-row"><span>${data.phone}</span><span>${data.email}</span></div>
-            <div class="compact-separator"></div>
-            <div class="personal-details">
-                <div class="detail-item"><span class="lbl">${labels.birth}</span><span class="dots"></span><span class="val">${data.birthplace}</span></div>
-                <div class="detail-item"><span class="lbl">${labels.lic}</span><span class="dots"></span><span class="val">${data.license}</span></div>
-            </div>
-        </header>
-        <div id="main-content">
-             <div class="section">
-                <div class="section-header"><span class="section-title">${labels.prof}</span></div>
-                <div class="entry"><div class="right-col">${data.summary}</div></div>
-            </div>
-            ${expContent}
-            ${eduContent}
-            ${customContent}
-        </div>`;
-
-    } else {
-        html = `
-        <header>
-            <h1>${data.fullname || 'ADINIZ SOYADINIZ'}</h1>
+            <h1>${data.fullname || 'AD SOYAD'}</h1>
             <div class="subtitle">${data.title}</div>
             <div class="contact-info">
-                <span>📍 ${data.address}</span> | <span>📞 ${data.phone}</span> | <span>✉️ ${data.email}</span>
-            </div>
-            <!-- Hidden Fields for switch compatibility -->
-            <div class="address-line" style="display:none">${data.address}</div>
-            <div class="contact-row" style="display:none"><span>${data.phone}</span><span>${data.email}</span></div>
-            <div class="personal-details" style="display:none">
-                 <div class="detail-item"><span class="lbl">${labels.birth}</span><span class="dots"></span><span class="val">${data.birthplace}</span></div>
-                <div class="detail-item"><span class="lbl">${labels.lic}</span><span class="dots"></span><span class="val">${data.license}</span></div>
+                ${data.address ? `<span>📍 ${data.address}</span> |` : ''} 
+                ${data.phone ? `<span>📞 ${data.phone}</span> |` : ''} 
+                ${data.email ? `<span>✉️ ${data.email}</span>` : ''}
             </div>
         </header>
         <div id="main-content">
-             <div class="section">
-                <div class="section-header"><span class="section-title">${labels.prof}</span></div>
-                <div class="entry"><div class="right-col">${data.summary}</div></div>
-            </div>
-            ${expContent}
-            ${eduContent}
-            ${customContent}
-        </div>`;
-    }
+            ${data.summary ? getSectionHTML(labels.prof, `<div class="entry"><div class="right-col">${data.summary}</div></div>`) : ''}
+            ${expHtml ? getSectionHTML(labels.exp, expHtml) : ''}
+            ${eduHtml ? getSectionHTML(labels.edu, eduHtml) : ''}
+            ${certHtml ? getSectionHTML(labels.cert, certHtml) : ''}
+            ${refHtml ? getSectionHTML(labels.ref, refHtml) : ''}
+            ${customHtml}
+        </div>
+    `;
 
-    document.getElementById('cv-root').innerHTML = html;
+    document.getElementById('cv-root').innerHTML = finalHtml;
     
-    // Trigger scale update if on mobile preview
-    if(window.innerWidth <= 1024) {
-        setTimeout(window.resizePreview, 10);
-    }
+    if(window.innerWidth <= 1024) setTimeout(window.resizePreview, 10);
 
-    // Trigger Debounce Save
-    if (triggerSave) {
-        triggerDebounceSave(data);
-    }
+    // Autosave check
+    if (triggerSave && !isLoadingData) triggerDebounceSave(data);
 };
 
+// --- DATA LOADING HELPERS ---
 function loadUserDataIntoForm(data) {
     document.getElementById('inp-fullname').value = data.fullname || '';
     document.getElementById('inp-title').value = data.title || '';
@@ -881,50 +682,28 @@ function loadUserDataIntoForm(data) {
     document.getElementById('inp-license').value = data.license || '';
     document.getElementById('inp-summary').value = data.summary || '';
 
-    const expList = document.getElementById('form-experiences-list');
-    expList.innerHTML = '';
-    if (data.experiences) {
-        data.experiences.forEach(exp => addFormExperience(exp));
-    }
+    // Clear lists
+    ['experiences', 'education', 'certificates', 'references', 'custom'].forEach(t => 
+        document.getElementById(`form-${t}-list`).innerHTML = ''
+    );
 
-    const eduList = document.getElementById('form-education-list');
-    eduList.innerHTML = '';
-    if (data.education) {
-        data.education.forEach(edu => addFormEducation(edu));
-    }
-
-    const customList = document.getElementById('form-custom-list');
-    customList.innerHTML = '';
-    if (data.customSections) {
-        data.customSections.forEach(sec => addFormCustomSection(sec));
-    }
+    if(data.experiences) data.experiences.forEach(d => addFormExperience(d));
+    if(data.education) data.education.forEach(d => addFormEducation(d));
+    if(data.certificates) data.certificates.forEach(d => addFormCertificate(d));
+    if(data.references) data.references.forEach(d => addFormReference(d));
+    if(data.customSections) data.customSections.forEach(d => addFormCustomSection(d));
 }
 
-
-// --- DEBOUNCE SAVE ---
-function triggerDebounceSave(data = null) {
-    // Clear existing timer
+function triggerDebounceSave(data) {
     if (saveTimeout) clearTimeout(saveTimeout);
-    
     updateStatus('syncing');
-
-    // Set new timer for 2 seconds
-    saveTimeout = setTimeout(() => {
-        saveToCloud(data);
-    }, 2000);
+    saveTimeout = setTimeout(() => saveToCloud(data), 2000);
 }
 
-
-// --- SAVE / LOAD ---
 async function saveToCloud(formData = null) {
-    if (!currentUser) return;
-    
-    // If saving explicitly without formData (e.g. template change), assume it's a direct state save
-    // But better to grab current form data if null to be safe, 
-    // though `generateCVFromForm` usually passes it.
+    if (!currentUser || isLoadingData) return; // Prevent saving empty data on load
     
     isSyncing = true;
-    
     const docRef = doc(db, 'artifacts', appId, 'users', currentUser.uid, 'data', 'cvContent');
     
     try {
@@ -937,16 +716,9 @@ async function saveToCloud(formData = null) {
         }, { merge: true });
         
         updateStatus('online');
-        
-        // Only show toast AFTER successful save
-        const t = document.getElementById('toast');
-        t.innerText = translations[currentLang].status_saved;
-        t.classList.add('show');
-        setTimeout(() => t.classList.remove('show'), 2000);
-
     } catch (e) { 
-        updateStatus('error'); 
-        console.error("Save failed:", e);
+        console.error(e);
+        updateStatus('error');
     } finally {
         isSyncing = false;
     }
@@ -955,42 +727,38 @@ async function saveToCloud(formData = null) {
 function updateStatus(state) {
     const dot = document.getElementById('status-dot');
     const text = document.getElementById('status-text');
-    if (!dot || !text) return;
-
-    dot.className = 'status-dot';
+    if (!dot) return;
     const t = translations[currentLang];
     
     if (state === 'online') {
-        dot.classList.add('status-online');
+        dot.className = 'status-dot status-online';
         text.innerText = t.status_online;
     } else if (state === 'syncing') {
-        dot.classList.add('status-syncing');
+        dot.className = 'status-dot status-syncing';
         text.innerText = t.status_syncing;
+    } else if (state === 'connecting') {
+        dot.className = 'status-dot status-syncing'; // Yellow
+        text.innerText = t.status_connecting;
     } else {
+        dot.className = 'status-dot';
         text.innerText = t.status_offline;
     }
 }
 
-// --- RESET ---
-window.resetAll = async (skipConfirm = false) => {
-    if(!skipConfirm && !confirm(translations[currentLang].confirm_reset)) return;
-    
-    // Clear Form Inputs
-    const inputs = document.querySelectorAll('.form-input');
-    inputs.forEach(i => i.value = '');
-    document.getElementById('form-experiences-list').innerHTML = '';
-    document.getElementById('form-education-list').innerHTML = '';
-    document.getElementById('form-custom-list').innerHTML = '';
-    
+window.selectTemplate = (tpl) => {
+    document.body.className = tpl;
+    window.showView('editor-view');
     generateCVFromForm();
-    if(!skipConfirm) {
-        const t = document.getElementById('toast');
-        t.innerText = translations[currentLang].toast_reset;
-        t.classList.add('show');
-        setTimeout(() => t.classList.remove('show'), 3000);
-    }
 };
 
-window.createNewSection = () => {
-    alert("Yeni sistemde 'Özel Bölümler' alanını kullanarak ekleme yapabilirsiniz.");
+window.backToTemplates = () => {
+    saveToCloud(); 
+    window.showView('template-view');
+};
+
+window.resetAll = async () => {
+    if(!confirm('Reset?')) return;
+    ['inp-fullname','inp-title','inp-email','inp-phone','inp-address','inp-summary'].forEach(id=>document.getElementById(id).value='');
+    ['experiences','education','certificates','references','custom'].forEach(t => document.getElementById(`form-${t}-list`).innerHTML = '');
+    generateCVFromForm();
 };
