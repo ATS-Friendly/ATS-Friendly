@@ -1309,82 +1309,65 @@ body.tpl-compact .entry { display: block; position: relative; margin-bottom: 15p
 body.tpl-compact .entry .left-col { position: absolute; top: 0; right: 0; width: auto; text-align: right; font-weight: 600; font-size: 0.9em; color: var(--cv-accent-color); }
 body.tpl-compact .entry .right-col { width: 100%; padding-right: 130px; }
 
+/* --- PRINT (YAZDIRMA) AYARLARI (GÜNCELLENMİŞ VERSİYON) --- */
 @media print {
-    @page {
-        margin: 0;
-        size: A4;
+    /* 1. Önce sayfadaki HER ŞEYİ gizle */
+    body * {
+        visibility: hidden;
     }
-    html, body { 
-        background: white !important; 
-        padding: 0 !important; 
-        margin: 0 !important; 
-        display: block !important; 
-        width: 100% !important;
+
+    /* 2. Sadece CV Kapsayıcısını ve içindekileri görünür yap */
+    #cv-scale-container, 
+    #cv-scale-container * {
+        visibility: visible;
+    }
+
+    /* 3. Ana Gövde Ayarları */
+    html, body {
         height: auto !important;
-        -webkit-print-color-adjust: exact;
-        print-color-adjust: exact;
-    }
-    
-    .sidebar, #auth-view, #template-view, #landing-view, .editor-panel-form, 
-    .lang-switcher, #toast, .modal-overlay, #theme-modal, #layout-modal, 
-    .mobile-view-toggle, .mobile-fab-container, .mobile-editor-tabs, .mobile-bottom-bar, .mobile-zoom-btn { 
-        display: none !important; 
-    }
-    
-    .editor-layout { 
-        display: block !important; 
-        padding: 0 !important; 
-        margin: 0 !important;
-        width: 100% !important; 
-        height: auto !important; 
+        overflow: visible !important;
         background: white !important;
-    }
-    
-    .editor-panel-preview { 
-        padding: 0 !important; 
         margin: 0 !important;
-        background: white !important; 
-        overflow: visible !important; 
-        display: block !important; 
-        height: auto !important; 
-        width: 100% !important;
+        padding: 0 !important;
     }
-    
+
+    /* 4. CV'yi sayfanın akışından (layout) kopar ve en başa yapıştır */
     #cv-scale-container {
-        transform: none !important;
+        position: absolute;
+        left: 0;
+        top: 0;
         width: 100% !important;
         margin: 0 !important;
         padding: 0 !important;
-        display: block !important;
+        transform: none !important;
+        overflow: visible !important;
         background: white !important;
     }
 
-    #cv-root { 
-        transform: none !important; 
-        width: 794px !important;
-        max-width: 794px !important;
-        height: auto !important;
-        box-shadow: none !important; 
+    /* 5. CV Sayfa Yapısı */
+    .page {
         margin: 0 auto !important;
-        padding: 0 !important;
-        overflow: visible !important;
-        display: block !important;
-        position: static !important;
-        zoom: 1 !important;
-        background: white !important;
-    }
-    
-    .page { 
-        width: 794px !important; 
+        width: 794px !important; /* Keep fixed width for A4 consistency */
         max-width: 794px !important;
-        margin: 0 auto !important; 
-        padding: 140px 95px 95px 95px !important; /* Increased top padding to match reference exactly */
-        box-shadow: none !important; 
-        border: none !important;
-        overflow: visible !important;
+        height: auto !important; 
         min-height: 1120px !important;
+        overflow: visible !important;
+        box-shadow: none !important;
+        border: none !important;
+        padding: 140px 95px 95px 95px !important; /* Professional spacing preserved */
         background: white !important;
         box-sizing: border-box !important;
+    }
+
+    /* 6. İçeriklerin bölünmesini yönet */
+    .section, .entry {
+        page-break-inside: avoid;
+    }
+
+    /* 7. Kağıt ayarı */
+    @page {
+        margin: 0;
+        size: A4;
     }
 }
 
