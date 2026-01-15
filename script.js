@@ -207,36 +207,9 @@ function showView(viewId) {
     const target = document.getElementById(viewId);
     if (target) target.classList.add('active');
     
-    // Reset Mobile View to Form when switching screens
-    if(viewId === 'editor-view') {
-        window.toggleMobileView('form');
-    }
+    // No special mobile view handling needed anymore as we are stacking vertically
 }
 
-// --- MOBILE VIEW MANAGEMENT ---
-window.toggleMobileView = (mode) => {
-    const layout = document.querySelector('.editor-layout');
-    const btnForm = document.getElementById('btn-show-form');
-    const btnPreview = document.getElementById('btn-show-preview');
-    const fab = document.querySelector('.mobile-fab-container');
-
-    if (mode === 'form') {
-        layout.classList.add('mobile-show-form');
-        layout.classList.remove('mobile-show-preview');
-        btnForm.classList.add('active');
-        btnPreview.classList.remove('active');
-        if(fab) fab.style.display = 'none'; // Hide FAB on form
-    } else {
-        layout.classList.add('mobile-show-preview');
-        layout.classList.remove('mobile-show-form');
-        btnForm.classList.remove('active');
-        btnPreview.classList.add('active');
-        if(fab) fab.style.display = 'flex'; // Show FAB on preview
-        
-        // Trigger resize to scale content after it becomes visible
-        setTimeout(window.resizePreview, 50);
-    }
-};
 
 // --- AUTO SCALE PREVIEW FOR MOBILE ---
 window.resizePreview = () => {
@@ -445,7 +418,13 @@ window.loginWithGoogle = async () => {
         updateStatus('syncing'); 
         await signInWithPopup(auth, googleProvider);
     } catch (e) {
-        alert("Google Giriş Hatası: " + e.message);
+        let msg = "Google Giriş Hatası: " + e.message;
+        if(e.code === 'auth/popup-blocked') {
+            msg = "Tarayıcınız açılır pencereyi engelledi. Lütfen izin verin.";
+        } else if (e.code === 'auth/popup-closed-by-user') {
+            msg = "Giriş işlemi iptal edildi.";
+        }
+        alert(msg);
         updateStatus('error');
     }
 };
