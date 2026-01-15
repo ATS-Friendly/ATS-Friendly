@@ -1,12 +1,7 @@
 
 import React from 'react';
-import type { View } from '../App';
 
-interface LandingViewProps {
-  setView: (view: View) => void;
-}
-
-const LandingView: React.FC<LandingViewProps> = ({ setView }) => {
+const LandingView = ({ setView }: { setView: any }) => {
   const scrollToFeatures = () => {
     document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' });
   };
@@ -84,4 +79,4 @@ const LandingView: React.FC<LandingViewProps> = ({ setView }) => {
   );
 };
 
-export default LandingView;
+(window as any).LandingView = LandingView;

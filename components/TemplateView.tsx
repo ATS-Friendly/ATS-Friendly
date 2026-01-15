@@ -1,12 +1,7 @@
 
 import React from 'react';
-import type { CvDocument } from '../types';
 
-interface TemplateViewProps {
-  onSelectTemplate: (template: CvDocument['template']) => void;
-}
-
-const TemplateView: React.FC<TemplateViewProps> = ({ onSelectTemplate }) => {
+const TemplateView = ({ onSelectTemplate }: { onSelectTemplate: any }) => {
   return (
     <div className="flex flex-col items-center justify-center min-h-screen p-4 bg-gray-50">
       <div className="text-center">
@@ -43,4 +38,4 @@ const TemplateView: React.FC<TemplateViewProps> = ({ onSelectTemplate }) => {
   );
 };
 
-export default TemplateView;
+(window as any).TemplateView = TemplateView;

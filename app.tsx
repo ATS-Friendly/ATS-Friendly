@@ -1,10 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
 import { onAuthStateChanged, User } from 'firebase/auth';
-import { auth } from './services/firebaseService';
-import LandingView from './components/LandingView';
-import AuthView from './components/AuthView';
-import EditorView from './components/EditorView';
 
 export type View = 'landing' | 'auth' | 'editor';
 
@@ -12,6 +8,12 @@ const App: React.FC = () => {
   const [view, setView] = useState<View>('landing');
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+
+  // Access globals
+  const { auth } = (window as any).FirebaseService;
+  const LandingView = (window as any).LandingView;
+  const AuthView = (window as any).AuthView;
+  const EditorView = (window as any).EditorView;
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -58,4 +60,4 @@ const App: React.FC = () => {
   return <div className="min-h-screen bg-slate-100">{renderView()}</div>;
 };
 
-export default App;
+(window as any).App = App;

@@ -38,7 +38,7 @@
     </style>
     <!-- Add Babel for in-browser JSX/TSX transpilation -->
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-    <!-- Correct and clean importmap -->
+    <!-- Clean importmap -->
     <script type="importmap">
 {
   "imports": {
@@ -56,7 +56,14 @@
   </head>
   <body>
     <div id="root"></div>
-    <!-- Use relative path for src to work on GitHub Pages -->
-    <script type="text/babel" data-presets="react,typescript" data-type="module" src="./index.tsx"></script>
+    
+    <!-- Load scripts sequentially. Order matters! -->
+    <script type="text/babel" data-type="module" src="./services/firebaseService.ts"></script>
+    <script type="text/babel" data-type="module" src="./components/TemplateView.tsx"></script>
+    <script type="text/babel" data-type="module" src="./components/LandingView.tsx"></script>
+    <script type="text/babel" data-type="module" src="./components/AuthView.tsx"></script>
+    <script type="text/babel" data-type="module" src="./components/EditorView.tsx"></script>
+    <script type="text/babel" data-type="module" src="./App.tsx"></script>
+    <script type="text/babel" data-type="module" src="./index.tsx"></script>
   </body>
 </html>

@@ -1,18 +1,15 @@
 
 import React, { useState } from 'react';
-import type { View } from '../App';
-import { handleEmailAuth, loginWithGoogle } from '../services/firebaseService';
 
-interface AuthViewProps {
-  setView: (view: View) => void;
-}
-
-const AuthView: React.FC<AuthViewProps> = ({ setView }) => {
+const AuthView = ({ setView }: { setView: any }) => {
   const [isLoginMode, setIsLoginMode] = useState(true);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+
+  // Access services from window
+  const { handleEmailAuth, loginWithGoogle } = (window as any).FirebaseService;
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -92,4 +89,4 @@ const AuthView: React.FC<AuthViewProps> = ({ setView }) => {
   );
 };
 
-export default AuthView;
+(window as any).AuthView = AuthView;

@@ -9,10 +9,10 @@ import {
     signInWithPopup 
 } from "firebase/auth";
 import { getFirestore, doc, getDoc, setDoc } from "firebase/firestore";
-import type { CvDocument } from "../types";
 
+// Config
 const firebaseConfig = {
-    apiKey: "AIzaSyBbxgCMw5dO5T-kt7Njapo5ST04MRp7JKU", // This is a public key
+    apiKey: "AIzaSyBbxgCMw5dO5T-kt7Njapo5ST04MRp7JKU",
     authDomain: "ats-friendly-93377.firebaseapp.com",
     projectId: "ats-friendly-93377",
     storageBucket: "ats-friendly-93377.appspot.com",
@@ -21,7 +21,7 @@ const firebaseConfig = {
 };
 
 const app = initializeApp(firebaseConfig);
-export const auth = getAuth(app);
+const auth = getAuth(app);
 const db = getFirestore(app);
 const googleProvider = new GoogleAuthProvider();
 
@@ -29,7 +29,7 @@ const CV_COLLECTION = 'cv-data';
 
 // --- Authentication ---
 
-export const handleEmailAuth = (isLogin: boolean, email: string, password: string) => {
+const handleEmailAuth = (isLogin: boolean, email: string, password: string) => {
     if (isLogin) {
         return signInWithEmailAndPassword(auth, email, password);
     } else {
@@ -37,18 +37,18 @@ export const handleEmailAuth = (isLogin: boolean, email: string, password: strin
     }
 };
 
-export const loginWithGoogle = () => {
+const loginWithGoogle = () => {
     return signInWithPopup(auth, googleProvider);
 };
 
-export const logout = () => {
+const logout = () => {
     return signOut(auth);
 };
 
 
 // --- Firestore Database ---
 
-export const saveCvDocument = async (userId: string, data: CvDocument) => {
+const saveCvDocument = async (userId: string, data: any) => {
     try {
         const docRef = doc(db, CV_COLLECTION, userId);
         await setDoc(docRef, data, { merge: true });
@@ -57,13 +57,13 @@ export const saveCvDocument = async (userId: string, data: CvDocument) => {
     }
 };
 
-export const getCvDocument = async (userId: string): Promise<CvDocument | null> => {
+const getCvDocument = async (userId: string) => {
     try {
         const docRef = doc(db, CV_COLLECTION, userId);
         const docSnap = await getDoc(docRef);
 
         if (docSnap.exists()) {
-            return docSnap.data() as CvDocument;
+            return docSnap.data();
         } else {
             console.log("No such document!");
             return null;
@@ -72,4 +72,14 @@ export const getCvDocument = async (userId: string): Promise<CvDocument | null> 
         console.error("Error getting document:", error);
         return null;
     }
+};
+
+// Expose to window for other components
+(window as any).FirebaseService = {
+    auth,
+    handleEmailAuth,
+    loginWithGoogle,
+    logout,
+    saveCvDocument,
+    getCvDocument
 };

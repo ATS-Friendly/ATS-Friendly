@@ -1,10 +1,62 @@
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { User } from 'firebase/auth';
-import type { View } from '../App';
-import type { CvDocument, CvFormData, Experience, Education, CustomSection } from '../types';
-import { getCvDocument, saveCvDocument, logout } from '../services/firebaseService';
-import TemplateView from './TemplateView';
+
+// --- Type definitions (inlined to avoid import issues in no-build env) ---
+// We can't import interfaces at runtime in this setup.
+interface Experience {
+  id: string;
+  title: string;
+  company: string;
+  date: string;
+  desc: string;
+}
+
+interface Education {
+  id: string;
+  school: string;
+  degree: string;
+  date: string;
+}
+
+interface CustomSection {
+  id: string;
+  title: string;
+  content: string;
+}
+
+interface CvFormData {
+  fullname: string;
+  title: string;
+  email: string;
+  phone: string;
+  address: string;
+  birthplace: string;
+  license: string;
+  summary: string;
+  experiences: Experience[];
+  education: Education[];
+  customSections: CustomSection[];
+}
+
+interface CvDocument {
+  formData: CvFormData;
+  template: 'tpl-classic' | 'tpl-compact';
+  theme: {
+    color: string;
+    font: string;
+  };
+  layout: {
+    fontSize: number;
+    lineHeight: number;
+    margin: number;
+    sectionGap: number;
+  };
+}
+
+// Access globals
+const { getCvDocument, saveCvDocument, logout } = (window as any).FirebaseService;
+const TemplateView = (window as any).TemplateView;
 
 // Helper to generate unique IDs for new items
 const generateId = () => `id_${new Date().getTime()}_${Math.random()}`;
@@ -116,7 +168,7 @@ const CVPreview: React.FC<{ cvData: CvDocument, cvRootRef: React.RefObject<HTMLD
     );
 };
 
-const EditorView: React.FC<{ user: User; setView: (view: View) => void; }> = ({ user }) => {
+const EditorView: React.FC<{ user: User; setView: any; }> = ({ user }) => {
     const [cvData, setCvData] = useState<CvDocument | null>(null);
     const [mobileTab, setMobileTab] = useState<'edit' | 'preview'>('edit');
     const [isMobile, setIsMobile] = useState(window.innerWidth <= 1024);
@@ -220,7 +272,7 @@ const EditorView: React.FC<{ user: User; setView: (view: View) => void; }> = ({ 
 
 
     if (cvData === null) {
-        return <TemplateView onSelectTemplate={(template) => {
+        return <TemplateView onSelectTemplate={(template: any) => {
             const newData = { ...initialCvDoc, template };
             setCvData(newData);
             saveCvDocument(user.uid, newData);
@@ -316,5 +368,4 @@ const EditorView: React.FC<{ user: User; setView: (view: View) => void; }> = ({ 
     );
 };
 
-
-export default EditorView;
+(window as any).EditorView = EditorView;
