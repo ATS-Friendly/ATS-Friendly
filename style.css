@@ -175,6 +175,11 @@ body {
     background: #2980b9; 
     transform: translateY(-2px); 
 }
+.auth-btn:disabled {
+    background: #bdc3c7;
+    cursor: not-allowed;
+    transform: none;
+}
 .auth-toggle { 
     margin-top: 20px; 
     font-size: 13px; 
@@ -587,7 +592,8 @@ textarea.form-input { resize: vertical; }
     position: fixed;
     top: 0; left: 0;
     width: 0; height: 0;
-    z-index: 2500;
+    /* Increase Z-index to cover FAB (2800) */
+    z-index: 3000;
 }
 #theme-modal.active, #layout-modal.active { display: block; }
 
@@ -618,7 +624,7 @@ textarea.form-input { resize: vertical; }
         box-shadow: 0 -5px 25px rgba(0,0,0,0.2);
         
         /* Glassmorphism attempt for transparency */
-        background: rgba(255, 255, 255, 0.92);
+        background: rgba(255, 255, 255, 0.95); /* Slightly less transparent for readability */
         backdrop-filter: blur(10px);
         -webkit-backdrop-filter: blur(10px);
     }
@@ -845,9 +851,32 @@ body.tpl-compact .entry .right-col { width: 100%; padding-right: 130px; }
         print-color-adjust: exact;
     }
     .sidebar, #auth-view, #template-view, .editor-panel-form, .lang-switcher, #toast, .modal-overlay, #theme-modal, #layout-modal, .mobile-view-toggle, .mobile-fab-container { display: none !important; }
+    
+    /* RESET EDITOR LAYOUT FOR PRINT */
     .editor-layout { display: block; padding: 0; width: 100%; height: auto; }
-    .editor-panel-preview { padding: 0; background: white; overflow: visible; display: block; height: auto !important; }
-    #cv-scale-container { transform: none !important; width: 100%; box-shadow: none; margin: 0; }
+    
+    /* Ensure the preview container spans full width without scrollbars */
+    .editor-panel-preview { 
+        padding: 0; 
+        background: white; 
+        overflow: visible; 
+        display: block; 
+        height: auto !important; 
+        width: 100%;
+        margin: 0;
+    }
+    
+    /* CRITICAL: RESET SCALING FOR PRINT */
+    /* Mobile view uses transform: scale() to fit screen. We must remove this for print. */
+    #cv-scale-container, #cv-root { 
+        transform: none !important; 
+        width: 210mm !important; /* Force A4 width */
+        height: auto !important;
+        box-shadow: none !important; 
+        margin: 0 auto !important;
+        overflow: visible !important;
+    }
+    
     .page { 
         width: 100%; 
         max-width: 210mm; /* Force A4 Width */
@@ -855,7 +884,7 @@ body.tpl-compact .entry .right-col { width: 100%; padding-right: 130px; }
         padding: var(--cv-padding) !important; /* Force user padding */
         box-shadow: none; 
         border: none;
-        overflow: hidden; /* Ensure content stays in */
+        overflow: hidden; 
     }
 }
 
@@ -865,6 +894,7 @@ body.tpl-compact .entry .right-col { width: 100%; padding-right: 130px; }
     position: fixed;
     bottom: 30px;
     left: 20px;
+    /* Z-index below modal (3000) but high enough above content */
     z-index: 2800;
     flex-direction: column-reverse;
     align-items: flex-start;

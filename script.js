@@ -32,6 +32,7 @@ const appId = "mono-cv-app";
 let isLoginMode = true;
 let currentUser = null;
 let isSyncing = false;
+let saveTimeout = null; // For debouncing save
 let currentLang = 'tr';
 // Theme Defaults
 let currentTheme = {
@@ -50,7 +51,9 @@ let currentLayout = {
 const translations = {
     tr: {
         auth_title: "Giriş Yap",
+        auth_signup_title: "Hesap Oluştur",
         auth_continue: "Devam Et",
+        auth_processing: "İşleniyor...",
         auth_google: "Google ile Giriş",
         auth_toggle_signup: "Hesabın yok mu? Kayıt Ol",
         auth_toggle_login: "Zaten hesabın var mı? Giriş Yap",
@@ -70,6 +73,7 @@ const translations = {
         status_connecting: "Bağlanıyor...",
         status_online: "Senkronize",
         status_syncing: "Kaydediliyor...",
+        status_saved: "Kaydedildi!",
         status_offline: "Çevrimdışı",
         cv_label_birth: "Doğum Yeri",
         cv_label_license: "Ehliyet",
@@ -110,7 +114,9 @@ const translations = {
     },
     en: {
         auth_title: "Login",
+        auth_signup_title: "Create Account",
         auth_continue: "Continue",
+        auth_processing: "Processing...",
         auth_google: "Login with Google",
         auth_toggle_signup: "Don't have an account? Sign Up",
         auth_toggle_login: "Already have an account? Login",
@@ -130,6 +136,7 @@ const translations = {
         status_connecting: "Connecting...",
         status_online: "Synced",
         status_syncing: "Saving...",
+        status_saved: "Saved!",
         status_offline: "Offline",
         cv_label_birth: "Place of birth",
         cv_label_license: "Driving license",
@@ -186,6 +193,8 @@ window.setLanguage = (lang) => {
     document.querySelector(`.lang-btn[onclick="setLanguage('${lang}')"]`).classList.add('active');
 
     // Update Form Labels that might be dynamic
+    const authTitleKey = isLoginMode ? 'auth_title' : 'auth_signup_title';
+    document.getElementById('auth-title').innerText = translations[lang][authTitleKey];
     document.getElementById('auth-toggle-text').innerText = isLoginMode ? translations[lang].auth_toggle_signup : translations[lang].auth_toggle_login;
     
     // Refresh CV Preview to apply language changes (e.g. section headers)
@@ -259,18 +268,17 @@ window.resizePreview = () => {
     const scale = Math.min(1, availableWidth / originalWidth);
     
     // 1. Transform the INNER content (#cv-root)
-    cvRoot.style.transformOrigin = 'top center'; // Changed from 'top left' to 'top center' for standard alignment
+    cvRoot.style.transformOrigin = 'top center'; 
     cvRoot.style.transform = `scale(${scale})`;
     
     // 2. Resize the OUTER wrapper (#cv-scale-container) to match the SCALED dimensions
-    // This allows Flexbox in the parent to center this smaller box perfectly
     const scaledWidth = originalWidth * scale;
     const scaledHeight = cvRoot.scrollHeight * scale;
 
     scaleContainer.style.width = `${scaledWidth}px`;
     scaleContainer.style.height = `${scaledHeight}px`;
     
-    // 3. Add margins for spacing (Center alignment is handled by CSS auto margin)
+    // 3. Add margins for spacing
     scaleContainer.style.marginTop = '20px';
     scaleContainer.style.marginBottom = '120px'; // Extra space for FAB
 };
@@ -317,6 +325,7 @@ function openModal(modalId) {
 window.openThemeModal = () => openModal('theme-modal');
 window.closeThemeModal = () => {
     document.getElementById('theme-modal').classList.remove('active');
+    // Save happens via debounce or explicit change
     saveToCloud(); 
 };
 
@@ -376,6 +385,7 @@ function initDragElement(elmnt) {
 window.applyColor = (color) => {
     currentTheme.color = color;
     document.documentElement.style.setProperty('--cv-accent-color', color);
+    triggerDebounceSave(); // Save when color changes
 };
 
 window.applyFont = (fontType) => {
@@ -393,6 +403,7 @@ window.applyFont = (fontType) => {
         case 'ptserif': default: fontVal = "'PT Serif', serif"; break;
     }
     document.documentElement.style.setProperty('--font-cv', fontVal);
+    triggerDebounceSave(); // Save when font changes
 };
 
 window.updateLayout = () => {
@@ -414,6 +425,9 @@ window.updateLayout = () => {
     document.documentElement.style.setProperty('--cv-line-height', lh);
     document.documentElement.style.setProperty('--cv-padding', mg + 'mm');
     document.documentElement.style.setProperty('--cv-section-gap', sg + 'px');
+    
+    // Note: Layout changes are usually saved when modal closes, but we can debounce here too if desired
+    // For performance, we wait for modal close or manual save
 };
 
 function applySavedLayout(layout) {
@@ -439,18 +453,34 @@ window.loginWithGoogle = async () => {
 window.toggleAuthMode = () => {
     isLoginMode = !isLoginMode;
     const t = translations[currentLang];
-    document.getElementById('auth-title').innerText = isLoginMode ? t.auth_title : "Kayıt Ol";
+    const authTitleKey = isLoginMode ? 'auth_title' : 'auth_signup_title';
+    document.getElementById('auth-title').innerText = t[authTitleKey];
     window.setLanguage(currentLang);
 };
 
 window.handleAuth = async () => {
     const email = document.getElementById('auth-email').value;
     const password = document.getElementById('auth-password').value;
-    if (!email || !password) return alert("Please fill in all fields.");
+    const btn = document.querySelector('.auth-btn');
+    
+    if (!email || !password) return alert("Lütfen tüm alanları doldurun.");
+    
+    const originalText = btn.innerText;
+    btn.innerText = translations[currentLang].auth_processing;
+    btn.disabled = true;
+
     try {
-        if (isLoginMode) await signInWithEmailAndPassword(auth, email, password);
-        else await createUserWithEmailAndPassword(auth, email, password);
-    } catch (e) { alert("Error: " + e.message); }
+        if (isLoginMode) {
+            await signInWithEmailAndPassword(auth, email, password);
+        } else {
+            await createUserWithEmailAndPassword(auth, email, password);
+        }
+        // Success is handled by onAuthStateChanged
+    } catch (e) { 
+        alert("Hata: " + e.message);
+        btn.innerText = originalText;
+        btn.disabled = false;
+    }
 };
 
 window.logout = () => signOut(auth).then(() => {
@@ -483,7 +513,7 @@ onAuthStateChanged(auth, async (user) => {
             }
             
             showView('editor-view');
-            generateCVFromForm(); // Render CV based on form data
+            generateCVFromForm(false); // Render CV, false = don't save immediately
             updateStatus('online');
         } else {
             showView('template-view');
@@ -506,6 +536,7 @@ window.backToTemplates = () => {
 };
 
 // --- DYNAMIC FORM HANDLERS ---
+// All dynamic handlers now call generateCVFromForm() which will Debounce save
 window.addFormExperience = (data = null) => {
     const container = document.getElementById('form-experiences-list');
     const div = document.createElement('div');
@@ -591,7 +622,7 @@ window.removeItemAndRefresh = (btn) => {
 };
 
 // --- DATA BINDING ---
-window.generateCVFromForm = () => {
+window.generateCVFromForm = (triggerSave = true) => {
     // 1. Gather Data from DOM Inputs
     const data = {
         fullname: document.getElementById('inp-fullname').value,
@@ -645,7 +676,6 @@ window.generateCVFromForm = () => {
     };
 
     // GENERATE SECTION CONTENT (Grouped)
-    
     // -- EXPERIENCES --
     let expContent = "";
     if (data.experiences.length > 0) {
@@ -743,79 +773,67 @@ window.generateCVFromForm = () => {
     }
 
     document.getElementById('cv-root').innerHTML = html;
-    saveToCloud(data); // Save the form data structure
     
     // Trigger scale update if on mobile preview
     if(window.innerWidth <= 1024) {
         setTimeout(window.resizePreview, 10);
     }
+
+    // Trigger Debounce Save
+    if (triggerSave) {
+        triggerDebounceSave(data);
+    }
 };
 
-function loadUserDataIntoForm(data) {
-    document.getElementById('inp-fullname').value = data.fullname || '';
-    document.getElementById('inp-title').value = data.title || '';
-    document.getElementById('inp-email').value = data.email || '';
-    document.getElementById('inp-phone').value = data.phone || '';
-    document.getElementById('inp-address').value = data.address || '';
-    document.getElementById('inp-birthplace').value = data.birthplace || '';
-    document.getElementById('inp-license').value = data.license || '';
-    document.getElementById('inp-summary').value = data.summary || '';
 
-    const expList = document.getElementById('form-experiences-list');
-    expList.innerHTML = '';
-    if (data.experiences) {
-        data.experiences.forEach(exp => addFormExperience(exp));
-    }
+// --- DEBOUNCE SAVE ---
+function triggerDebounceSave(data = null) {
+    // Clear existing timer
+    if (saveTimeout) clearTimeout(saveTimeout);
+    
+    updateStatus('syncing');
 
-    const eduList = document.getElementById('form-education-list');
-    eduList.innerHTML = '';
-    if (data.education) {
-        data.education.forEach(edu => addFormEducation(edu));
-    }
-
-    const customList = document.getElementById('form-custom-list');
-    customList.innerHTML = '';
-    if (data.customSections) {
-        data.customSections.forEach(sec => addFormCustomSection(sec));
-    }
+    // Set new timer for 2 seconds
+    saveTimeout = setTimeout(() => {
+        saveToCloud(data);
+    }, 2000);
 }
+
 
 // --- SAVE / LOAD ---
 async function saveToCloud(formData = null) {
-    if (!currentUser || isSyncing) return;
+    if (!currentUser) return;
     
-    // If formData is not passed (e.g. template change), gather it
-    if (!formData) {
-        // ... gather logic similar to generateCVFromForm or store state globally
-        // For simplicity, we assume this function is usually called by generateCVFromForm
-        return; 
-    }
-
+    // If saving explicitly without formData (e.g. template change), assume it's a direct state save
+    // But better to grab current form data if null to be safe, 
+    // though `generateCVFromForm` usually passes it.
+    
     isSyncing = true;
-    updateStatus('syncing');
     
     const docRef = doc(db, 'artifacts', appId, 'users', currentUser.uid, 'data', 'cvContent');
     
     try {
         await setDoc(docRef, { 
-            formData: formData, // Store structured data
+            formData: formData, 
             template: document.body.className,
             theme: currentTheme,
             layout: currentLayout,
             updatedAt: new Date().toISOString() 
         }, { merge: true });
+        
         updateStatus('online');
+        
+        // Only show toast AFTER successful save
+        const t = document.getElementById('toast');
+        t.innerText = translations[currentLang].status_saved;
+        t.classList.add('show');
+        setTimeout(() => t.classList.remove('show'), 2000);
+
     } catch (e) { 
         updateStatus('error'); 
         console.error("Save failed:", e);
     } finally {
         isSyncing = false;
-        
-        // Mobile specific toast handling
-        const t = document.getElementById('toast');
-        t.innerText = translations[currentLang].status_syncing.replace('...','!');
-        t.classList.add('show');
-        setTimeout(() => t.classList.remove('show'), 2000);
     }
 }
 
@@ -859,6 +877,5 @@ window.resetAll = async (skipConfirm = false) => {
 };
 
 window.createNewSection = () => {
-    // This is deprecated, handled by addFormCustomSection now
     alert("Yeni sistemde 'Özel Bölümler' alanını kullanarak ekleme yapabilirsiniz.");
 };
