@@ -1,10 +1,7 @@
+
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 
-// Access globals
-const { getCvDocument, saveCvDocument, logout } = (window as any).FirebaseService;
-const TemplateView = (window as any).TemplateView;
-
-// Helper to generate unique IDs for new items
+// Helper to generate unique IDs
 const generateId = () => `id_${new Date().getTime()}_${Math.random()}`;
 
 const initialFormData = {
@@ -32,8 +29,6 @@ const initialCvDoc = {
 const CVPreview = ({ cvData, cvRootRef }) => {
     const { formData, template } = cvData;
     const isCompact = template === 'tpl-compact';
-
-    // Tailwind doesn't support dynamic style properties well, so we use inline styles here for themes.
     const accentStyle = { color: cvData.theme.color };
     const borderStyle = { borderColor: cvData.theme.color };
 
@@ -62,15 +57,11 @@ const CVPreview = ({ cvData, cvRootRef }) => {
                     </div>
                 )}
             </header>
-
             <main className="space-y-6">
-                {/* Summary */}
                 <section>
                     <h2 className="pb-2 mb-4 text-sm font-bold tracking-widest uppercase border-b-2" style={{...borderStyle, ...accentStyle}}>Profil</h2>
                     <p className="text-gray-700">{formData.summary}</p>
                 </section>
-
-                {/* Experience */}
                 {formData.experiences.length > 0 && <section>
                     <h2 className="pb-2 mb-4 text-sm font-bold tracking-widest uppercase border-b-2" style={{...borderStyle, ...accentStyle}}>İş Deneyimi</h2>
                     <div className="space-y-4">
@@ -85,8 +76,6 @@ const CVPreview = ({ cvData, cvRootRef }) => {
                         ))}
                     </div>
                 </section>}
-                
-                {/* Education */}
                 {formData.education.length > 0 && <section>
                     <h2 className="pb-2 mb-4 text-sm font-bold tracking-widest uppercase border-b-2" style={{...borderStyle, ...accentStyle}}>Eğitim</h2>
                     <div className="space-y-4">
@@ -101,8 +90,6 @@ const CVPreview = ({ cvData, cvRootRef }) => {
                         ))}
                     </div>
                 </section>}
-
-                {/* Custom Sections */}
                 {formData.customSections.map(sec => (
                     <section key={sec.id}>
                         <h2 className="pb-2 mb-4 text-sm font-bold tracking-widest uppercase border-b-2" style={{...borderStyle, ...accentStyle}}>{sec.title}</h2>
@@ -115,16 +102,18 @@ const CVPreview = ({ cvData, cvRootRef }) => {
 };
 
 const EditorView = ({ user, setView }) => {
+    // Globals accessed here safely
+    const { getCvDocument, saveCvDocument, logout } = (window as any).FirebaseService;
+    const TemplateView = (window as any).TemplateView;
+
     const [cvData, setCvData] = useState(null);
     const [mobileTab, setMobileTab] = useState('edit');
     const [isMobile, setIsMobile] = useState(window.innerWidth <= 1024);
 
     const cvScaleContainerRef = useRef(null);
     const cvRootRef = useRef(null);
-
     const debounceTimeoutRef = useRef(null);
 
-    // Debounced save function
     const debouncedSave = useCallback((data) => {
         if (debounceTimeoutRef.current) {
             clearTimeout(debounceTimeoutRef.current);
@@ -132,7 +121,7 @@ const EditorView = ({ user, setView }) => {
         debounceTimeoutRef.current = window.setTimeout(() => {
             saveCvDocument(user.uid, data);
         }, 1500);
-    }, [user.uid]);
+    }, [user.uid, saveCvDocument]);
 
     useEffect(() => {
         const fetchCvData = async () => {
@@ -140,13 +129,12 @@ const EditorView = ({ user, setView }) => {
             if (doc) {
                 setCvData(doc);
             } else {
-                setCvData(null); // This will trigger template selection
+                setCvData(null); 
             }
         };
         fetchCvData();
-    }, [user.uid]);
+    }, [user.uid, getCvDocument]);
     
-    // Update state and trigger save
     const updateCvData = (updates) => {
         setCvData(prevData => {
             if (!prevData) return null;
@@ -164,14 +152,12 @@ const EditorView = ({ user, setView }) => {
         });
     };
 
-    // Handle screen resizing
     useEffect(() => {
         const handleResize = () => setIsMobile(window.innerWidth <= 1024);
         window.addEventListener('resize', handleResize);
         return () => window.removeEventListener('resize', handleResize);
     }, []);
 
-    // ** THE FIX: SCALING LOGIC FOR MOBILE PREVIEW **
     useEffect(() => {
         const resizePreview = () => {
             const scaleContainer = cvScaleContainerRef.current;
@@ -180,23 +166,19 @@ const EditorView = ({ user, setView }) => {
             if (!scaleContainer || !cvRoot) return;
 
             if (!isMobile) {
-                // Reset styles on desktop
                 cvRoot.style.transform = 'scale(1)';
                 scaleContainer.style.width = 'auto';
                 scaleContainer.style.height = 'auto';
                 return;
             }
 
-            // A4 width in pixels at 96 DPI is approx 794px
             const originalWidth = 794; 
-            // Give 20px total padding (10px on each side)
             const availableWidth = window.innerWidth - 20;
             const scale = Math.min(1, availableWidth / originalWidth);
 
             cvRoot.style.transformOrigin = 'top center';
             cvRoot.style.transform = `scale(${scale})`;
             
-            // Adjust container size to match the scaled content for proper scrolling
             const scaledWidth = originalWidth * scale;
             const scaledHeight = cvRoot.scrollHeight * scale;
 
@@ -204,17 +186,15 @@ const EditorView = ({ user, setView }) => {
             scaleContainer.style.height = `${scaledHeight}px`;
         };
 
-        // Resize when mobile status changes or when switching to preview tab
         if (isMobile && mobileTab === 'preview') {
-             // Timeout allows the DOM to update to the preview tab before measuring
             setTimeout(resizePreview, 50);
         } else {
-            resizePreview(); // Also run for desktop
+            resizePreview();
         }
 
         window.addEventListener('resize', resizePreview);
         return () => window.removeEventListener('resize', resizePreview);
-    }, [isMobile, mobileTab, cvData]); // Rerun whenever data changes to update height
+    }, [isMobile, mobileTab, cvData]);
 
 
     if (cvData === null) {
@@ -229,7 +209,6 @@ const EditorView = ({ user, setView }) => {
 
     return (
         <div className="flex w-screen h-screen overflow-hidden">
-            {/* Sidebar (Desktop only) */}
             <aside className="hidden lg:flex flex-col w-64 bg-gray-800 text-white">
                 <div className="p-4 border-b border-gray-700">
                     <h1 className="text-xl font-bold">ATS-Friendly</h1>
@@ -242,11 +221,8 @@ const EditorView = ({ user, setView }) => {
             
             <div className="flex-1 flex flex-col h-screen">
                 <div className="flex-1 lg:grid lg:grid-cols-2 overflow-hidden">
-                    {/* Form Panel */}
                     <div className={`p-6 overflow-y-auto bg-white ${isMobile && mobileTab !== 'edit' ? 'hidden' : 'block'}`}>
                         <h2 className="text-xl font-bold mb-6">Bilgilerinizi Düzenleyin</h2>
-
-                        {/* Kişisel Bilgiler */}
                         <div className="mb-6">
                             <h3 className="font-bold text-blue-600 mb-2">Kişisel Bilgiler</h3>
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -258,13 +234,11 @@ const EditorView = ({ user, setView }) => {
                             </div>
                         </div>
 
-                         {/* Profil */}
                         <div className="mb-6">
                             <h3 className="font-bold text-blue-600 mb-2">Profil Özeti</h3>
                             <textarea value={formData.summary} onChange={e => updateFormData({ summary: e.target.value })} placeholder="Kısa özet..." rows={4} className="w-full p-2 border rounded"></textarea>
                         </div>
                         
-                        {/* Deneyim */}
                         <div className="mb-6">
                             <h3 className="font-bold text-blue-600 mb-2">İş Deneyimi</h3>
                             {formData.experiences.map((exp, index) => (
@@ -280,7 +254,6 @@ const EditorView = ({ user, setView }) => {
                         </div>
                     </div>
 
-                    {/* Preview Panel */}
                     <div className={`flex justify-center items-start p-4 lg:p-8 overflow-auto bg-gray-200 ${isMobile && mobileTab !== 'preview' ? 'hidden' : 'flex'}`}>
                         <div ref={cvScaleContainerRef} className="print-area">
                            <CVPreview cvData={cvData} cvRootRef={cvRootRef} />
@@ -288,7 +261,6 @@ const EditorView = ({ user, setView }) => {
                     </div>
                 </div>
 
-                {/* Mobile Bottom Navigation */}
                 {isMobile && (
                     <div className="flex items-center bg-white border-t border-gray-200 shadow-inner h-16">
                         <button onClick={() => setMobileTab('edit')} className={`flex-1 flex flex-col items-center justify-center h-full text-xs font-bold ${mobileTab === 'edit' ? 'text-blue-600' : 'text-gray-500'}`}>
@@ -314,4 +286,4 @@ const EditorView = ({ user, setView }) => {
     );
 };
 
-window.EditorView = EditorView;
+(window as any).EditorView = EditorView;

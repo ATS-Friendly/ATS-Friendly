@@ -1,8 +1,6 @@
+
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-
-// App is loaded into window by App.tsx
-const App = (window as any).App;
 
 const rootElement = document.getElementById('root');
 if (!rootElement) {
@@ -10,8 +8,20 @@ if (!rootElement) {
 }
 
 const root = ReactDOM.createRoot(rootElement);
-root.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>
-);
+
+// Wait for App to be loaded via Babel script execution
+const mountApp = () => {
+    const App = (window as any).App;
+    if (App) {
+        root.render(
+            <React.StrictMode>
+                <App />
+            </React.StrictMode>
+        );
+    } else {
+        // Retry shortly if App.tsx hasn't finished transpiling yet
+        setTimeout(mountApp, 50);
+    }
+}
+
+mountApp();

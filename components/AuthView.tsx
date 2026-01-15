@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 
 const AuthView = ({ setView }) => {
@@ -7,16 +8,16 @@ const AuthView = ({ setView }) => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  // Access services from window
-  const { handleEmailAuth, loginWithGoogle } = (window as any).FirebaseService;
-
   const onSubmit = async (e) => {
     e.preventDefault();
     setError('');
     setLoading(true);
+    
+    // Access global service here
+    const { handleEmailAuth } = (window as any).FirebaseService;
+
     try {
       await handleEmailAuth(isLoginMode, email, password);
-      // onAuthStateChanged in App.tsx will handle the view change
     } catch (err) {
       setError(err.message || 'Bir hata oluştu.');
     } finally {
@@ -26,9 +27,10 @@ const AuthView = ({ setView }) => {
 
   const onGoogleLogin = async () => {
     setError('');
+    const { loginWithGoogle } = (window as any).FirebaseService;
+    
     try {
       await loginWithGoogle();
-      // onAuthStateChanged will handle view change
     } catch (err) {
       setError(err.message || 'Google ile giriş yapılamadı.');
     }
@@ -88,4 +90,4 @@ const AuthView = ({ setView }) => {
   );
 };
 
-window.AuthView = AuthView;
+(window as any).AuthView = AuthView;
