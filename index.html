@@ -313,9 +313,6 @@
 
                 <div class="nav-group">
                     <span class="nav-label" data-i18n="nav_actions">İŞLEMLER</span>
-                    <button class="nav-item" onclick="window.print()">
-                        <span class="icon">🖨️</span> <span data-i18n="btn_download_pdf">PDF İndir</span>
-                    </button>
                     <button class="nav-item danger" onclick="resetAll()">
                         <span class="icon">🗑️</span> <span data-i18n="btn_reset">Sıfırla / Temizle</span>
                     </button>
@@ -405,10 +402,6 @@
 
             <!-- RIGHT PANEL: PREVIEW -->
             <div class="editor-panel-preview" id="panel-preview">
-                <!-- Mobile Fullscreen Button -->
-                <button class="mobile-zoom-btn" onclick="window.print()" aria-label="Fullscreen Preview">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6M9 21H3v-6M21 15v6h-6M3 9V3h6"/></svg>
-                </button>
                 <div id="cv-scale-container">
                     <div class="page cv-content" id="cv-root">
                         <!-- CV Content generated here -->
@@ -421,9 +414,6 @@
         <div class="mobile-bottom-bar">
             <button class="mobile-action-btn secondary" onclick="openThemeModal()">
                 <span class="icon">🎨</span> <span data-i18n="btn_design">Tasarım</span>
-            </button>
-            <button class="mobile-action-btn primary" onclick="window.print()">
-                <span data-i18n="btn_download_pdf">İndir</span>
             </button>
         </div>
 
@@ -439,9 +429,6 @@
                 </button>
                 <button class="fab-item" onclick="backToTemplates()">
                     <span class="fab-label">Şablonlar</span> 💠
-                </button>
-                <button class="fab-item" onclick="window.print()">
-                    <span class="fab-label">PDF İndir</span> 🖨️
                 </button>
                 <button class="fab-item danger" onclick="resetAll()">
                     <span class="fab-label">Temizle</span> 🗑️
