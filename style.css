@@ -584,6 +584,18 @@ input[type=range] {
     font-size: var(--cv-font-size);
 }
 
+/* GENERAL TEXT WRAPPING FIXES */
+.cv-content p, 
+.cv-content h1, 
+.cv-content h2, 
+.cv-content h3, 
+.cv-content span, 
+.cv-content div {
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+    word-break: break-word; /* Forces long unbroken strings to wrap */
+}
+
 /* HEADER BASE STYLES */
 header { 
     text-align: center; 
@@ -628,7 +640,7 @@ h1 {
 }
 .entry { display: flex; margin-bottom: 15px; }
 .left-col { width: 140px; flex-shrink: 0; font-size: 0.9em; font-weight: 700; color: #636e72; }
-.right-col { width: 100%; }
+.right-col { width: 100%; word-break: break-word; } /* Ensure right column breaks long text */
 .entry h3 { margin: 0 0 4px 0; font-size: 1.05em; font-weight: 700; }
 .entry p { margin: 0; font-size: 1em; color: #444; }
 
@@ -663,9 +675,28 @@ body.tpl-compact .entry .right-col { width: 100%; padding-right: 130px; }
 
 /* PRINT */
 @media print {
-    body { background: white; padding: 0; margin: 0; display: block; }
+    @page {
+        margin: 0; /* Clear browser default margins */
+        size: auto;
+    }
+    body { 
+        background: white; 
+        padding: 0; 
+        margin: 0; 
+        display: block; 
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
     .sidebar, #auth-view, #template-view, .editor-panel-form, .lang-switcher, #toast, .modal-overlay, #theme-modal, #layout-modal { display: none !important; }
     .editor-layout { display: block; padding: 0; width: 100%; height: auto; }
     .editor-panel-preview { padding: 0; background: white; overflow: visible; display: block; }
-    .page { width: 100%; margin: 0; padding: var(--cv-padding); box-shadow: none; border: none; }
+    .page { 
+        width: 100%; 
+        max-width: 210mm; /* Force A4 Width */
+        margin: 0 auto; 
+        padding: var(--cv-padding) !important; /* Force user padding */
+        box-shadow: none; 
+        border: none;
+        overflow: hidden; /* Ensure content stays in */
+    }
 }
