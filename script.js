@@ -353,6 +353,22 @@ window.resizePreview = () => {
 // Listen for window resize
 window.addEventListener('resize', window.resizePreview);
 
+// --- PRINT SCALING RESET ---
+window.onbeforeprint = () => {
+    const cvRoot = document.getElementById('cv-root');
+    const scaleContainer = document.getElementById('cv-scale-container');
+    if (cvRoot && scaleContainer) {
+        cvRoot.style.transform = 'none';
+        cvRoot.style.width = '210mm';
+        scaleContainer.style.width = '210mm';
+        scaleContainer.style.height = 'auto';
+    }
+};
+
+window.onafterprint = () => {
+    window.resizePreview();
+};
+
 
 // --- MOBILE FAB MENU ---
 window.toggleFabMenu = () => {
@@ -368,24 +384,26 @@ window.toggleFabMenu = () => {
 // --- MODAL YÖNETİMİ (TEMA & LAYOUT) ---
 function openModal(modalId) {
     const modal = document.getElementById(modalId);
+    const content = modal.querySelector('.modal-content');
     modal.classList.add('active');
     
     // Close FAB when opening modal
-    document.getElementById('fab-items').classList.remove('show');
-    document.getElementById('fab-trigger').classList.remove('active');
-    document.getElementById('fab-overlay').classList.remove('active');
+    if (document.getElementById('fab-items')) {
+        document.getElementById('fab-items').classList.remove('show');
+        document.getElementById('fab-trigger').classList.remove('active');
+        document.getElementById('fab-overlay').classList.remove('active');
+    }
 
     // Center modal or simple fixed positioning for mobile stability
     if(window.innerWidth > 1024) {
-        if (!modal.style.top || !modal.style.left) {
-            modal.style.top = "100px";
+        if (!content.style.top || !content.style.left) {
+            content.style.top = "100px";
             const initialLeft = Math.max(20, window.innerWidth - 360);
-            modal.style.left = initialLeft + "px";
+            content.style.left = initialLeft + "px";
         }
-        initDragElement(modal.querySelector('.modal-content'));
+        initDragElement(content);
     } else {
         // Mobile positioning handled by CSS (bottom sheet)
-        const content = modal.querySelector('.modal-content');
         content.style.top = '';
         content.style.left = '';
         content.style.transform = '';
@@ -442,8 +460,8 @@ function initDragElement(elmnt) {
         pos2 = pos4 - e.clientY;
         pos3 = e.clientX;
         pos4 = e.clientY;
-        elmnt.parentElement.style.top = (elmnt.parentElement.offsetTop - pos2) + "px";
-        elmnt.parentElement.style.left = (elmnt.parentElement.offsetLeft - pos1) + "px";
+        elmnt.style.top = (elmnt.offsetTop - pos2) + "px";
+        elmnt.style.left = (elmnt.offsetLeft - pos1) + "px";
     }
     function closeDragElement() {
         document.onmouseup = null;

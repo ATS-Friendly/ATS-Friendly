@@ -1383,21 +1383,24 @@ body.tpl-compact .entry .right-col { width: 100%; padding-right: 130px; }
     #cv-scale-container, #cv-root { 
         transform: none !important; 
         width: 210mm !important; /* Force A4 width */
+        max-width: 210mm !important;
         height: auto !important;
         box-shadow: none !important; 
         margin: 0 auto !important;
         overflow: visible !important;
+        display: block !important;
     }
     
     .page { 
-        width: 100%; 
-        max-width: 210mm; /* Force A4 Width */
-        margin: 0 auto; 
+        width: 210mm !important; 
+        max-width: 210mm !important; /* Force A4 Width */
+        margin: 0 auto !important; 
         padding: var(--cv-padding) !important; /* Force user padding */
-        box-shadow: none; 
-        border: none;
-        overflow: visible; /* Fix cutoff */
-        min-height: 297mm; /* Ensure full page height is captured */
+        box-shadow: none !important; 
+        border: none !important;
+        overflow: visible !important;
+        min-height: 297mm !important; /* Ensure full page height is captured */
+        background: white !important;
     }
 }
 
