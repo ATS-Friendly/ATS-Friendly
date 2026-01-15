@@ -333,6 +333,9 @@
 
                 <div class="nav-group">
                     <span class="nav-label" data-i18n="nav_actions">İŞLEMLER</span>
+                    <button class="nav-item" onclick="window.print()">
+                        <span class="icon">🖨️</span> <span data-i18n="btn_download_pdf">PDF İndir</span>
+                    </button>
                     <button class="nav-item danger" onclick="resetAll()">
                         <span class="icon">🗑️</span> <span data-i18n="btn_reset">Sıfırla / Temizle</span>
                     </button>
@@ -431,6 +434,9 @@
             <button class="mobile-action-btn secondary" onclick="openThemeModal()">
                 <span class="icon">🎨</span> <span data-i18n="btn_design">Tasarım</span>
             </button>
+            <button class="mobile-action-btn primary" onclick="window.print()">
+                <span data-i18n="btn_download_pdf">Kaydet (PDF)</span>
+            </button>
         </div>
 
         <!-- NEW MOBILE FLOATING ACTION MENU -->
@@ -445,6 +451,9 @@
                 </button>
                 <button class="fab-item" onclick="backToTemplates()">
                     <span class="fab-label">Şablonlar</span> 💠
+                </button>
+                <button class="fab-item" onclick="window.print()">
+                    <span class="fab-label">Kaydet (PDF)</span> 🖨️
                 </button>
                 <button class="fab-item danger" onclick="resetAll()">
                     <span class="fab-label">Temizle</span> 🗑️

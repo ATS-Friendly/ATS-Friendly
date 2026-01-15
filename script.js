@@ -354,6 +354,24 @@ window.resizePreview = () => {
 // Listen for window resize
 window.addEventListener('resize', window.resizePreview);
 
+// --- PRINT SCALING RESET ---
+window.onbeforeprint = () => {
+    const cvRoot = document.getElementById('cv-root');
+    const scaleContainer = document.getElementById('cv-scale-container');
+    if (cvRoot && scaleContainer) {
+        cvRoot.style.transform = '';
+        cvRoot.style.width = '';
+        cvRoot.style.margin = '';
+        scaleContainer.style.transform = '';
+        scaleContainer.style.width = '';
+        scaleContainer.style.height = '';
+    }
+};
+
+window.onafterprint = () => {
+    window.resizePreview();
+};
+
 // --- MOBILE FAB MENU ---
 window.toggleFabMenu = () => {
     const items = document.getElementById('fab-items');
