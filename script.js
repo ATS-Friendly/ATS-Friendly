@@ -222,6 +222,7 @@ const translations = {
 
 window.setLanguage = (lang) => {
     currentLang = lang;
+    document.documentElement.lang = lang; // Set HTML lang attribute to fix text-transform issues
     
     // UI Güncelle
     document.querySelectorAll('[data-i18n]').forEach(el => {

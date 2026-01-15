@@ -1,5 +1,4 @@
 
-/* --- ROOT VARIABLES --- */
 :root {
     --primary-color: #3498db;
     --primary-dark: #2980b9;
@@ -9,7 +8,6 @@
     --warning-color: #f1c40f;
     --info-color: #1abc9c;
     
-    /* Sidebar Theme */
     --sidebar-bg: #1e272e;
     --sidebar-text: #d2dae2;
     --sidebar-hover: rgba(255, 255, 255, 0.08);
@@ -19,18 +17,15 @@
     --sidebar-width: 260px;
     --font-ui: 'Plus Jakarta Sans', sans-serif;
     
-    /* Dynamic CV Theme Variables */
-    --cv-accent-color: #2c3e50; /* Default dark */
-    --font-cv: 'PT Serif', serif; /* Default serif */
+    --cv-accent-color: #2c3e50;
+    --font-cv: 'PT Serif', serif;
     
-    /* Dynamic Layout Variables */
     --cv-font-size: 11pt;
     --cv-line-height: 1.4;
     --cv-padding: 20mm;
     --cv-section-gap: 15px;
 }
 
-/* --- GENERAL RESET --- */
 body {
     background-color: var(--light-bg);
     margin: 0;
@@ -40,7 +35,6 @@ body {
     overflow-x: hidden;
 }
 
-/* --- TOAST --- */
 #toast {
     visibility: hidden;
     min-width: 200px;
@@ -72,7 +66,6 @@ body {
   to {top: 0; opacity: 0;}
 }
 
-/* --- LANDING PAGE STYLES --- */
 #landing-view {
     flex-direction: column;
     background: white;
@@ -183,7 +176,6 @@ body {
     justify-content: center;
 }
 
-/* ABSTRACT ATS VISUAL */
 .mockup-card {
     width: 300px;
     height: 380px;
@@ -229,7 +221,6 @@ body {
     box-shadow: 0 5px 15px rgba(46, 204, 113, 0.3);
 }
 
-/* FEATURES SECTION */
 .features-section {
     padding: 60px 20px;
     background: #f8f9fa;
@@ -273,7 +264,6 @@ body {
     .mockup-card { width: 260px; height: 330px; margin: 0 auto; }
 }
 
-/* --- AUTHENTICATION SCREEN (OVERHAULED) --- */
 #auth-view { 
     align-items: center; 
     justify-content: center; 
@@ -442,7 +432,6 @@ body {
     cursor: pointer;
 }
 
-/* Terms Checkbox */
 .terms-check {
     margin-bottom: 20px;
     font-size: 12px;
@@ -480,7 +469,6 @@ body {
 .terms-text a { color: var(--primary-color); text-decoration: none; }
 
 
-/* --- VIEW MANAGEMENT --- */
 .view-section { 
     display: none; 
     min-height: 100vh; 
@@ -490,7 +478,6 @@ body {
     display: flex; 
 }
 
-/* --- LANGUAGE SWITCHER --- */
 .lang-switcher-sidebar {
     margin-left: auto;
     display: flex;
@@ -547,10 +534,9 @@ body {
 }
 
 @media screen and (max-width: 480px) {
-    .lang-switcher-minimal { display: none; } /* Hide on very small screens in header to save space */
+    .lang-switcher-minimal { display: none; }
 }
 
-/* --- TEMPLATE SELECTION --- */
 #template-view { 
     flex-direction: column; 
     align-items: center; 
@@ -616,7 +602,6 @@ body {
     color: #636e72;
 }
 
-/* --- MODERN DASHBOARD SIDEBAR --- */
 .sidebar {
     background-color: var(--sidebar-bg);
     color: var(--sidebar-text);
@@ -637,11 +622,9 @@ body {
 }
 
 @media screen and (max-width: 1024px) {
-    /* HIDE SIDEBAR ON MOBILE */
     .sidebar { display: none !important; }
 }
 
-/* Sidebar Components */
 .brand-container {
     padding: 30px 24px;
     display: flex;
@@ -736,7 +719,6 @@ body {
 .nav-item.logout { color: #747d8c; }
 .nav-item.logout:hover { color: white; background: rgba(255,255,255,0.05); }
 
-/* --- NEW BADGE STYLE --- */
 .badge-new {
     background: var(--danger-color);
     color: white;
@@ -749,7 +731,6 @@ body {
     text-transform: uppercase;
 }
 
-/* --- MOBILE TABS & BOTTOM BAR --- */
 .mobile-editor-tabs {
     display: none;
     position: fixed;
@@ -834,7 +815,7 @@ body {
 }
 
 .mobile-action-btn.primary {
-    background: #0082e6; /* Blue like resume.io */
+    background: #0082e6;
     color: white;
     box-shadow: 0 4px 15px rgba(0, 130, 230, 0.3);
 }
@@ -857,24 +838,20 @@ body {
     .editor-layout {
         flex-direction: column;
         padding-left: 0;
-        padding-top: 60px; /* Offset for tabs */
-        padding-bottom: 80px; /* Offset for bottom bar */
+        padding-top: 60px;
+        padding-bottom: 80px;
         height: auto;
         min-height: calc(100vh - 140px);
     }
 
-    /* Tab-based visibility */
     #editor-view.show-preview .editor-panel-form { display: none !important; }
     #editor-view.show-edit .editor-panel-preview { display: none !important; }
     
-    /* Default visibility if classes not set */
     .editor-panel-form, .editor-panel-preview { width: 100%; }
     
-    /* FAB repurposed or hidden - User wants the new structure, so hide FAB to avoid clutter */
     .mobile-fab-container, .fab-overlay { display: none !important; }
 }
 
-/* --- SPLIT EDITOR LAYOUT --- */
 .editor-layout {
     display: flex;
     width: 100%;
@@ -883,17 +860,16 @@ body {
     box-sizing: border-box;
 }
 
-/* MOBILE VIEW TOGGLE - REMOVED */
 .mobile-view-toggle { display: none; }
 
 
 @media screen and (max-width: 1024px) {
     .editor-layout {
-        flex-direction: column; /* Vertical Stack */
+        flex-direction: column;
         padding-left: 0;
         padding-bottom: 0; 
         height: auto;
-        overflow-y: auto; /* Allow scrolling the whole page */
+        overflow-y: auto;
     }
     
     /* Show both panels vertically stacked */
@@ -901,7 +877,6 @@ body {
     .editor-panel-preview { display: block; width: 100%; }
 }
 
-/* LEFT PANEL: FORM */
 .editor-panel-form {
     width: 40%;
     min-width: 350px;
@@ -924,24 +899,21 @@ body {
 .form-header-mini { margin-bottom: 20px; }
 .form-header-mini h2 { font-size: 20px; margin: 0; color: #2d3436; }
 
-/* RIGHT PANEL: PREVIEW */
-.editor-panel-preview {
-    flex-grow: 1;
-    background: #f0f2f5;
-    overflow-y: auto; /* Allow scrolling for desktop */
-    overflow-x: auto; /* Prevent lock on mobile */
-    padding: 40px;
-    
-    /* RESET FLEXBOX CENTERING FOR MOBILE PREVIEW TO AVOID ALIGNMENT BUGS */
-    display: flex;
-    justify-content: center;
-    align-items: flex-start;
-}
+    .editor-panel-preview {
+        flex-grow: 1;
+        background: #f0f2f5;
+        overflow-y: auto;
+        overflow-x: auto;
+        padding: 40px;
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+    }
 @media screen and (max-width: 1024px) {
     .editor-panel-preview {
-        padding: 40px 0; /* No horizontal padding here, we handle it in JS */
+        padding: 40px 0;
         min-height: auto;
-        display: flex; /* Use flex for centering */
+        display: flex;
         justify-content: center;
         align-items: flex-start;
         background: #f8f9fd;
@@ -949,7 +921,6 @@ body {
     }
 }
 
-/* --- FORM STYLES (Adapted for Side Panel) --- */
 .form-block {
     margin-bottom: 25px;
     padding-bottom: 25px;
@@ -985,7 +956,7 @@ body {
     border: 1px solid #dfe6e9;
     border-radius: 8px;
     font-family: inherit;
-    font-size: 16px; /* Prevents auto-zoom on iOS */
+    font-size: 16px;
     background: #f8f9fa;
     width: 100%;
     box-sizing: border-box;
@@ -1061,17 +1032,16 @@ textarea.form-input { resize: vertical; }
     .mobile-zoom-btn { display: flex; }
     
     .editor-panel-preview {
-        background: #f8f9fd; /* Lighter background like resume.io */
+        background: #f8f9fd;
         position: relative;
         padding-top: 20px !important;
     }
     
     #cv-scale-container {
-        box-shadow: 0 10px 40px rgba(0,0,0,0.08); /* Softer shadow */
+        box-shadow: 0 10px 40px rgba(0,0,0,0.08);
     }
 }
 
-/* --- THEME & LAYOUT MODAL --- */
 #theme-modal, #layout-modal {
     display: none;
     position: fixed;
@@ -1091,7 +1061,7 @@ textarea.form-input { resize: vertical; }
 
 @media screen and (max-width: 1024px) {
     #theme-modal.active, #layout-modal.active {
-        align-items: flex-end; /* Bottom sheet on mobile */
+        align-items: flex-end;
     }
 }
 
@@ -1115,14 +1085,12 @@ textarea.form-input { resize: vertical; }
         top: auto !important;
         bottom: 0 !important;
         border-radius: 20px 20px 0 0;
-        transform: none !important; /* Disable drag position */
+        transform: none !important;
         animation: slideUp 0.3s ease-out;
-        max-height: 60vh; /* Limit height so users can see CV behind */
+        max-height: 60vh;
         overflow-y: auto;
         box-shadow: 0 -5px 25px rgba(0,0,0,0.2);
-        
-        /* Glassmorphism attempt for transparency */
-        background: rgba(255, 255, 255, 0.95); /* Slightly less transparent for readability */
+        background: rgba(255, 255, 255, 0.95);
         backdrop-filter: blur(10px);
         -webkit-backdrop-filter: blur(10px);
     }
@@ -1219,8 +1187,6 @@ input[type=range] {
 }
 
 
-/* --- CV PAPER STYLES --- */
-/* Wrapper to handle scaling */
 #cv-scale-container {
     transform-origin: top left;
     transition: transform 0.2s;
@@ -1243,9 +1209,8 @@ input[type=range] {
     }
 }
 
-.page { 
-    background: white; 
-    width: 210mm; /* Fixed A4 Width */
+    .page { 
+    width: 210mm;
     min-height: 297mm; 
     padding: var(--cv-padding); 
     position: relative; 
@@ -1268,10 +1233,9 @@ input[type=range] {
 .cv-content div {
     overflow-wrap: break-word;
     word-wrap: break-word;
-    word-break: break-word; /* Forces long unbroken strings to wrap */
+    word-break: break-word;
 }
 
-/* HEADER BASE STYLES */
 header { 
     text-align: center; 
     margin-bottom: 30px; 
@@ -1315,7 +1279,7 @@ h1 {
 }
 .entry { display: flex; margin-bottom: 15px; }
 .left-col { width: 140px; flex-shrink: 0; font-size: 0.9em; font-weight: 700; color: #636e72; }
-.right-col { width: 100%; word-break: break-word; } /* Ensure right column breaks long text */
+.right-col { width: 100%; word-break: break-word; }
 .entry h3 { margin: 0 0 4px 0; font-size: 1.05em; font-weight: 700; }
 .entry p { margin: 0; font-size: 1em; color: #444; }
 
@@ -1348,63 +1312,72 @@ body.tpl-compact .entry { display: block; position: relative; margin-bottom: 15p
 body.tpl-compact .entry .left-col { position: absolute; top: 0; right: 0; width: auto; text-align: right; font-weight: 600; font-size: 0.9em; color: var(--cv-accent-color); }
 body.tpl-compact .entry .right-col { width: 100%; padding-right: 130px; }
 
-/* PRINT */
 @media print {
     @page {
-        margin: 0; /* Clear browser default margins */
-        size: auto;
+        margin: 0;
+        size: A4;
     }
     body { 
-        background: white; 
-        padding: 0; 
-        margin: 0; 
-        display: block; 
+        background: white !important; 
+        padding: 0 !important; 
+        margin: 0 !important; 
+        display: block !important; 
+        width: 100% !important;
         -webkit-print-color-adjust: exact;
         print-color-adjust: exact;
     }
-    .sidebar, #auth-view, #template-view, #landing-view, .editor-panel-form, .lang-switcher, #toast, .modal-overlay, #theme-modal, #layout-modal, .mobile-view-toggle, .mobile-fab-container { display: none !important; }
     
-    /* RESET EDITOR LAYOUT FOR PRINT */
-    .editor-layout { display: block; padding: 0; width: 100%; height: auto; }
-    
-    /* Ensure the preview container spans full width without scrollbars */
-    .editor-panel-preview { 
-        padding: 0; 
-        background: white; 
-        overflow: visible; 
-        display: block; 
-        height: auto !important; 
-        width: 100%;
-        margin: 0;
+    .sidebar, #auth-view, #template-view, #landing-view, .editor-panel-form, 
+    .lang-switcher, #toast, .modal-overlay, #theme-modal, #layout-modal, 
+    .mobile-view-toggle, .mobile-fab-container, .mobile-editor-tabs, .mobile-bottom-bar { 
+        display: none !important; 
     }
     
-    /* CRITICAL: RESET SCALING FOR PRINT */
-    /* Mobile view uses transform: scale() to fit screen. We must remove this for print. */
+    .editor-layout { 
+        display: block !important; 
+        padding: 0 !important; 
+        margin: 0 !important;
+        width: 100% !important; 
+        height: auto !important; 
+    }
+    
+    .editor-panel-preview { 
+        padding: 0 !important; 
+        margin: 0 !important;
+        background: white !important; 
+        overflow: visible !important; 
+        display: block !important; 
+        height: auto !important; 
+        width: 100% !important;
+    }
+    
     #cv-scale-container, #cv-root { 
         transform: none !important; 
-        width: 210mm !important; /* Force A4 width */
+        width: 210mm !important;
         max-width: 210mm !important;
         height: auto !important;
         box-shadow: none !important; 
         margin: 0 auto !important;
+        padding: 0 !important;
         overflow: visible !important;
         display: block !important;
+        position: static !important;
     }
     
     .page { 
         width: 210mm !important; 
-        max-width: 210mm !important; /* Force A4 Width */
+        max-width: 210mm !important;
         margin: 0 auto !important; 
-        padding: var(--cv-padding) !important; /* Force user padding */
+        padding: var(--cv-padding) !important;
         box-shadow: none !important; 
         border: none !important;
         overflow: visible !important;
-        min-height: 297mm !important; /* Ensure full page height is captured */
+        min-height: 297mm !important;
         background: white !important;
+        page-break-after: always;
     }
 }
 
-/* --- MOBILE FLOATING ACTION MENU --- */
 .fab-overlay {
     display: none;
     position: fixed;
@@ -1457,9 +1430,9 @@ body.tpl-compact .entry .right-col { width: 100%; padding-right: 130px; }
     background: #e74c3c;
 }
 
-.fab-menu-items {
+    .fab-menu-items {
     display: flex;
-    flex-direction: column-reverse; /* Bottom to top */
+    flex-direction: column-reverse;
     gap: 12px;
     opacity: 0;
     pointer-events: none;
@@ -1476,7 +1449,7 @@ body.tpl-compact .entry .right-col { width: 100%; padding-right: 130px; }
 /* TRANSPARENT MENU ITEM STYLE */
 .fab-item {
     /* Glassmorphism background */
-    background: rgba(255, 255, 255, 0.85); /* More opaque for better contrast on touch */
+    background: rgba(255, 255, 255, 0.85);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
     
@@ -1492,7 +1465,7 @@ body.tpl-compact .entry .right-col { width: 100%; padding-right: 130px; }
     color: #2d3436;
     font-weight: 700;
     transition: 0.2s;
-    min-height: 48px; /* Standard touch target height */
+    min-height: 48px;
 }
 .fab-item:active {
     transform: scale(0.95);
