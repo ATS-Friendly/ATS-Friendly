@@ -418,14 +418,20 @@
             layout: { fontSize: 11, lineHeight: 1.4, margin: 20, sectionGap: 15 },
         };
 
+        // --- FIXED CV PREVIEW COMPONENT ---
         const CVPreview = ({ cvData, cvRootRef }) => {
             const { formData, template } = cvData;
             const isCompact = template === 'tpl-compact';
             const accentStyle = { color: cvData.theme.color };
             const borderStyle = { borderColor: cvData.theme.color };
 
+            // IMPORTANT: We now use strict pixel values for A4 @ 96DPI
+            // Width: 794px, Height: 1123px
             return (
-                <div ref={cvRootRef} className="p-[20mm] bg-white w-[210mm] min-h-[297mm] cv-preview-font text-black shadow-lg" style={{
+                <div ref={cvRootRef} className="bg-white shadow-lg cv-preview-font text-black" style={{
+                    width: '794px',
+                    minHeight: '1123px',
+                    padding: '40px', // Approx 20mm
                     fontSize: `${cvData.layout.fontSize}pt`,
                     lineHeight: cvData.layout.lineHeight,
                     boxSizing: 'border-box'
@@ -550,49 +556,37 @@
                 return () => window.removeEventListener('resize', handleResize);
             }, []);
 
+            // --- FIXED SCALING LOGIC ---
             useEffect(() => {
-                const resizePreview = () => {
-                    const scaleContainer = cvScaleContainerRef.current;
-                    const cvRoot = cvRootRef.current;
+                const wrapper = cvScaleContainerRef.current;
+                
+                if (!wrapper) return;
 
-                    if (!scaleContainer || !cvRoot) return;
-
-                    if (!isMobile) {
-                        cvRoot.style.transform = 'scale(1)';
-                        cvRoot.style.transformOrigin = 'top center';
-                        scaleContainer.style.width = 'auto';
-                        scaleContainer.style.height = 'auto';
-                        return;
-                    }
-
-                    // Mobile Scaling Logic - FIXED FOR CENTERING
-                    const originalWidth = 794; // approx 210mm
-                    const padding = 20; // safe area
-                    const availableWidth = window.innerWidth - padding;
-                    const scale = Math.min(1, availableWidth / originalWidth);
-
-                    cvRoot.style.transformOrigin = 'top center';
-                    cvRoot.style.transform = `scale(${scale})`;
-                    
-                    const scaledHeight = 1123 * scale; // 297mm height approx in px
-
-                    // Force height on container so scroll works, but layout is flex-centered
-                    scaleContainer.style.width = '100%';
-                    scaleContainer.style.height = `${scaledHeight + 50}px`; 
-                    scaleContainer.style.display = 'flex';
-                    scaleContainer.style.justifyContent = 'center';
-                };
-
-                // Add delay to ensure DOM is ready
-                if (isMobile && mobileTab === 'preview') {
-                    setTimeout(resizePreview, 50);
-                } else if (!isMobile) {
-                    resizePreview();
+                if (!isMobile) {
+                    wrapper.style.transform = 'none';
+                    wrapper.style.marginBottom = '0px';
+                    return;
                 }
 
-                window.addEventListener('resize', resizePreview);
-                return () => window.removeEventListener('resize', resizePreview);
-            }, [isMobile, mobileTab, cvData]);
+                // A4 Width in Pixels
+                const originalWidth = 794; 
+                // Padding: 16px left + 16px right = 32px
+                const availableWidth = window.innerWidth - 32; 
+                
+                const scale = Math.min(1, availableWidth / originalWidth);
+
+                wrapper.style.transformOrigin = 'top center';
+                wrapper.style.transform = `scale(${scale})`;
+                
+                // IMPORTANT: transform: scale reduces the visual size but keeps the original layout space.
+                // We must calculate the empty space created at the bottom and remove it with negative margin.
+                const originalHeight = 1123; // A4 Height in PX
+                const scaledHeight = originalHeight * scale;
+                const spaceToRemove = originalHeight - scaledHeight;
+
+                wrapper.style.marginBottom = `-${spaceToRemove}px`;
+
+            }, [isMobile, mobileTab, cvData]); // Recalculate if these change
 
 
             if (cvData === null) {
@@ -659,9 +653,9 @@
                                 </div>
                             </div>
 
-                            {/* Preview Section - UPDATED CONTAINER */}
-                            <div className={`bg-gray-200 overflow-y-auto overflow-x-hidden flex justify-center h-full ${isMobile && mobileTab !== 'preview' ? 'hidden' : 'flex'} ${!isMobile ? 'items-start py-8' : 'items-start pt-4'}`}>
-                                <div ref={cvScaleContainerRef} className="print-area transition-all duration-300 ease-out origin-top relative">
+                            {/* Preview Section - FIXED CONTAINER */}
+                            <div className={`bg-gray-200 overflow-y-auto overflow-x-hidden flex justify-center w-full h-full py-8 ${isMobile && mobileTab !== 'preview' ? 'hidden' : 'flex'}`}>
+                                <div ref={cvScaleContainerRef} className="origin-top transition-transform duration-200 ease-out">
                                    <CVPreview cvData={cvData} cvRootRef={cvRootRef} />
                                 </div>
                             </div>
