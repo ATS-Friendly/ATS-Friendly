@@ -1,3 +1,4 @@
+
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 
@@ -7,26 +8,32 @@ declare global {
   }
 }
 
-const rootElement = document.getElementById('root');
-if (!rootElement) {
-  throw new Error("Could not find root element to mount to");
-}
+console.log("🚀 Index.tsx starting...");
 
-const root = ReactDOM.createRoot(rootElement);
-
-// Wait for App to be loaded via Babel script execution
 const mountApp = () => {
+    const rootElement = document.getElementById('root');
+    if (!rootElement) {
+        console.error("❌ Root element not found!");
+        return;
+    }
+
+    // Check if App component is registered in window
     const App = window.App;
+    
     if (App) {
+        console.log("✅ App component found, mounting React...");
+        const root = ReactDOM.createRoot(rootElement);
         root.render(
             <React.StrictMode>
                 <App />
             </React.StrictMode>
         );
     } else {
-        // Retry shortly if App.tsx hasn't finished transpiling yet
-        setTimeout(mountApp, 50);
+        console.log("⏳ Waiting for App component to load...");
+        // Retry shortly
+        setTimeout(mountApp, 100);
     }
 }
 
+// Start the mounting process
 mountApp();

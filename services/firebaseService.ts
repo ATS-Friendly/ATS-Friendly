@@ -1,19 +1,20 @@
-// 1. İçe Aktarmalar (DÜZELTİLDİ: Tarayıcı uyumlu CDN linkleri eklendi)
-// Tüm modüllerin aynı sürüm (10.7.1) olduğundan emin olduk.
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+
+// FIX: Use module names that match the "imports" in index.html
+// DO NOT use https:// URLs here. The browser handles mapping via importmap.
+import { initializeApp } from "firebase/app";
 import { 
     getAuth, 
     signInWithEmailAndPassword, 
     createUserWithEmailAndPassword, 
     signOut,
     GoogleAuthProvider,
-    signInWithPopup 
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    signInWithPopup,
+    onAuthStateChanged
+} from "firebase/auth";
+import { getFirestore, doc, getDoc, setDoc } from "firebase/firestore";
 
 console.log("🔥 Firebase Service initializing...");
 
-// 2. Config (Aynen korundu)
 const firebaseConfig = {
     apiKey: "AIzaSyBbxgCMw5dO5T-kt7Njapo5ST04MRp7JKU",
     authDomain: "ats-friendly-93377.firebaseapp.com",
@@ -23,47 +24,71 @@ const firebaseConfig = {
     appId: "1:542738169697:web:a999680a273fdd90ab4f20",
 };
 
-// 3. Başlatma
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
-const googleProvider = new GoogleAuthProvider();
+let app;
+let auth;
+let db;
+let googleProvider;
+
+try {
+    app = initializeApp(firebaseConfig);
+    auth = getAuth(app);
+    db = getFirestore(app);
+    googleProvider = new GoogleAuthProvider();
+    console.log("✅ Firebase Service Modules Loaded");
+} catch (e) {
+    console.error("❌ Firebase Initialization Error:", e);
+    throw e;
+}
 
 const CV_COLLECTION = 'cv-data';
 
 // --- Authentication ---
 
-const handleEmailAuth = (isLogin, email, password) => {
-    if (isLogin) {
-        return signInWithEmailAndPassword(auth, email, password);
-    } else {
-        return createUserWithEmailAndPassword(auth, email, password);
+const handleEmailAuth = async (isLogin: boolean, email: string, password: string) => {
+    try {
+        if (isLogin) {
+            return await signInWithEmailAndPassword(auth, email, password);
+        } else {
+            return await createUserWithEmailAndPassword(auth, email, password);
+        }
+    } catch (error) {
+        console.error("Auth Error:", error);
+        throw error;
     }
 };
 
-const loginWithGoogle = () => {
-    return signInWithPopup(auth, googleProvider);
+const loginWithGoogle = async () => {
+    try {
+        return await signInWithPopup(auth, googleProvider);
+    } catch (error) {
+        console.error("Google Auth Error:", error);
+        throw error;
+    }
 };
 
-const logout = () => {
-    return signOut(auth);
+const logout = async () => {
+    try {
+        await signOut(auth);
+    } catch (error) {
+        console.error("Logout Error:", error);
+    }
 };
 
 
 // --- Firestore Database ---
 
-const saveCvDocument = async (userId, data) => {
+const saveCvDocument = async (userId: string, data: any) => {
     try {
         const docRef = doc(db, CV_COLLECTION, userId);
         await setDoc(docRef, data, { merge: true });
-        console.log("Document successfully written!"); // Başarı logu eklendi
+        console.log("💾 Document saved successfully");
     } catch (error) {
-        console.error("Error saving document: ", error);
-        throw error; // Hatayı yukarı fırlatalım ki UI haberdar olsun
+        console.error("❌ Error saving document: ", error);
+        throw error;
     }
 };
 
-const getCvDocument = async (userId) => {
+const getCvDocument = async (userId: string) => {
     try {
         const docRef = doc(db, CV_COLLECTION, userId);
         const docSnap = await getDoc(docRef);
@@ -71,16 +96,17 @@ const getCvDocument = async (userId) => {
         if (docSnap.exists()) {
             return docSnap.data();
         } else {
-            console.log("No such document!");
+            console.log("ℹ️ No existing document found, returning null");
             return null;
         }
     } catch (error) {
-        console.error("Error getting document:", error);
+        console.error("❌ Error getting document:", error);
         return null;
     }
 };
 
 // Expose to window for other components
+// We attach 'auth' directly so onAuthStateChanged can be used in App.tsx
 window.FirebaseService = {
     auth,
     handleEmailAuth,
@@ -89,5 +115,3 @@ window.FirebaseService = {
     saveCvDocument,
     getCvDocument
 };
-
-console.log("✅ Firebase Service Loaded");
