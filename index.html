@@ -264,6 +264,16 @@
 
     <!-- 3. SPLIT EDİTÖR (FORM + PREVIEW) -->
     <section id="editor-view" class="view-section">
+        <!-- MOBILE TOP TABS -->
+        <div class="mobile-editor-tabs">
+            <button class="mobile-tab-btn active" onclick="switchMobileTab('edit')" id="tab-edit">
+                <span data-i18n="tab_edit">Düzenle</span>
+            </button>
+            <button class="mobile-tab-btn" onclick="switchMobileTab('preview')" id="tab-preview">
+                <span data-i18n="tab_preview">Önizle</span>
+            </button>
+        </div>
+
         <!-- Sidebar Navigation (Desktop Only) -->
         <aside class="sidebar">
             <div class="brand-container">
@@ -386,12 +396,26 @@
 
             <!-- RIGHT PANEL: PREVIEW -->
             <div class="editor-panel-preview" id="panel-preview">
+                <!-- Mobile Fullscreen Button -->
+                <button class="mobile-zoom-btn" onclick="window.print()" aria-label="Fullscreen Preview">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6M9 21H3v-6M21 15v6h-6M3 9V3h6"/></svg>
+                </button>
                 <div id="cv-scale-container">
                     <div class="page cv-content" id="cv-root">
                         <!-- CV Content generated here -->
                     </div>
                 </div>
             </div>
+        </div>
+
+        <!-- NEW MOBILE BOTTOM BAR -->
+        <div class="mobile-bottom-bar">
+            <button class="mobile-action-btn secondary" onclick="openThemeModal()">
+                <span class="icon">🎨</span> <span data-i18n="btn_design">Tasarım</span>
+            </button>
+            <button class="mobile-action-btn primary" onclick="window.print()">
+                <span data-i18n="btn_download_pdf">İndir</span>
+            </button>
         </div>
 
         <!-- NEW MOBILE FLOATING ACTION MENU -->

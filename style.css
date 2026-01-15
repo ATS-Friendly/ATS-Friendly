@@ -689,6 +689,112 @@ body {
     text-transform: uppercase;
 }
 
+/* --- MOBILE TABS & BOTTOM BAR --- */
+.mobile-editor-tabs {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 60px;
+    background: white;
+    z-index: 2000;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    padding: 10px;
+    box-sizing: border-box;
+    gap: 10px;
+}
+
+.mobile-tab-btn {
+    flex: 1;
+    border: none;
+    background: #f1f2f6;
+    color: #747d8c;
+    font-weight: 700;
+    font-size: 14px;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.mobile-tab-btn.active {
+    background: white;
+    color: var(--primary-color);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    border: 1px solid #eee;
+}
+
+.mobile-bottom-bar {
+    display: none;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: white;
+    padding: 15px 20px;
+    box-sizing: border-box;
+    z-index: 2000;
+    box-shadow: 0 -5px 20px rgba(0,0,0,0.05);
+    gap: 15px;
+    border-top: 1px solid #eee;
+}
+
+.mobile-action-btn {
+    flex: 1;
+    padding: 14px;
+    border-radius: 12px;
+    font-weight: 700;
+    font-size: 15px;
+    cursor: pointer;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    transition: 0.2s;
+}
+
+.mobile-action-btn.primary {
+    background: #0082e6; /* Blue like resume.io */
+    color: white;
+    box-shadow: 0 4px 15px rgba(0, 130, 230, 0.3);
+}
+
+.mobile-action-btn.secondary {
+    background: white;
+    color: #2d3436;
+    border: 1px solid #dfe6e9;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.mobile-action-btn:active {
+    transform: scale(0.96);
+}
+
+@media screen and (max-width: 1024px) {
+    .mobile-editor-tabs { display: flex; }
+    .mobile-bottom-bar { display: flex; }
+    
+    .editor-layout {
+        flex-direction: column;
+        padding-left: 0;
+        padding-top: 60px; /* Offset for tabs */
+        padding-bottom: 80px; /* Offset for bottom bar */
+        height: auto;
+        min-height: calc(100vh - 140px);
+    }
+
+    /* Tab-based visibility */
+    #editor-view.show-preview .editor-panel-form { display: none !important; }
+    #editor-view.show-edit .editor-panel-preview { display: none !important; }
+    
+    /* Default visibility if classes not set */
+    .editor-panel-form, .editor-panel-preview { width: 100%; }
+    
+    /* FAB repurposed or hidden - User wants the new structure, so hide FAB to avoid clutter */
+    .mobile-fab-container, .fab-overlay { display: none !important; }
+}
+
 /* --- SPLIT EDITOR LAYOUT --- */
 .editor-layout {
     display: flex;
@@ -850,7 +956,40 @@ textarea.form-input { resize: vertical; }
     color: var(--primary-color);
 }
 
-/* --- THEME & LAYOUT MODAL (Floating on Desktop, Bottom Sheet on Mobile) --- */
+.mobile-zoom-btn {
+    display: none;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    border: none;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    z-index: 10;
+    align-items: center;
+    justify-content: center;
+    color: var(--primary-color);
+    cursor: pointer;
+}
+
+@media screen and (max-width: 1024px) {
+    .mobile-zoom-btn { display: flex; }
+    
+    .editor-panel-preview {
+        background: #f8f9fd; /* Lighter background like resume.io */
+        position: relative;
+        padding-top: 20px !important;
+    }
+    
+    #cv-scale-container {
+        box-shadow: 0 10px 40px rgba(0,0,0,0.08); /* Softer shadow */
+    }
+}
+
+/* --- THEME & LAYOUT MODAL --- */
 #theme-modal, #layout-modal {
     display: none;
     position: fixed;

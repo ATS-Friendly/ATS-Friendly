@@ -100,6 +100,9 @@ const translations = {
         lbl_margin: "Kenar Boşluğu",
         lbl_sectiongap: "Bölüm Aralığı",
         btn_save_close: "Kapat",
+        btn_design: "Özelleştir",
+        tab_edit: "Düzenle",
+        tab_preview: "Önizle",
         // Form Translations
         form_title: "Bilgilerinizi Düzenleyin",
         form_personal: "Kişisel Bilgiler",
@@ -168,6 +171,9 @@ const translations = {
         lbl_margin: "Margin",
         lbl_sectiongap: "Section Gap",
         btn_save_close: "Close",
+        btn_design: "Customize",
+        tab_edit: "Edit",
+        tab_preview: "Preview",
         // Form Translations
         form_title: "Edit Your Details",
         form_personal: "Personal Details",
@@ -242,7 +248,35 @@ function updateAuthUI() {
 window.showView = (viewId) => {
     document.querySelectorAll('.view-section').forEach(v => v.classList.remove('active'));
     const target = document.getElementById(viewId);
-    if (target) target.classList.add('active');
+    if (target) {
+        target.classList.add('active');
+        // Default mobile tab
+        if (viewId === 'editor-view' && window.innerWidth <= 1024) {
+            window.switchMobileTab('edit');
+        }
+    }
+};
+
+window.switchMobileTab = (tab) => {
+    const editorView = document.getElementById('editor-view');
+    const tabEdit = document.getElementById('tab-edit');
+    const tabPreview = document.getElementById('tab-preview');
+    
+    if (tab === 'edit') {
+        editorView.classList.add('show-edit');
+        editorView.classList.remove('show-preview');
+        tabEdit.classList.add('active');
+        tabPreview.classList.remove('active');
+        // Scroll to top of form
+        document.getElementById('panel-form').scrollTop = 0;
+    } else {
+        editorView.classList.add('show-preview');
+        editorView.classList.remove('show-edit');
+        tabPreview.classList.add('active');
+        tabEdit.classList.remove('active');
+        // Recalculate preview scale when switching to preview
+        setTimeout(window.resizePreview, 50);
+    }
 };
 
 
