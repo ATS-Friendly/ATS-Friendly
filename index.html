@@ -54,15 +54,15 @@
       console.log("System initializing...");
     </script>
 
+    <!-- Babel Standalone -->
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     
+    <!-- Import Map -->
     <script type="importmap">
     {
       "imports": {
         "react": "https://esm.sh/react@18.2.0",
-        "react-dom/client": "https://esm.sh/react-dom@18.2.0/client",
-        "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
-        "react/": "https://esm.sh/react@^19.2.3/"
+        "react-dom/client": "https://esm.sh/react-dom@18.2.0/client"
       }
     }
     </script>
@@ -77,6 +77,11 @@
 
     <div id="root"></div>
 
+    <!-- 
+      INLINED SCRIPTS START HERE
+    -->
+
+    <!-- 1. Mock Service -->
     <script type="text/babel" data-type="module" data-presets="typescript,react">
         console.log("🛠️ Mock Service initializing (Frontend Only Mode)...");
 
@@ -165,9 +170,9 @@
             saveCvDocument,
             getCvDocument
         };
-        console.log("✅ Mock Service Ready.");
     </script>
 
+    <!-- 2. TemplateView -->
     <script type="text/babel" data-type="module" data-presets="typescript,react">
         import React from 'react';
 
@@ -196,7 +201,7 @@
                     onClick={() => onSelectTemplate('tpl-compact')}
                 >
                   <div className="overflow-hidden aspect-[210/297] bg-gray-100">
-                      <img src="https://picsum.photos/seed/compactCV/420/594" alt="Kompakt" className="object-cover object-top w-full h-full" />
+                     <img src="https://picsum.photos/seed/compactCV/420/594" alt="Kompakt" className="object-cover object-top w-full h-full" />
                   </div>
                   <div className="p-6 text-center">
                     <h3 className="text-xl font-bold">Kompakt</h3>
@@ -210,6 +215,7 @@
         window.TemplateView = TemplateView;
     </script>
 
+    <!-- 3. LandingView -->
     <script type="text/babel" data-type="module" data-presets="typescript,react">
         import React from 'react';
 
@@ -293,6 +299,7 @@
         window.LandingView = LandingView;
     </script>
 
+    <!-- 4. AuthView -->
     <script type="text/babel" data-type="module" data-presets="typescript,react">
         import React, { useState } from 'react';
 
@@ -384,6 +391,7 @@
         window.AuthView = AuthView;
     </script>
 
+    <!-- 5. EditorView -->
     <script type="text/babel" data-type="module" data-presets="typescript,react">
         import React, { useState, useEffect, useRef, useCallback } from 'react';
 
@@ -542,7 +550,6 @@
                 return () => window.removeEventListener('resize', handleResize);
             }, []);
 
-            // --- FIXED SCALING LOGIC ---
             useEffect(() => {
                 const resizePreview = () => {
                     const scaleContainer = cvScaleContainerRef.current;
@@ -550,48 +557,34 @@
 
                     if (!scaleContainer || !cvRoot) return;
 
-                    // A4 Width in px (approx)
-                    const originalWidth = 794; 
-
                     if (!isMobile) {
-                        // Desktop Mode: Reset styles
                         cvRoot.style.transform = 'scale(1)';
                         cvRoot.style.transformOrigin = 'top center';
-                        cvRoot.style.marginLeft = '0px';
                         scaleContainer.style.width = 'auto';
                         scaleContainer.style.height = 'auto';
-                        scaleContainer.style.overflow = 'visible';
                         return;
                     }
 
-                    // Mobile Mode: Precise Scaling
-                    const padding = 32; // 1rem padding on each side
+                    // Mobile Scaling Logic - FIXED FOR CENTERING
+                    const originalWidth = 794; // approx 210mm
+                    const padding = 20; // safe area
                     const availableWidth = window.innerWidth - padding;
-                    
-                    // Calculate scale factor
                     const scale = Math.min(1, availableWidth / originalWidth);
 
-                    // Apply Scale
+                    cvRoot.style.transformOrigin = 'top center';
                     cvRoot.style.transform = `scale(${scale})`;
-                    cvRoot.style.transformOrigin = 'top left'; // Important: Scale from top-left
+                    
+                    const scaledHeight = 1123 * scale; // 297mm height approx in px
 
-                    // Center the Scaled Element Manually
-                    // Formula: (Container Width - (Original Width * Scale)) / 2
-                    const scaledWidth = originalWidth * scale;
-                    const leftOffset = (window.innerWidth - scaledWidth) / 2;
-                    
-                    cvRoot.style.marginLeft = `${leftOffset}px`; // Apply centering
-                    
-                    // Force the container height to match the new scaled height
-                    // Adding extra padding at bottom for better scrolling
-                    const scaledHeight = cvRoot.scrollHeight * scale;
+                    // Force height on container so scroll works, but layout is flex-centered
                     scaleContainer.style.width = '100%';
-                    scaleContainer.style.height = `${scaledHeight + 100}px`; 
-                    scaleContainer.style.overflow = 'hidden';
+                    scaleContainer.style.height = `${scaledHeight + 50}px`; 
+                    scaleContainer.style.display = 'flex';
+                    scaleContainer.style.justifyContent = 'center';
                 };
 
+                // Add delay to ensure DOM is ready
                 if (isMobile && mobileTab === 'preview') {
-                    // Slight delay to ensure DOM is rendered
                     setTimeout(resizePreview, 50);
                 } else if (!isMobile) {
                     resizePreview();
@@ -666,9 +659,9 @@
                                 </div>
                             </div>
 
-                            {/* Preview Section */}
+                            {/* Preview Section - UPDATED CONTAINER */}
                             <div className={`bg-gray-200 overflow-y-auto overflow-x-hidden flex justify-center h-full ${isMobile && mobileTab !== 'preview' ? 'hidden' : 'flex'} ${!isMobile ? 'items-start py-8' : 'items-start pt-4'}`}>
-                                <div ref={cvScaleContainerRef} className="print-area transition-all duration-300 ease-out origin-top">
+                                <div ref={cvScaleContainerRef} className="print-area transition-all duration-300 ease-out origin-top relative">
                                    <CVPreview cvData={cvData} cvRootRef={cvRootRef} />
                                 </div>
                             </div>
@@ -701,6 +694,7 @@
         window.EditorView = EditorView;
     </script>
 
+    <!-- 6. App -->
     <script type="text/babel" data-type="module" data-presets="typescript,react">
         import React, { useState, useEffect } from 'react';
 
@@ -773,6 +767,7 @@
         window.App = App;
     </script>
 
+    <!-- 7. Index -->
     <script type="text/babel" data-type="module" data-presets="typescript,react">
         import React from 'react';
         import ReactDOM from 'react-dom/client';
