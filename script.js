@@ -220,8 +220,51 @@ window.toggleMobileView = (mode) => {
         layout.classList.remove('mobile-show-form');
         btnForm.classList.remove('active');
         btnPreview.classList.add('active');
+        
+        // Trigger resize to scale content after it becomes visible
+        setTimeout(window.resizePreview, 50);
     }
 };
+
+// --- AUTO SCALE PREVIEW FOR MOBILE ---
+window.resizePreview = () => {
+    if (window.innerWidth > 1024) {
+        // Desktop: Reset
+        const container = document.getElementById('cv-scale-container');
+        if(container) container.style.transform = 'none';
+        return;
+    }
+
+    const previewPanel = document.getElementById('panel-preview');
+    const scaleContainer = document.getElementById('cv-scale-container');
+    const page = document.getElementById('cv-root');
+    
+    if (!previewPanel || !scaleContainer || !page) return;
+
+    // Calculate available width vs needed width
+    // 210mm is approx 794px at 96dpi. We use scrollWidth to get the real pixel width.
+    const pageWidth = 794; // Standard A4 width in pixels roughly
+    const availableWidth = previewPanel.clientWidth - 20; // 20px padding
+    
+    const scale = availableWidth / pageWidth;
+    
+    if (scale < 1) {
+        scaleContainer.style.transform = `scale(${scale})`;
+        // Adjust the height of the container so scrolling works properly with the scaled content
+        // 1123 is approx A4 height in pixels
+        const scaledHeight = 1123 * scale;
+        scaleContainer.style.height = scaledHeight + 'px';
+        scaleContainer.style.width = pageWidth + 'px'; // Fix width to prevent wrapping before scale
+    } else {
+        scaleContainer.style.transform = 'none';
+        scaleContainer.style.height = 'auto';
+        scaleContainer.style.width = 'auto';
+    }
+};
+
+// Listen for window resize
+window.addEventListener('resize', window.resizePreview);
+
 
 // --- MODAL YÖNETİMİ (TEMA & LAYOUT) ---
 function openModal(modalId) {
@@ -229,7 +272,7 @@ function openModal(modalId) {
     modal.classList.add('active');
     
     // Center modal or simple fixed positioning for mobile stability
-    if(window.innerWidth > 768) {
+    if(window.innerWidth > 1024) {
         if (!modal.style.top || !modal.style.left) {
             modal.style.top = "100px";
             const initialLeft = Math.max(20, window.innerWidth - 360);
@@ -237,11 +280,12 @@ function openModal(modalId) {
         }
         initDragElement(modal.querySelector('.modal-content'));
     } else {
-        // Mobile positioning defaults
-        modal.style.top = "50px";
-        modal.style.left = "50%";
-        modal.querySelector('.modal-content').style.transform = "translateX(-50%)";
-        modal.querySelector('.modal-content').style.width = "90%";
+        // Mobile positioning handled by CSS (bottom sheet)
+        // Reset inline styles if any
+        const content = modal.querySelector('.modal-content');
+        content.style.top = '';
+        content.style.left = '';
+        content.style.transform = '';
     }
 }
 
@@ -675,6 +719,11 @@ window.generateCVFromForm = () => {
 
     document.getElementById('cv-root').innerHTML = html;
     saveToCloud(data); // Save the form data structure
+    
+    // Trigger scale update if on mobile preview
+    if(window.innerWidth <= 1024) {
+        setTimeout(window.resizePreview, 10);
+    }
 };
 
 function loadUserDataIntoForm(data) {
