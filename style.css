@@ -1310,16 +1310,17 @@ body.tpl-compact .entry .left-col { position: absolute; top: 0; right: 0; width:
 body.tpl-compact .entry .right-col { width: 100%; padding-right: 130px; }
 
 @media print {
-    body { background: white; padding: 0; margin: 0; display: block; }
     @page {
-        margin: 0; /* Clear browser default margins */
-        size: auto;
+        margin: 0;
+        size: A4;
     }
-    body { 
-        background: white; 
-        padding: 0; 
-        margin: 0; 
-        display: block; 
+    html, body { 
+        background: white !important; 
+        padding: 0 !important; 
+        margin: 0 !important; 
+        display: block !important; 
+        width: 100% !important;
+        height: auto !important;
         -webkit-print-color-adjust: exact;
         print-color-adjust: exact;
     }
@@ -1377,7 +1378,7 @@ body.tpl-compact .entry .right-col { width: 100%; padding-right: 130px; }
         width: 794px !important; 
         max-width: 794px !important;
         margin: 0 auto !important; 
-        padding: 113px 95px 95px 95px !important;
+        padding: 140px 95px 95px 95px !important; /* Increased top padding to match reference exactly */
         box-shadow: none !important; 
         border: none !important;
         overflow: visible !important;
