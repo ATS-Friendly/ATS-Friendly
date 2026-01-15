@@ -22,7 +22,7 @@
     
     --cv-font-size: 11pt;
     --cv-line-height: 1.4;
-    --cv-padding: 20mm;
+    --cv-padding: 25mm; /* Increased for better professional margins */
     --cv-section-gap: 15px;
 }
 
@@ -1234,6 +1234,7 @@ input[type=range] {
 
 header { 
     text-align: center; 
+    margin-top: 15mm; /* Professional top breathing room */
     margin-bottom: 30px; 
     border-bottom: 2px solid var(--cv-accent-color); 
     padding-bottom: 25px; 
@@ -1347,7 +1348,15 @@ body.tpl-compact .entry .right-col { width: 100%; padding-right: 130px; }
         width: 100% !important;
     }
     
-    #cv-scale-container, #cv-root { 
+    #cv-scale-container {
+        transform: none !important;
+        width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        display: block !important;
+    }
+
+    #cv-root { 
         transform: none !important; 
         width: 210mm !important;
         max-width: 210mm !important;
@@ -1358,7 +1367,6 @@ body.tpl-compact .entry .right-col { width: 100%; padding-right: 130px; }
         overflow: visible !important;
         display: block !important;
         position: static !important;
-        /* Reset any custom zoom/scale */
         zoom: 1 !important;
     }
     
@@ -1373,7 +1381,6 @@ body.tpl-compact .entry .right-col { width: 100%; padding-right: 130px; }
         min-height: 297mm !important;
         background: white !important;
         page-break-after: always;
-        /* Force exact size for print engines */
         box-sizing: border-box !important;
     }
 }

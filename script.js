@@ -359,13 +359,13 @@ window.onbeforeprint = () => {
     const cvRoot = document.getElementById('cv-root');
     const scaleContainer = document.getElementById('cv-scale-container');
     if (cvRoot && scaleContainer) {
-        // Clear inline styles that might interfere with print CSS
-        cvRoot.style.transform = 'none';
-        cvRoot.style.width = '210mm';
-        cvRoot.style.margin = '0 auto';
-        scaleContainer.style.transform = 'none';
-        scaleContainer.style.width = '85%';
-        scaleContainer.style.height = 'auto';
+        // Clear inline styles to let @media print CSS take full control
+        cvRoot.style.transform = '';
+        cvRoot.style.width = '';
+        cvRoot.style.margin = '';
+        scaleContainer.style.transform = '';
+        scaleContainer.style.width = '';
+        scaleContainer.style.height = '';
     }
 };
 
