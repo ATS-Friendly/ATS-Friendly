@@ -1,7 +1,6 @@
-
 <!DOCTYPE html>
 <html lang="en">
-  <head>
+<head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>ATS-Friendly CV Builder</title>
@@ -47,8 +46,7 @@
         if (overlay && content) {
           overlay.style.display = 'block';
           const time = new Date().toLocaleTimeString();
-          const filename = url ? url.split('/').pop() : 'inline';
-          content.innerText += `[${time}] ${msg}\nFile: ${filename}:${line}\n\n`;
+          content.innerText += `[${time}] ${msg}\nLine: ${line}\n\n`;
         }
         console.error('Global Error:', msg, error);
         return false; 
@@ -59,10 +57,7 @@
     <!-- Babel Standalone -->
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     
-    <!-- 
-      Clean Import Map (NO FIREBASE)
-      We are running in Mock Mode.
-    -->
+    <!-- Import Map -->
     <script type="importmap">
 {
   "imports": {
@@ -73,8 +68,8 @@
   }
 }
 </script>
-  </head>
-  <body>
+</head>
+<body>
     <div id="debug-overlay">
       <h1 class="text-2xl font-bold mb-4">⚠️ Uygulama Hatası</h1>
       <p class="mb-4">Uygulama yüklenirken bir sorun oluştu.</p>
@@ -83,13 +78,728 @@
     </div>
 
     <div id="root"></div>
-    
-    <script type="text/babel" data-type="module" data-presets="typescript,react" src="./services/firebaseService.ts"></script>
-    <script type="text/babel" data-type="module" data-presets="typescript,react" src="./components/TemplateView.tsx"></script>
-    <script type="text/babel" data-type="module" data-presets="typescript,react" src="./components/LandingView.tsx"></script>
-    <script type="text/babel" data-type="module" data-presets="typescript,react" src="./components/AuthView.tsx"></script>
-    <script type="text/babel" data-type="module" data-presets="typescript,react" src="./components/EditorView.tsx"></script>
-    <script type="text/babel" data-type="module" data-presets="typescript,react" src="./App.tsx"></script>
-    <script type="text/babel" data-type="module" data-presets="typescript,react" src="./index.tsx"></script>
-  </body>
+
+    <!-- 
+      INLINED SCRIPTS START HERE
+      We are inlining all code to prevent 404 errors on file fetching.
+    -->
+
+    <!-- 1. Mock Service -->
+    <script type="text/babel" data-type="module" data-presets="typescript,react">
+        console.log("🛠️ Mock Service initializing (Frontend Only Mode)...");
+
+        // --- Mock State ---
+        const LOCAL_STORAGE_USER_KEY = 'ats_mock_user';
+        const LOCAL_STORAGE_DATA_KEY = 'ats_mock_data';
+
+        const authObservers = [];
+
+        const getMockUser = () => {
+            const stored = localStorage.getItem(LOCAL_STORAGE_USER_KEY);
+            return stored ? JSON.parse(stored) : null;
+        };
+
+        const auth = {
+            currentUser: getMockUser()
+        };
+
+        const notifyObservers = (user) => {
+            auth.currentUser = user;
+            authObservers.forEach(cb => cb(user));
+        };
+
+        const onAuthStateChanged = (authInstance, callback) => {
+            authObservers.push(callback);
+            callback(getMockUser());
+            return () => {
+                const index = authObservers.indexOf(callback);
+                if (index > -1) authObservers.splice(index, 1);
+            };
+        };
+
+        const handleEmailAuth = async (isLogin, email, password) => {
+            console.log(`[MockAuth] ${isLogin ? 'Login' : 'Register'} with ${email}`);
+            await new Promise(resolve => setTimeout(resolve, 800));
+            const user = {
+                uid: 'mock-user-' + Math.random().toString(36).substr(2, 9),
+                email: email,
+                displayName: email.split('@')[0]
+            };
+            localStorage.setItem(LOCAL_STORAGE_USER_KEY, JSON.stringify(user));
+            notifyObservers(user);
+            return user;
+        };
+
+        const loginWithGoogle = async () => {
+            console.log("[MockAuth] Google Login");
+            await new Promise(resolve => setTimeout(resolve, 800));
+            const user = {
+                uid: 'mock-google-user-123',
+                email: 'google-user@example.com',
+                displayName: 'Google User'
+            };
+            localStorage.setItem(LOCAL_STORAGE_USER_KEY, JSON.stringify(user));
+            notifyObservers(user);
+            return user;
+        };
+
+        const logout = async () => {
+            console.log("[MockAuth] Logout");
+            localStorage.removeItem(LOCAL_STORAGE_USER_KEY);
+            notifyObservers(null);
+        };
+
+        const saveCvDocument = async (userId, data) => {
+            console.log(`[MockDB] Saving data for ${userId}`);
+            await new Promise(resolve => setTimeout(resolve, 500));
+            const allData = JSON.parse(localStorage.getItem(LOCAL_STORAGE_DATA_KEY) || '{}');
+            allData[userId] = data;
+            localStorage.setItem(LOCAL_STORAGE_DATA_KEY, JSON.stringify(allData));
+        };
+
+        const getCvDocument = async (userId) => {
+            console.log(`[MockDB] Fetching data for ${userId}`);
+            await new Promise(resolve => setTimeout(resolve, 300));
+            const allData = JSON.parse(localStorage.getItem(LOCAL_STORAGE_DATA_KEY) || '{}');
+            return allData[userId] || null;
+        };
+
+        window.FirebaseService = {
+            auth,
+            onAuthStateChanged,
+            handleEmailAuth,
+            loginWithGoogle,
+            logout,
+            saveCvDocument,
+            getCvDocument
+        };
+        console.log("✅ Mock Service Ready.");
+    </script>
+
+    <!-- 2. TemplateView -->
+    <script type="text/babel" data-type="module" data-presets="typescript,react">
+        import React from 'react';
+
+        const TemplateView = ({ onSelectTemplate }) => {
+          return (
+            <div className="flex flex-col items-center justify-center min-h-screen p-4 bg-gray-50">
+              <div className="text-center">
+                <h1 className="text-3xl font-bold text-gray-800 md:text-4xl">Profesyonel Bir Şablon Seçin</h1>
+                <p className="mt-2 text-gray-600">CV'niz için bir başlangıç noktası seçin.</p>
+              </div>
+              <div className="grid grid-cols-1 gap-8 mt-12 md:grid-cols-2 max-w-4xl">
+                <div 
+                    className="overflow-hidden bg-white border-4 border-transparent rounded-lg shadow-lg cursor-pointer hover:border-blue-500 hover:scale-105 transform transition-all duration-300 group"
+                    onClick={() => onSelectTemplate('tpl-classic')}
+                >
+                  <div className="overflow-hidden aspect-[210/297] bg-gray-100">
+                    <img src="https://picsum.photos/seed/classicCV/420/594" alt="Klasik" className="object-cover object-top w-full h-full" />
+                  </div>
+                  <div className="p-6 text-center">
+                    <h3 className="text-xl font-bold">Klasik</h3>
+                    <p className="text-sm text-gray-500">🏛️ Geleneksel & Akademik</p>
+                  </div>
+                </div>
+                <div 
+                    className="overflow-hidden bg-white border-4 border-transparent rounded-lg shadow-lg cursor-pointer hover:border-blue-500 hover:scale-105 transform transition-all duration-300 group"
+                    onClick={() => onSelectTemplate('tpl-compact')}
+                >
+                  <div className="overflow-hidden aspect-[210/297] bg-gray-100">
+                     <img src="https://picsum.photos/seed/compactCV/420/594" alt="Kompakt" className="object-cover object-top w-full h-full" />
+                  </div>
+                  <div className="p-6 text-center">
+                    <h3 className="text-xl font-bold">Kompakt</h3>
+                    <p className="text-sm text-gray-500">📄 Minimal & Tek Sayfa</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          );
+        };
+        window.TemplateView = TemplateView;
+    </script>
+
+    <!-- 3. LandingView -->
+    <script type="text/babel" data-type="module" data-presets="typescript,react">
+        import React from 'react';
+
+        const LandingView = ({ setView }) => {
+          const scrollToFeatures = () => {
+            document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' });
+          };
+
+          return (
+            <div className="bg-white">
+              <header className="sticky top-0 z-10 flex items-center justify-between px-6 py-4 bg-white shadow-sm md:px-10">
+                <div className="flex items-center gap-3">
+                  <div className="flex items-center justify-center w-10 h-10 text-xl font-bold text-white bg-gray-800 rounded-md">AF</div>
+                  <div className="text-lg font-bold text-gray-800">ATS-Friendly</div>
+                </div>
+                <div className="flex items-center gap-4">
+                  <button className="text-sm font-semibold text-gray-700 hover:text-blue-600" onClick={() => setView('auth')}>Giriş Yap</button>
+                  <button className="px-4 py-2 text-sm font-bold text-white bg-blue-600 rounded-lg hover:bg-blue-700" onClick={() => setView('auth')}>Kayıt Ol</button>
+                </div>
+              </header>
+
+              <main className="grid max-w-6xl grid-cols-1 gap-8 px-6 py-16 mx-auto md:grid-cols-2 md:py-24 lg:py-32 md:px-10">
+                <div className="flex flex-col justify-center text-center md:text-left">
+                  <h1 className="text-4xl font-extrabold leading-tight text-gray-800 md:text-5xl lg:text-6xl">
+                    İşe Alım Robotlarını<br />
+                    <span className="text-blue-600">Yenecek CV'nizi Oluşturun</span>
+                  </h1>
+                  <p className="mt-4 text-lg text-gray-600 md:text-xl">
+                    Modern işe alım sistemleri (ATS) ile %100 uyumlu, profesyonel ve sade CV'ler hazırlayın. Üstelik tamamen ücretsiz.
+                  </p>
+                  <div className="flex flex-col items-center justify-center gap-4 mt-8 sm:flex-row md:justify-start">
+                    <button className="w-full px-8 py-4 text-lg font-bold text-white bg-blue-600 rounded-lg sm:w-auto hover:bg-blue-700" onClick={() => setView('auth')}>Hemen Ücretsiz Başla</button>
+                    <button className="w-full px-8 py-4 text-lg font-bold text-gray-700 bg-gray-200 rounded-lg sm:w-auto hover:bg-gray-300" onClick={scrollToFeatures}>Nasıl Çalışır?</button>
+                  </div>
+                </div>
+                <div className="flex items-center justify-center">
+                  <div className="w-full max-w-sm p-2 transition-transform duration-500 transform bg-white border border-gray-200 rounded-xl shadow-2xl hover:scale-105 hover:rotate-[-1deg]">
+                    <div className="flex items-center gap-2 p-3 border-b border-gray-100">
+                      <span className="w-3 h-3 bg-red-400 rounded-full"></span>
+                      <span className="w-3 h-3 bg-yellow-400 rounded-full"></span>
+                      <span className="w-3 h-3 bg-green-400 rounded-full"></span>
+                    </div>
+                    <div className="p-6">
+                      <div className="w-3/5 h-6 mb-4 bg-gray-200 rounded-md"></div>
+                      <div className="w-4/5 h-4 mb-6 bg-gray-200 rounded-md"></div>
+                      <div className="w-full h-4 mb-2 bg-gray-200 rounded-md"></div>
+                      <div className="w-full h-4 mb-2 bg-gray-200 rounded-md"></div>
+                      <div className="w-2/3 h-4 bg-gray-200 rounded-md"></div>
+                      <div className="inline-block px-4 py-2 mt-6 font-bold text-white bg-green-500 rounded-full">ATS Score: 98/100</div>
+                    </div>
+                  </div>
+                </div>
+              </main>
+
+              <section id="features" className="py-20 bg-gray-50">
+                <div className="grid max-w-6xl grid-cols-1 gap-8 px-6 mx-auto md:grid-cols-3 md:px-10">
+                  <div className="p-8 text-center bg-white border border-gray-200 rounded-lg shadow-sm">
+                    <div className="mb-4 text-5xl">🤖</div>
+                    <h3 className="mb-2 text-xl font-bold text-gray-800">ATS Dostu Format</h3>
+                    <p className="text-gray-600">Karmaşık grafikler yok. İnsan kaynakları yazılımlarının (ATS) kolayca okuyabileceği temiz kod yapısı.</p>
+                  </div>
+                  <div className="p-8 text-center bg-white border border-gray-200 rounded-lg shadow-sm">
+                    <div className="mb-4 text-5xl">💸</div>
+                    <h3 className="mb-2 text-xl font-bold text-gray-800">%100 Ücretsiz</h3>
+                    <p className="text-gray-600">Gizli ödeme yok, filigran yok. Sınırsız düzenleme ve PDF indirme hakkı.</p>
+                  </div>
+                  <div className="p-8 text-center bg-white border border-gray-200 rounded-lg shadow-sm">
+                    <div className="mb-4 text-5xl">☁️</div>
+                    <h3 className="mb-2 text-xl font-bold text-gray-800">Bulut Kayıt</h3>
+                    <p className="text-gray-600">CV'niz bulutta güvende. İstediğiniz cihazdan (PC veya Mobil) kaldığınız yerden devam edin.</p>
+                  </div>
+                </div>
+              </section>
+
+              <footer className="py-8 text-center bg-white border-t border-gray-200">
+                <p className="text-sm text-gray-500">&copy; 2024 ATS-Friendly CV Maker. Tüm hakları saklıdır.</p>
+              </footer>
+            </div>
+          );
+        };
+        window.LandingView = LandingView;
+    </script>
+
+    <!-- 4. AuthView -->
+    <script type="text/babel" data-type="module" data-presets="typescript,react">
+        import React, { useState } from 'react';
+
+        const AuthView = ({ setView }) => {
+          const [isLoginMode, setIsLoginMode] = useState(true);
+          const [email, setEmail] = useState('');
+          const [password, setPassword] = useState('');
+          const [error, setError] = useState('');
+          const [loading, setLoading] = useState(false);
+
+          const onSubmit = async (e) => {
+            e.preventDefault();
+            setError('');
+            setLoading(true);
+            
+            const { handleEmailAuth } = window.FirebaseService;
+
+            try {
+              await handleEmailAuth(isLoginMode, email, password);
+            } catch (err) {
+              setError(err.message || 'Bir hata oluştu.');
+            } finally {
+              setLoading(false);
+            }
+          };
+
+          const onGoogleLogin = async () => {
+            setError('');
+            const { loginWithGoogle } = window.FirebaseService;
+            try {
+              await loginWithGoogle();
+            } catch (err) {
+              setError(err.message || 'Google ile giriş yapılamadı.');
+            }
+          };
+
+          return (
+            <div className="flex flex-col items-center justify-center min-h-screen p-4 bg-gray-100">
+                <button onClick={() => setView('landing')} className="absolute text-sm font-semibold text-gray-600 top-5 left-5 hover:text-blue-600">
+                    ← Ana Sayfa
+                </button>
+              <div className="w-full max-w-md p-8 bg-white rounded-lg shadow-md">
+                <div className="mb-6 text-center">
+                  <div className="flex items-center justify-center w-12 h-12 mx-auto mb-4 text-2xl font-bold text-white bg-gray-800 rounded-lg">AF</div>
+                  <h2 className="text-2xl font-bold text-gray-800">{isLoginMode ? 'Hesabınıza Giriş Yapın' : 'Ücretsiz Hesap Oluşturun'}</h2>
+                  <p className="text-gray-500">{isLoginMode ? "CV'nizi düzenlemeye devam edin" : 'Kredi kartı gerekmez'}</p>
+                </div>
+
+                {error && <p className="mb-4 text-sm text-center text-red-500">{error}</p>}
+
+                <form onSubmit={onSubmit}>
+                  <div className="mb-4">
+                    <label className="block mb-1 text-sm font-bold text-gray-600" htmlFor="email">E-posta Adresi</label>
+                    <input 
+                        type="email" id="email" value={email} onChange={(e) => setEmail(e.target.value)}
+                        className="w-full px-3 py-2 leading-tight text-gray-700 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        placeholder="ornek@email.com" required 
+                    />
+                  </div>
+                  <div className="mb-6">
+                    <label className="block mb-1 text-sm font-bold text-gray-600" htmlFor="password">Şifre</label>
+                    <input 
+                        type="password" id="password" value={password} onChange={(e) => setPassword(e.target.value)}
+                        className="w-full px-3 py-2 leading-tight text-gray-700 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" 
+                        placeholder="••••••••" required 
+                    />
+                  </div>
+                  <button type="submit" disabled={loading} className="w-full px-4 py-2 font-bold text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 disabled:bg-blue-300">
+                    {loading ? 'İşleniyor...' : (isLoginMode ? 'Giriş Yap' : 'Kayıt Ol')}
+                  </button>
+                </form>
+
+                <div className="my-6 text-center text-xs font-bold text-gray-400 uppercase">Veya</div>
+
+                <button onClick={onGoogleLogin} className="flex items-center justify-center w-full gap-3 px-4 py-2 font-semibold text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-200">
+                    Google ile Devam Et
+                </button>
+                
+                <p className="mt-6 text-sm text-center text-gray-600">
+                  {isLoginMode ? 'Hesabın yok mu? ' : 'Zaten hesabın var mı? '}
+                  <button onClick={() => setIsLoginMode(!isLoginMode)} className="font-bold text-blue-600 hover:underline">
+                    {isLoginMode ? 'Hemen Kayıt Ol' : 'Giriş Yap'}
+                  </button>
+                </p>
+              </div>
+            </div>
+          );
+        };
+        window.AuthView = AuthView;
+    </script>
+
+    <!-- 5. EditorView -->
+    <script type="text/babel" data-type="module" data-presets="typescript,react">
+        import React, { useState, useEffect, useRef, useCallback } from 'react';
+
+        const generateId = () => `id_${new Date().getTime()}_${Math.random()}`;
+
+        const initialFormData = {
+            fullname: "Adınız Soyadınız",
+            title: "Unvanınız",
+            email: "email@adresiniz.com",
+            phone: "555-123-4567",
+            address: "Şehir, Ülke",
+            birthplace: "",
+            license: "",
+            summary: "Kariyer hedeflerinizi ve becerilerinizi özetleyen kısa bir bölüm.",
+            experiences: [],
+            education: [],
+            customSections: [],
+        };
+
+        const initialCvDoc = {
+            formData: initialFormData,
+            template: 'tpl-classic',
+            theme: { color: '#2c3e50', font: 'ptserif' },
+            layout: { fontSize: 11, lineHeight: 1.4, margin: 20, sectionGap: 15 },
+        };
+
+        const CVPreview = ({ cvData, cvRootRef }) => {
+            const { formData, template } = cvData;
+            const isCompact = template === 'tpl-compact';
+            const accentStyle = { color: cvData.theme.color };
+            const borderStyle = { borderColor: cvData.theme.color };
+
+            return (
+                <div ref={cvRootRef} className="p-[20mm] bg-white w-[210mm] min-h-[297mm] cv-preview-font text-black shadow-lg" style={{
+                    fontSize: `${cvData.layout.fontSize}pt`,
+                    lineHeight: cvData.layout.lineHeight,
+                    boxSizing: 'border-box'
+                }}>
+                    <header className="pb-6 mb-8 text-center" style={{...borderStyle, borderBottomWidth: '2px'}}>
+                        <h1 className="text-4xl font-bold tracking-widest uppercase" style={accentStyle}>{formData.fullname || 'Ad Soyad'}</h1>
+                        <p className="text-lg">{formData.title || 'Unvan'}</p>
+                        {!isCompact && (
+                            <div className="flex justify-center gap-4 mt-2 text-sm text-gray-600">
+                                <span>📍 {formData.address}</span>
+                                <span>📞 {formData.phone}</span>
+                                <span>✉️ {formData.email}</span>
+                            </div>
+                        )}
+                        {isCompact && (
+                            <div className="mt-4 text-sm">
+                                <p>{formData.address}</p>
+                                <div className="flex justify-center gap-4 font-semibold" style={accentStyle}>
+                                    <span>{formData.phone}</span>
+                                    <span>{formData.email}</span>
+                                </div>
+                            </div>
+                        )}
+                    </header>
+                    <main className="space-y-6">
+                        <section>
+                            <h2 className="pb-2 mb-4 text-sm font-bold tracking-widest uppercase border-b-2" style={{...borderStyle, ...accentStyle}}>Profil</h2>
+                            <p className="text-gray-700">{formData.summary}</p>
+                        </section>
+                        {formData.experiences.length > 0 && <section>
+                            <h2 className="pb-2 mb-4 text-sm font-bold tracking-widest uppercase border-b-2" style={{...borderStyle, ...accentStyle}}>İş Deneyimi</h2>
+                            <div className="space-y-4">
+                                {formData.experiences.map((exp) => (
+                                    <div key={exp.id} className="grid grid-cols-4 gap-4">
+                                        <div className="text-xs font-bold text-gray-600 col-span-1">{exp.date}</div>
+                                        <div className="col-span-3">
+                                            <h3 className="font-bold">{exp.title}, <span className="font-normal text-gray-800">{exp.company}</span></h3>
+                                            <p className="text-sm text-gray-700 whitespace-pre-wrap">{exp.desc}</p>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </section>}
+                        {formData.education.length > 0 && <section>
+                            <h2 className="pb-2 mb-4 text-sm font-bold tracking-widest uppercase border-b-2" style={{...borderStyle, ...accentStyle}}>Eğitim</h2>
+                            <div className="space-y-4">
+                                {formData.education.map((edu) => (
+                                    <div key={edu.id} className="grid grid-cols-4 gap-4">
+                                        <div className="text-xs font-bold text-gray-600 col-span-1">{edu.date}</div>
+                                        <div className="col-span-3">
+                                            <h3 className="font-bold">{edu.degree}</h3>
+                                            <p className="text-sm text-gray-700">{edu.school}</p>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </section>}
+                        {formData.customSections.map((sec) => (
+                            <section key={sec.id}>
+                                <h2 className="pb-2 mb-4 text-sm font-bold tracking-widest uppercase border-b-2" style={{...borderStyle, ...accentStyle}}>{sec.title}</h2>
+                                <p className="text-gray-700 whitespace-pre-wrap">{sec.content}</p>
+                            </section>
+                        ))}
+                    </main>
+                </div>
+            );
+        };
+
+        const EditorView = ({ user, setView }) => {
+            const { getCvDocument, saveCvDocument, logout } = window.FirebaseService;
+            const TemplateView = window.TemplateView;
+
+            const [cvData, setCvData] = useState(null);
+            const [mobileTab, setMobileTab] = useState('edit');
+            const [isMobile, setIsMobile] = useState(window.innerWidth <= 1024);
+
+            const cvScaleContainerRef = useRef(null);
+            const cvRootRef = useRef(null);
+            const debounceTimeoutRef = useRef(null);
+
+            const debouncedSave = useCallback((data) => {
+                if (debounceTimeoutRef.current) {
+                    clearTimeout(debounceTimeoutRef.current);
+                }
+                debounceTimeoutRef.current = window.setTimeout(() => {
+                    saveCvDocument(user.uid, data);
+                }, 1500);
+            }, [user.uid, saveCvDocument]);
+
+            useEffect(() => {
+                const fetchCvData = async () => {
+                    const doc = await getCvDocument(user.uid);
+                    if (doc) {
+                        setCvData(doc);
+                    } else {
+                        setCvData(null); 
+                    }
+                };
+                fetchCvData();
+            }, [user.uid, getCvDocument]);
+            
+            const updateCvData = (updates) => {
+                setCvData((prevData) => {
+                    if (!prevData) return null;
+                    const newPartialData = typeof updates === 'function' ? updates(prevData) : updates;
+                    const newData = { ...prevData, ...newPartialData };
+                    debouncedSave(newData);
+                    return newData;
+                });
+            };
+
+            const updateFormData = (updates) => {
+                updateCvData((prev) => {
+                    const newPartialForm = typeof updates === 'function' ? updates(prev.formData) : updates;
+                    return { formData: { ...prev.formData, ...newPartialForm } };
+                });
+            };
+
+            useEffect(() => {
+                const handleResize = () => setIsMobile(window.innerWidth <= 1024);
+                window.addEventListener('resize', handleResize);
+                return () => window.removeEventListener('resize', handleResize);
+            }, []);
+
+            useEffect(() => {
+                const resizePreview = () => {
+                    const scaleContainer = cvScaleContainerRef.current;
+                    const cvRoot = cvRootRef.current;
+
+                    if (!scaleContainer || !cvRoot) return;
+
+                    if (!isMobile) {
+                        cvRoot.style.transform = 'scale(1)';
+                        cvRoot.style.transformOrigin = 'top center';
+                        scaleContainer.style.width = 'auto';
+                        scaleContainer.style.height = 'auto';
+                        scaleContainer.style.overflow = 'visible';
+                        return;
+                    }
+
+                    const originalWidth = 794; 
+                    const padding = 32;
+                    const availableWidth = window.innerWidth - padding;
+                    
+                    const scale = Math.min(1, availableWidth / originalWidth);
+
+                    cvRoot.style.transformOrigin = 'top center';
+                    cvRoot.style.transform = `scale(${scale})`;
+                    
+                    const scaledHeight = cvRoot.scrollHeight * scale;
+
+                    scaleContainer.style.width = '100%';
+                    scaleContainer.style.height = `${scaledHeight + 20}px`;
+                    scaleContainer.style.overflow = 'hidden';
+                };
+
+                if (isMobile && mobileTab === 'preview') {
+                    setTimeout(resizePreview, 100);
+                } else if (!isMobile) {
+                    resizePreview();
+                }
+
+                window.addEventListener('resize', resizePreview);
+                return () => window.removeEventListener('resize', resizePreview);
+            }, [isMobile, mobileTab, cvData]);
+
+
+            if (cvData === null) {
+                return <TemplateView onSelectTemplate={(template) => {
+                    const newData = { ...initialCvDoc, template };
+                    setCvData(newData);
+                    saveCvDocument(user.uid, newData);
+                }} />;
+            }
+
+            const { formData } = cvData;
+
+            return (
+                <div className="flex w-screen h-screen overflow-hidden bg-gray-100">
+                    <aside className="hidden lg:flex flex-col w-64 bg-gray-800 text-white shadow-xl z-20">
+                        <div className="p-4 border-b border-gray-700">
+                            <h1 className="text-xl font-bold">ATS-Friendly</h1>
+                        </div>
+                        <nav className="flex-1 p-4 space-y-2">
+                            <button onClick={() => window.print()} className="w-full px-3 py-2 text-left rounded hover:bg-gray-700 flex items-center gap-2">
+                                <span>🖨️</span> PDF İndir
+                            </button>
+                            <button onClick={logout} className="w-full px-3 py-2 text-left rounded hover:bg-gray-700 flex items-center gap-2">
+                                <span>🚪</span> Çıkış Yap
+                            </button>
+                        </nav>
+                    </aside>
+                    
+                    <div className="flex-1 flex flex-col h-screen">
+                        <div className="flex-1 lg:grid lg:grid-cols-2 overflow-hidden relative">
+                            {/* Editor Section */}
+                            <div className={`h-full overflow-y-auto bg-white border-r border-gray-200 p-6 ${isMobile && mobileTab !== 'edit' ? 'hidden' : 'block'}`}>
+                                <h2 className="text-xl font-bold mb-6 text-gray-800">Bilgilerinizi Düzenleyin</h2>
+                                <div className="mb-6">
+                                    <h3 className="font-bold text-blue-600 mb-2 border-b pb-1">Kişisel Bilgiler</h3>
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                        <input value={formData.fullname} onChange={e => updateFormData({ fullname: e.target.value })} placeholder="Ad Soyad" className="p-2 border rounded focus:ring-2 focus:ring-blue-400 outline-none"/>
+                                        <input value={formData.title} onChange={e => updateFormData({ title: e.target.value })} placeholder="Unvan" className="p-2 border rounded focus:ring-2 focus:ring-blue-400 outline-none"/>
+                                        <input type="email" value={formData.email} onChange={e => updateFormData({ email: e.target.value })} placeholder="E-posta" className="p-2 border rounded focus:ring-2 focus:ring-blue-400 outline-none"/>
+                                        <input value={formData.phone} onChange={e => updateFormData({ phone: e.target.value })} placeholder="Telefon" className="p-2 border rounded focus:ring-2 focus:ring-blue-400 outline-none"/>
+                                        <input value={formData.address} onChange={e => updateFormData({ address: e.target.value })} placeholder="Adres" className="p-2 border rounded sm:col-span-2 focus:ring-2 focus:ring-blue-400 outline-none"/>
+                                    </div>
+                                </div>
+
+                                <div className="mb-6">
+                                    <h3 className="font-bold text-blue-600 mb-2 border-b pb-1">Profil Özeti</h3>
+                                    <textarea value={formData.summary} onChange={e => updateFormData({ summary: e.target.value })} placeholder="Kısa özet..." rows={4} className="w-full p-2 border rounded focus:ring-2 focus:ring-blue-400 outline-none"></textarea>
+                                </div>
+                                
+                                <div className="mb-6">
+                                    <h3 className="font-bold text-blue-600 mb-2 border-b pb-1">İş Deneyimi</h3>
+                                    {formData.experiences.map((exp, index) => (
+                                        <div key={exp.id} className="p-4 mb-4 bg-gray-50 border border-gray-200 rounded-lg space-y-3">
+                                            <input value={exp.title} onChange={e => updateFormData((p) => ({ experiences: p.experiences.map((i, idx) => idx === index ? {...i, title: e.target.value} : i) }))} placeholder="Pozisyon" className="w-full p-2 border rounded bg-white"/>
+                                            <input value={exp.company} onChange={e => updateFormData((p) => ({ experiences: p.experiences.map((i, idx) => idx === index ? {...i, company: e.target.value} : i) }))} placeholder="Şirket" className="w-full p-2 border rounded bg-white"/>
+                                            <input value={exp.date} onChange={e => updateFormData((p) => ({ experiences: p.experiences.map((i, idx) => idx === index ? {...i, date: e.target.value} : i) }))} placeholder="Tarih (örn: Oca 2020 - Halen)" className="w-full p-2 border rounded bg-white"/>
+                                            <textarea value={exp.desc} onChange={e => updateFormData((p) => ({ experiences: p.experiences.map((i, idx) => idx === index ? {...i, desc: e.target.value} : i) }))} placeholder="Açıklama" rows={3} className="w-full p-2 border rounded bg-white"></textarea>
+                                            <div className="text-right">
+                                                <button onClick={() => updateFormData((p) => ({ experiences: p.experiences.filter((i) => i.id !== exp.id) }))} className="text-red-500 text-sm hover:underline">Deneyimi Sil</button>
+                                            </div>
+                                        </div>
+                                    ))}
+                                    <button onClick={() => updateFormData((p) => ({ experiences: [...p.experiences, {id: generateId(), title: '', company: '', date: '', desc: ''}] }))} className="w-full p-3 mt-2 text-blue-600 font-semibold border-2 border-dashed border-blue-200 rounded-lg hover:bg-blue-50 hover:border-blue-400 transition-colors">+ İş Deneyimi Ekle</button>
+                                </div>
+                            </div>
+
+                            {/* Preview Section */}
+                            <div className={`bg-gray-200 overflow-auto flex justify-center h-full ${isMobile && mobileTab !== 'preview' ? 'hidden' : 'flex'} ${!isMobile ? 'items-start py-8' : 'items-start pt-4'}`}>
+                                <div ref={cvScaleContainerRef} className="print-area transition-all duration-300 ease-out origin-top">
+                                   <CVPreview cvData={cvData} cvRootRef={cvRootRef} />
+                                </div>
+                            </div>
+                        </div>
+
+                        {isMobile && (
+                            <div className="flex items-center bg-white border-t border-gray-200 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)] h-16 z-30">
+                                <button onClick={() => setMobileTab('edit')} className={`flex-1 flex flex-col items-center justify-center h-full text-xs font-bold transition-colors ${mobileTab === 'edit' ? 'text-blue-600 bg-blue-50' : 'text-gray-500 hover:bg-gray-50'}`}>
+                                    <span className="text-xl mb-0.5">✏️</span>
+                                    Düzenle
+                                </button>
+                                <button onClick={() => setMobileTab('preview')} className={`flex-1 flex flex-col items-center justify-center h-full text-xs font-bold transition-colors ${mobileTab === 'preview' ? 'text-blue-600 bg-blue-50' : 'text-gray-500 hover:bg-gray-50'}`}>
+                                    <span className="text-xl mb-0.5">👁️</span>
+                                    Önizle
+                                </button>
+                                <button onClick={() => window.print()} className="flex-1 flex flex-col items-center justify-center h-full text-xs font-bold text-gray-500 hover:bg-gray-50 transition-colors">
+                                     <span className="text-xl mb-0.5">🖨️</span>
+                                    İndir
+                                </button>
+                                <button onClick={logout} className="flex-1 flex flex-col items-center justify-center h-full text-xs font-bold text-gray-500 hover:bg-gray-50 transition-colors">
+                                     <span className="text-xl mb-0.5">🚪</span>
+                                    Çıkış
+                                </button>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            );
+        };
+        window.EditorView = EditorView;
+    </script>
+
+    <!-- 6. App -->
+    <script type="text/babel" data-type="module" data-presets="typescript,react">
+        import React, { useState, useEffect } from 'react';
+
+        const App = () => {
+          const [view, setView] = useState('landing');
+          const [currentUser, setCurrentUser] = useState(null);
+          const [loading, setLoading] = useState(true);
+          const [servicesReady, setServicesReady] = useState(false);
+
+          useEffect(() => {
+            const checkServices = () => {
+              if (
+                window.FirebaseService && 
+                window.LandingView && 
+                window.AuthView && 
+                window.EditorView
+              ) {
+                setServicesReady(true);
+                const { auth, onAuthStateChanged } = window.FirebaseService;
+                
+                const unsubscribe = onAuthStateChanged(auth, (user) => {
+                  console.log("Auth State Changed:", user ? "User Logged In" : "User Logged Out");
+                  setCurrentUser(user);
+                  if (user) {
+                    setView('editor');
+                  } else if (view === 'editor') {
+                    setView('landing');
+                  }
+                  setLoading(false);
+                });
+                return unsubscribe;
+              } else {
+                setTimeout(checkServices, 100);
+              }
+            };
+
+            const cleanup = checkServices();
+            return () => { if(typeof cleanup === 'function') cleanup(); };
+          }, [view]);
+
+          if (!servicesReady || loading) {
+            return (
+              <div className="flex items-center justify-center h-screen bg-slate-100">
+                <div className="text-xl font-semibold text-slate-600">
+                    {!servicesReady ? 'Sistem Hazırlanıyor...' : 'Oturum Kontrol Ediliyor...'}
+                </div>
+              </div>
+            );
+          }
+
+          const LandingView = window.LandingView;
+          const AuthView = window.AuthView;
+          const EditorView = window.EditorView;
+
+          switch (view) {
+            case 'auth':
+              return <AuthView setView={setView} />;
+            case 'editor':
+              if (currentUser) {
+                return <EditorView user={currentUser} setView={setView} />;
+              }
+              setView('auth');
+              return <AuthView setView={setView} />;
+            case 'landing':
+            default:
+              return <LandingView setView={setView} />;
+          }
+        };
+
+        window.App = App;
+    </script>
+
+    <!-- 7. Index -->
+    <script type="text/babel" data-type="module" data-presets="typescript,react">
+        import React from 'react';
+        import ReactDOM from 'react-dom/client';
+
+        console.log("🚀 Index starting...");
+
+        const mountApp = () => {
+            const rootElement = document.getElementById('root');
+            if (!rootElement) {
+                console.error("❌ Root element not found!");
+                return;
+            }
+
+            const App = window.App;
+            
+            if (App) {
+                console.log("✅ App component found, mounting React...");
+                const root = ReactDOM.createRoot(rootElement);
+                root.render(
+                    <React.StrictMode>
+                        <App />
+                    </React.StrictMode>
+                );
+            } else {
+                console.log("⏳ Waiting for App component to load...");
+                setTimeout(mountApp, 100);
+            }
+        }
+
+        mountApp();
+    </script>
+</body>
 </html>
