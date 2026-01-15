@@ -1,717 +1,420 @@
+
 <!DOCTYPE html>
-<html lang="en">
+<html lang="tr">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <title>ATS-Friendly CV Builder</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ATS-Friendly | Profesyonel Bulut CV Oluşturucu</title>
+    
+    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=PT+Serif:ital,wght@0,400;0,700;1,400&family=Inter:wght@400;600&family=Merriweather:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&family=Lora:ital,wght@0,400;0,700;1,400&family=Merriweather:wght@300;400;700&family=Montserrat:wght@400;600;700&family=Open+Sans:wght@400;600;700&family=PT+Serif:ital,wght@0,400;0,700;1,400&family=Playfair+Display:wght@400;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Raleway:wght@400;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     
-    <style>
-      body {
-        font-family: 'Plus Jakarta Sans', sans-serif;
-        overflow-x: hidden;
-        background-color: #f3f4f6;
-      }
-      * { box-sizing: border-box; }
-      
-      /* Font Classes for CV */
-      .font-ptserif { font-family: 'PT Serif', serif; }
-      .font-inter { font-family: 'Inter', sans-serif; }
-      .font-merriweather { font-family: 'Merriweather', serif; }
-      .font-jakarta { font-family: 'Plus Jakarta Sans', sans-serif; }
-
-      /* Custom Scrollbar for Editor */
-      .custom-scroll::-webkit-scrollbar { width: 6px; }
-      .custom-scroll::-webkit-scrollbar-track { background: #f1f1f1; }
-      .custom-scroll::-webkit-scrollbar-thumb { background: #ccc; border-radius: 3px; }
-      .custom-scroll::-webkit-scrollbar-thumb:hover { background: #bbb; }
-
-      /* Print Styles */
-      @media print {
-        @page { margin: 0; size: auto; }
-        body { background: white; }
-        .no-print { display: none !important; }
-        .print-area { 
-            transform: none !important; 
-            width: 100% !important; 
-            height: auto !important; 
-            box-shadow: none !important;
-            margin: 0 !important;
-            padding: 0 !important;
-            border: none !important;
-        }
-        /* Hide scrollbars in print */
-        ::-webkit-scrollbar { display: none; }
-      }
-    </style>
-    
-    <!-- Babel Standalone -->
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-    
-    <!-- Import Map -->
-    <script type="importmap">
-    {
-      "imports": {
-        "react": "https://esm.sh/react@18.2.0",
-        "react-dom/client": "https://esm.sh/react-dom@18.2.0/client",
-        "lucide-react": "https://esm.sh/lucide-react@0.344.0"
-      }
-    }
-    </script>
+    <!-- CSS Link -->
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div id="root"></div>
 
-    <!-- INLINED SCRIPTS START HERE -->
+    <div id="toast">Kaydedildi!</div>
 
-    <!-- 1. Mock Service -->
-    <script type="text/babel" data-type="module" data-presets="typescript,react">
-        const LOCAL_STORAGE_USER_KEY = 'ats_mock_user';
-        const LOCAL_STORAGE_DATA_KEY = 'ats_mock_data';
-        const authObservers = [];
-
-        const getMockUser = () => {
-            const stored = localStorage.getItem(LOCAL_STORAGE_USER_KEY);
-            return stored ? JSON.parse(stored) : null;
-        };
-
-        const auth = { currentUser: getMockUser() };
-
-        const onAuthStateChanged = (authInstance, callback) => {
-            authObservers.push(callback);
-            callback(getMockUser());
-            return () => {
-                const index = authObservers.indexOf(callback);
-                if (index > -1) authObservers.splice(index, 1);
-            };
-        };
-
-        const notifyObservers = (user) => {
-            auth.currentUser = user;
-            authObservers.forEach(cb => cb(user));
-        };
-
-        const handleEmailAuth = async (isLogin, email, password) => {
-            await new Promise(resolve => setTimeout(resolve, 600));
-            const user = { uid: 'mock-user-' + Date.now(), email: email, displayName: email.split('@')[0] };
-            localStorage.setItem(LOCAL_STORAGE_USER_KEY, JSON.stringify(user));
-            notifyObservers(user);
-            return user;
-        };
-
-        const loginWithGoogle = async () => {
-            await new Promise(resolve => setTimeout(resolve, 600));
-            const user = { uid: 'mock-google-' + Date.now(), email: 'google.user@example.com', displayName: 'Google User' };
-            localStorage.setItem(LOCAL_STORAGE_USER_KEY, JSON.stringify(user));
-            notifyObservers(user);
-            return user;
-        };
-
-        const logout = async () => {
-            localStorage.removeItem(LOCAL_STORAGE_USER_KEY);
-            notifyObservers(null);
-        };
-
-        const saveCvDocument = async (userId, data) => {
-            const allData = JSON.parse(localStorage.getItem(LOCAL_STORAGE_DATA_KEY) || '{}');
-            allData[userId] = data;
-            localStorage.setItem(LOCAL_STORAGE_DATA_KEY, JSON.stringify(allData));
-        };
-
-        const getCvDocument = async (userId) => {
-            const allData = JSON.parse(localStorage.getItem(LOCAL_STORAGE_DATA_KEY) || '{}');
-            return allData[userId] || null;
-        };
-
-        window.FirebaseService = {
-            auth, onAuthStateChanged, handleEmailAuth, loginWithGoogle, logout, saveCvDocument, getCvDocument
-        };
-    </script>
-
-    <!-- 2. LandingView -->
-    <script type="text/babel" data-type="module" data-presets="typescript,react">
-        import React from 'react';
-        import { CheckCircle2, FileText, Smartphone, Download } from 'lucide-react';
-
-        const LandingView = ({ setView }) => {
-          return (
-            <div className="bg-white min-h-screen flex flex-col no-print">
-              <header className="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-gray-100">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                  <div className="flex justify-between items-center h-16">
-                    <div className="flex items-center gap-2">
-                        <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-white font-bold text-lg">A</div>
-                        <span className="font-bold text-xl text-gray-900">ATS-Friendly</span>
-                    </div>
-                    <div className="flex gap-4">
-                      <button onClick={() => setView('auth')} className="text-gray-600 hover:text-blue-600 font-medium">Giriş Yap</button>
-                      <button onClick={() => setView('auth')} className="bg-blue-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-blue-700 transition-colors">Ücretsiz Başla</button>
-                    </div>
-                  </div>
-                </div>
-              </header>
-
-              <main className="flex-grow">
-                {/* Hero Section */}
-                <section className="pt-20 pb-32 px-4 text-center">
-                    <h1 className="text-5xl md:text-6xl font-extrabold text-gray-900 tracking-tight mb-6">
-                        İşe Alım Robotlarını <br/><span className="text-blue-600">Yenecek CV'niz Hazır</span>
-                    </h1>
-                    <p className="text-xl text-gray-600 mb-10 max-w-2xl mx-auto">
-                        Karmaşık tasarımlar yok. Sadece ATS (Aday Takip Sistemleri) uyumlu, temiz ve profesyonel şablonlar. %100 Mobil uyumlu.
-                    </p>
-                    <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                        <button onClick={() => setView('auth')} className="px-8 py-4 bg-blue-600 text-white text-lg font-bold rounded-xl hover:bg-blue-700 shadow-lg shadow-blue-600/30 transition-all transform hover:-translate-y-1">
-                            Hemen CV Oluştur
-                        </button>
-                        <button className="px-8 py-4 bg-gray-100 text-gray-700 text-lg font-bold rounded-xl hover:bg-gray-200 transition-colors">
-                            Örnekleri Gör
-                        </button>
-                    </div>
-                </section>
-
-                {/* Features */}
-                <section className="bg-gray-50 py-24">
-                    <div className="max-w-7xl mx-auto px-4 grid grid-cols-1 md:grid-cols-3 gap-12">
-                        <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100">
-                            <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center text-green-600 mb-6"><CheckCircle2 size={24} /></div>
-                            <h3 className="text-xl font-bold mb-3">ATS Uyumlu Kod</h3>
-                            <p className="text-gray-600">İnsan Kaynakları yazılımlarının okuyabileceği sade ve standart format.</p>
-                        </div>
-                        <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100">
-                            <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center text-purple-600 mb-6"><Smartphone size={24} /></div>
-                            <h3 className="text-xl font-bold mb-3">Mobilde Düzenle</h3>
-                            <p className="text-gray-600">Bilgisayara ihtiyacınız yok. Telefondan CV'nizi düzenleyin ve PDF indirin.</p>
-                        </div>
-                        <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100">
-                            <div className="w-12 h-12 bg-orange-100 rounded-xl flex items-center justify-center text-orange-600 mb-6"><Download size={24} /></div>
-                            <h3 className="text-xl font-bold mb-3">Sınırsız PDF</h3>
-                            <p className="text-gray-600">Filigran yok, gizli ücret yok. İstediğiniz kadar düzenleyin ve indirin.</p>
-                        </div>
-                    </div>
-                </section>
-              </main>
-
-              <footer className="bg-white border-t py-12 text-center text-gray-500">
-                <p>&copy; 2024 ATS-Friendly CV Builder. Made with 💙 by Gemini.</p>
-              </footer>
+    <!-- THEME MODAL -->
+    <div id="theme-modal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 data-i18n="modal_theme_title">Tasarım Ayarları</h3>
+                <button class="close-modal" onclick="closeThemeModal()">×</button>
             </div>
-          );
-        };
-        window.LandingView = LandingView;
-    </script>
-
-    <!-- 3. AuthView -->
-    <script type="text/babel" data-type="module" data-presets="typescript,react">
-        import React, { useState } from 'react';
-        import { Mail, Lock, Chrome, ArrowLeft } from 'lucide-react';
-
-        const AuthView = ({ setView }) => {
-          const [isLogin, setIsLogin] = useState(true);
-          const [email, setEmail] = useState('');
-          const [password, setPassword] = useState('');
-          const [loading, setLoading] = useState(false);
-
-          const handleAuth = async (e) => {
-            e.preventDefault();
-            setLoading(true);
-            await window.FirebaseService.handleEmailAuth(isLogin, email, password);
-            setLoading(false);
-          };
-
-          return (
-            <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8 no-print">
-              <button onClick={() => setView('landing')} className="absolute top-6 left-6 flex items-center text-gray-600 hover:text-blue-600 font-medium">
-                <ArrowLeft size={20} className="mr-2"/> Ana Sayfa
-              </button>
-              
-              <div className="sm:mx-auto sm:w-full sm:max-w-md">
-                <div className="flex justify-center mb-6">
-                    <div className="w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center text-white font-bold text-2xl">A</div>
+            <div class="modal-body">
+                <div class="setting-group">
+                    <label data-i18n="lbl_color">Vurgu Rengi</label>
+                    <div class="color-options">
+                        <button class="color-btn" style="background-color: #2c3e50;" onclick="applyColor('#2c3e50')" title="Midnight Blue"></button>
+                        <button class="color-btn" style="background-color: #3498db;" onclick="applyColor('#3498db')" title="Classic Blue"></button>
+                        <button class="color-btn" style="background-color: #27ae60;" onclick="applyColor('#27ae60')" title="Emerald Green"></button>
+                        <button class="color-btn" style="background-color: #c0392b;" onclick="applyColor('#c0392b')" title="Crimson Red"></button>
+                        <button class="color-btn" style="background-color: #8e44ad;" onclick="applyColor('#8e44ad')" title="Royal Purple"></button>
+                        <button class="color-btn" style="background-color: #000000;" onclick="applyColor('#000000')" title="Elegant Black"></button>
+                        <button class="color-btn" style="background-color: #d35400;" onclick="applyColor('#d35400')" title="Pumpkin Orange"></button>
+                        <button class="color-btn" style="background-color: #7f8c8d;" onclick="applyColor('#7f8c8d')" title="Concrete Grey"></button>
+                    </div>
                 </div>
-                <h2 className="text-center text-3xl font-extrabold text-gray-900">
-                  {isLogin ? 'Hesabınıza Giriş Yapın' : 'Ücretsiz Hesap Oluşturun'}
-                </h2>
-                <p className="mt-2 text-center text-sm text-gray-600">
-                    {isLogin ? 'Henüz hesabınız yok mu?' : 'Zaten hesabınız var mı?'}
-                    <button onClick={() => setIsLogin(!isLogin)} className="font-medium text-blue-600 hover:text-blue-500 ml-1">
-                        {isLogin ? 'Kayıt Ol' : 'Giriş Yap'}
-                    </button>
-                </p>
-              </div>
-
-              <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-                <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
-                  <form className="space-y-6" onSubmit={handleAuth}>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700">Email Adresi</label>
-                      <div className="mt-1 relative rounded-md shadow-sm">
-                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                          <Mail size={18} className="text-gray-400" />
-                        </div>
-                        <input type="email" required value={email} onChange={e=>setEmail(e.target.value)} className="focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 sm:text-sm border-gray-300 rounded-md p-3 border" placeholder="ornek@email.com"/>
-                      </div>
+                <div class="setting-group">
+                    <label data-i18n="lbl_font">Yazı Tipi</label>
+                    <div class="font-options-grid">
+                        <button class="font-btn" style="font-family: 'Roboto', sans-serif;" onclick="applyFont('roboto')">Roboto</button>
+                        <button class="font-btn" style="font-family: 'Open Sans', sans-serif;" onclick="applyFont('opensans')">Open Sans</button>
+                        <button class="font-btn" style="font-family: 'Montserrat', sans-serif;" onclick="applyFont('montserrat')">Montserrat</button>
+                        <button class="font-btn" style="font-family: 'Lato', sans-serif;" onclick="applyFont('lato')">Lato</button>
+                        <button class="font-btn" style="font-family: 'Raleway', sans-serif;" onclick="applyFont('raleway')">Raleway</button>
+                        <button class="font-btn" style="font-family: 'PT Serif', serif;" onclick="applyFont('ptserif')">PT Serif</button>
+                        <button class="font-btn" style="font-family: 'Playfair Display', serif;" onclick="applyFont('playfair')">Playfair</button>
+                        <button class="font-btn" style="font-family: 'Lora', serif;" onclick="applyFont('lora')">Lora</button>
+                        <button class="font-btn" style="font-family: 'Merriweather', serif;" onclick="applyFont('merriweather')">Merriweather</button>
                     </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700">Şifre</label>
-                      <div className="mt-1 relative rounded-md shadow-sm">
-                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                          <Lock size={18} className="text-gray-400" />
-                        </div>
-                        <input type="password" required value={password} onChange={e=>setPassword(e.target.value)} className="focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 sm:text-sm border-gray-300 rounded-md p-3 border" placeholder="••••••••"/>
-                      </div>
-                    </div>
-
-                    <button type="submit" disabled={loading} className="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:bg-blue-300">
-                      {loading ? 'İşleniyor...' : (isLogin ? 'Giriş Yap' : 'Kayıt Ol')}
-                    </button>
-                  </form>
-
-                  <div className="mt-6">
-                    <div className="relative">
-                      <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-gray-300"></div></div>
-                      <div className="relative flex justify-center text-sm"><span className="px-2 bg-white text-gray-500">veya</span></div>
-                    </div>
-
-                    <div className="mt-6">
-                      <button onClick={() => window.FirebaseService.loginWithGoogle()} className="w-full flex justify-center items-center py-3 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50">
-                        <Chrome size={18} className="mr-2 text-blue-500" /> Google ile Devam Et
-                      </button>
-                    </div>
-                  </div>
                 </div>
-              </div>
             </div>
-          );
-        };
-        window.AuthView = AuthView;
-    </script>
+            <div class="modal-footer">
+                <button class="btn btn-primary" onclick="closeThemeModal()" style="width:100%" data-i18n="btn_save_close">Kaydet & Kapat</button>
+            </div>
+        </div>
+    </div>
 
-    <!-- 4. TemplateView -->
-    <script type="text/babel" data-type="module" data-presets="typescript,react">
-        import React from 'react';
-        import { FileText } from 'lucide-react';
-
-        const TemplateView = ({ onSelectTemplate }) => {
-            const templates = [
-                { id: 'tpl-classic', name: 'Klasik', desc: 'Akademik ve Kurumsal', color: 'bg-blue-50', border: 'border-blue-200' },
-                { id: 'tpl-compact', name: 'Kompakt', desc: 'Modern ve Tek Sayfa', color: 'bg-emerald-50', border: 'border-emerald-200' },
-                { id: 'tpl-modern', name: 'Modern', desc: 'Yaratıcı ve Dikkat Çekici', color: 'bg-purple-50', border: 'border-purple-200' },
-            ];
-
-            return (
-                <div className="min-h-screen bg-gray-50 flex flex-col items-center py-12 px-4 no-print">
-                    <div className="text-center mb-12">
-                        <h2 className="text-3xl font-bold text-gray-900">Bir Şablon Seçin</h2>
-                        <p className="mt-2 text-gray-600">CV'niz için en iyi başlangıç noktasını belirleyin. İçeriği sonra değiştirebilirsiniz.</p>
+    <!-- LAYOUT MODAL -->
+    <div id="layout-modal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 data-i18n="modal_layout_title">Sayfa Düzeni</h3>
+                <button class="close-modal" onclick="closeLayoutModal()">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="setting-group">
+                    <div class="range-header">
+                        <label data-i18n="lbl_fontsize">Yazı Boyutu</label>
+                        <span id="val-fontsize">11pt</span>
                     </div>
-                    
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl w-full">
-                        {templates.map(t => (
-                            <div key={t.id} onClick={() => onSelectTemplate(t.id)} className={`group relative bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 cursor-pointer border-2 border-transparent hover:border-blue-500 overflow-hidden`}>
-                                <div className={`h-64 ${t.color} flex items-center justify-center group-hover:scale-105 transition-transform duration-500`}>
-                                    <FileText size={48} className="text-gray-400 opacity-50" />
-                                </div>
-                                <div className="p-6">
-                                    <h3 className="text-xl font-bold text-gray-900">{t.name}</h3>
-                                    <p className="text-sm text-gray-500">{t.desc}</p>
-                                </div>
-                                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors" />
-                            </div>
-                        ))}
+                    <input type="range" id="rng-fontsize" min="9" max="14" step="0.5" value="11" oninput="updateLayout()">
+                </div>
+                
+                <div class="setting-group">
+                    <div class="range-header">
+                        <label data-i18n="lbl_lineheight">Satır Aralığı</label>
+                        <span id="val-lineheight">1.4</span>
+                    </div>
+                    <input type="range" id="rng-lineheight" min="1.0" max="2.0" step="0.1" value="1.4" oninput="updateLayout()">
+                </div>
+
+                <div class="setting-group">
+                    <div class="range-header">
+                        <label data-i18n="lbl_margin">Kenar Boşluğu</label>
+                        <span id="val-margin">20mm</span>
+                    </div>
+                    <input type="range" id="rng-margin" min="10" max="35" step="1" value="20" oninput="updateLayout()">
+                </div>
+
+                <div class="setting-group">
+                    <div class="range-header">
+                        <label data-i18n="lbl_sectiongap">Bölüm Aralığı</label>
+                        <span id="val-sectiongap">15px</span>
+                    </div>
+                    <input type="range" id="rng-sectiongap" min="5" max="40" step="1" value="15" oninput="updateLayout()">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" onclick="closeLayoutModal()" style="width:100%" data-i18n="btn_save_close">Kaydet & Kapat</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 0. LANDING PAGE (DEFAULT VIEW) -->
+    <section id="landing-view" class="view-section active">
+        <header class="landing-header">
+            <div class="brand-container">
+                <div class="brand-logo">AF</div>
+                <div class="brand-text" style="color:#2d3436;">ATS-Friendly</div>
+            </div>
+            <div class="header-actions">
+                <button class="btn-text" onclick="showAuth(true)">Giriş Yap</button>
+                <button class="btn-primary-small" onclick="showAuth(false)">Kayıt Ol</button>
+            </div>
+        </header>
+
+        <main class="landing-hero">
+            <div class="hero-content">
+                <h1>İşe Alım Robotlarını<br><span class="highlight-text">Yenecek CV'nizi Oluşturun</span></h1>
+                <p class="hero-subtitle">Modern işe alım sistemleri (ATS) ile %100 uyumlu, profesyonel ve sade CV'ler hazırlayın. Üstelik tamamen ücretsiz.</p>
+                <div class="hero-buttons">
+                    <button class="btn-hero-primary" onclick="showAuth(false)">Hemen Ücretsiz Başla</button>
+                    <button class="btn-hero-secondary" onclick="scrollToFeatures()">Nasıl Çalışır?</button>
+                </div>
+            </div>
+            <div class="hero-image">
+                <!-- Abstract visual representation of ATS filtering -->
+                <div class="mockup-card">
+                    <div class="mockup-header">
+                        <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+                    </div>
+                    <div class="mockup-body">
+                        <div class="mock-line title"></div>
+                        <div class="mock-line short"></div>
+                        <br>
+                        <div class="mock-line"></div>
+                        <div class="mock-line"></div>
+                        <div class="mock-line"></div>
+                        <div class="mock-badge">ATS Score: 98/100</div>
                     </div>
                 </div>
-            );
-        };
-        window.TemplateView = TemplateView;
-    </script>
+            </div>
+        </main>
 
-    <!-- 5. EditorView (THE MASTERPIECE) -->
-    <script type="text/babel" data-type="module" data-presets="typescript,react">
-        import React, { useState, useEffect, useRef } from 'react';
-        import { 
-            User, Briefcase, GraduationCap, PenTool, Layout, Settings, 
-            Download, LogOut, ChevronDown, ChevronUp, Plus, Trash2,
-            Type, Palette, MoveVertical
-        } from 'lucide-react';
+        <section id="features" class="features-section">
+            <div class="feature-card">
+                <div class="f-icon">🤖</div>
+                <h3>ATS Dostu Format</h3>
+                <p>Karmaşık grafikler yok. İnsan kaynakları yazılımlarının (ATS) kolayca okuyabileceği temiz kod yapısı.</p>
+            </div>
+            <div class="feature-card">
+                <div class="f-icon">💸</div>
+                <h3>%100 Ücretsiz</h3>
+                <p>Gizli ödeme yok, filigran yok. Sınırsız düzenleme ve PDF indirme hakkı.</p>
+            </div>
+            <div class="feature-card">
+                <div class="f-icon">☁️</div>
+                <h3>Bulut Kayıt</h3>
+                <p>CV'niz bulutta güvende. İstediğiniz cihazdan (PC veya Mobil) kaldığınız yerden devam edin.</p>
+            </div>
+        </section>
 
-        const generateId = () => `id_${Math.random().toString(36).substr(2, 9)}`;
+        <footer class="landing-footer">
+            <p>&copy; 2024 ATS-Friendly CV Maker. Tüm hakları saklıdır.</p>
+            <div class="footer-links">
+                <a href="#">Gizlilik Politikası</a>
+                <a href="#">Kullanım Koşulları</a>
+                <a href="#">İletişim</a>
+            </div>
+        </footer>
+    </section>
 
-        const initialFormData = {
-            fullname: "Adınız Soyadınız",
-            title: "Yazılım Mühendisi",
-            email: "email@ornek.com",
-            phone: "+90 555 123 4567",
-            address: "İstanbul, Türkiye",
-            summary: "Deneyimli ve sonuç odaklı profesyonel. Karmaşık problemleri çözme konusunda tutkulu.",
-            experiences: [
-                { id: 'exp1', title: 'Kıdemli Geliştirici', company: 'Teknoloji A.Ş.', date: '2020 - Halen', desc: '• Büyük ölçekli web uygulamaları geliştirildi.\n• Performans iyileştirmeleri yapıldı.' }
-            ],
-            education: [
-                { id: 'edu1', degree: 'Bilgisayar Mühendisliği', school: 'Teknik Üniversite', date: '2016 - 2020' }
-            ],
-            skills: "JavaScript, React, Node.js, Python, AWS, Docker"
-        };
+    <!-- 1. AUTH SCREEN (GİRİŞ/KAYIT) -->
+    <section id="auth-view" class="view-section">
+        <!-- Back Button for Mobile -->
+        <button class="back-to-home" onclick="showView('landing-view')">← Ana Sayfa</button>
+        
+        <div class="auth-card professional">
+            <div class="auth-header">
+                <div class="brand-logo small">AF</div>
+                <h2 id="auth-title">Hesabınıza Giriş Yapın</h2>
+                <p id="auth-subtitle">CV'nizi düzenlemeye devam edin</p>
+            </div>
 
-        const initialCvDoc = {
-            formData: initialFormData,
-            template: 'tpl-classic',
-            theme: { color: '#2563eb', font: 'font-jakarta' },
-            layout: { fontSize: 11, lineHeight: 1.5, margin: 20 },
-        };
-
-        // --- CV PREVIEW COMPONENT ---
-        const CVPreview = ({ cvData }) => {
-            const { formData, theme, layout } = cvData;
-            
-            // Dynamic Styles
-            const headingStyle = { color: theme.color };
-            const borderStyle = { borderColor: theme.color };
-            const containerStyle = {
-                width: '794px', // A4 Width
-                minHeight: '1123px', // A4 Height
-                padding: `${layout.margin * 2}px`, // Scaled padding
-                boxSizing: 'border-box',
-                fontSize: `${layout.fontSize}pt`,
-                lineHeight: layout.lineHeight,
-            };
-
-            return (
-                <div className={`bg-white shadow-2xl text-gray-800 print-area ${theme.font}`} style={containerStyle}>
-                    {/* Header */}
-                    <div className="border-b-2 pb-6 mb-6" style={borderStyle}>
-                        <h1 className="text-4xl font-bold uppercase tracking-wide mb-2" style={headingStyle}>{formData.fullname}</h1>
-                        <p className="text-xl font-medium text-gray-600">{formData.title}</p>
-                        <div className="flex flex-wrap gap-4 mt-4 text-sm text-gray-500 font-medium">
-                            {formData.phone && <span>📞 {formData.phone}</span>}
-                            {formData.email && <span>✉️ {formData.email}</span>}
-                            {formData.address && <span>📍 {formData.address}</span>}
-                        </div>
-                    </div>
-
-                    {/* Summary */}
-                    {formData.summary && (
-                        <div className="mb-8">
-                            <h3 className="text-sm font-bold uppercase tracking-widest mb-3 border-b border-gray-200 pb-1" style={headingStyle}>Profil Özeti</h3>
-                            <p className="text-gray-700 whitespace-pre-wrap">{formData.summary}</p>
-                        </div>
-                    )}
-
-                    {/* Experience */}
-                    {formData.experiences.length > 0 && (
-                        <div className="mb-8">
-                            <h3 className="text-sm font-bold uppercase tracking-widest mb-4 border-b border-gray-200 pb-1" style={headingStyle}>İş Deneyimi</h3>
-                            <div className="space-y-6">
-                                {formData.experiences.map(exp => (
-                                    <div key={exp.id}>
-                                        <div className="flex justify-between items-baseline mb-1">
-                                            <h4 className="font-bold text-lg">{exp.title}</h4>
-                                            <span className="text-sm font-bold text-gray-500 whitespace-nowrap ml-4">{exp.date}</span>
-                                        </div>
-                                        <div className="text-gray-600 italic mb-2 font-medium">{exp.company}</div>
-                                        <p className="text-gray-700 whitespace-pre-wrap text-sm">{exp.desc}</p>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-                    )}
-
-                    {/* Education */}
-                    {formData.education.length > 0 && (
-                        <div className="mb-8">
-                            <h3 className="text-sm font-bold uppercase tracking-widest mb-4 border-b border-gray-200 pb-1" style={headingStyle}>Eğitim</h3>
-                            <div className="space-y-4">
-                                {formData.education.map(edu => (
-                                    <div key={edu.id}>
-                                        <div className="flex justify-between items-baseline mb-1">
-                                            <h4 className="font-bold">{edu.degree}</h4>
-                                            <span className="text-sm font-bold text-gray-500 whitespace-nowrap ml-4">{edu.date}</span>
-                                        </div>
-                                        <div className="text-gray-600">{edu.school}</div>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-                    )}
-
-                    {/* Skills */}
-                    {formData.skills && (
-                         <div>
-                            <h3 className="text-sm font-bold uppercase tracking-widest mb-3 border-b border-gray-200 pb-1" style={headingStyle}>Yetenekler</h3>
-                            <p className="text-gray-700">{formData.skills}</p>
-                        </div>
-                    )}
+            <form onsubmit="event.preventDefault(); handleAuth();">
+                <div class="input-group">
+                    <label>E-posta Adresi</label>
+                    <input type="email" id="auth-email" class="auth-input" placeholder="ornek@email.com" autocomplete="email" required>
                 </div>
-            );
-        };
+                
+                <div class="input-group">
+                    <label>Şifre</label>
+                    <input type="password" id="auth-password" class="auth-input" placeholder="••••••••" autocomplete="current-password" required>
+                </div>
 
-        const AccordionItem = ({ title, icon: Icon, children, isOpen, onToggle }) => (
-            <div className="border border-gray-200 rounded-lg bg-white overflow-hidden mb-3">
-                <button onClick={onToggle} className="w-full flex items-center justify-between p-4 bg-gray-50 hover:bg-gray-100 transition-colors">
-                    <div className="flex items-center gap-3 font-semibold text-gray-700">
-                        {Icon && <Icon size={18} className="text-blue-500" />}
-                        {title}
-                    </div>
-                    {isOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                <!-- Terms Checkbox (Visible only on Signup) -->
+                <div id="terms-container" style="display:none;" class="terms-check">
+                    <label class="checkbox-container">
+                        <input type="checkbox" id="auth-terms">
+                        <span class="checkmark"></span>
+                        <span class="terms-text"><a href="#">Kullanım Koşulları</a>'nı ve <a href="#">Gizlilik Politikasını</a> okudum, kabul ediyorum.</span>
+                    </label>
+                </div>
+                
+                <button type="submit" class="auth-btn">
+                    <span id="auth-btn-text">Giriş Yap</span>
                 </button>
-                {isOpen && <div className="p-4 border-t border-gray-200">{children}</div>}
-            </div>
-        );
-
-        const EditorView = ({ user }) => {
-            const [cvData, setCvData] = useState(null);
-            const [activeTab, setActiveTab] = useState('content'); // content, design, settings
-            const [mobileView, setMobileView] = useState('edit'); // edit, preview
-            const [openSection, setOpenSection] = useState('personal');
-            const [isMobile, setIsMobile] = useState(window.innerWidth < 1024);
-            const [scale, setScale] = useState(1);
-
-            useEffect(() => {
-                window.FirebaseService.getCvDocument(user.uid).then(doc => setCvData(doc || initialCvDoc));
-            }, [user.uid]);
-
-            useEffect(() => {
-                const handleResize = () => {
-                    const mobile = window.innerWidth < 1024;
-                    setIsMobile(mobile);
-                    // NUCLEAR OPTION CALCULATION
-                    if (mobile) {
-                        const availableWidth = window.innerWidth - 32; // 16px padding
-                        setScale(Math.min(1, availableWidth / 794));
-                    } else {
-                        setScale(1);
-                    }
-                };
-                window.addEventListener('resize', handleResize);
-                handleResize();
-                return () => window.removeEventListener('resize', handleResize);
-            }, []);
-
-            const updateData = (newData) => {
-                setCvData(newData);
-                window.FirebaseService.saveCvDocument(user.uid, newData);
-            };
-
-            const updateForm = (key, val) => updateData({ ...cvData, formData: { ...cvData.formData, [key]: val } });
-            const updateTheme = (key, val) => updateData({ ...cvData, theme: { ...cvData.theme, [key]: val } });
-            const updateLayout = (key, val) => updateData({ ...cvData, layout: { ...cvData.layout, [key]: val } });
-
-            if (!cvData) return <div className="flex h-screen items-center justify-center bg-gray-100 text-gray-500">CV Yükleniyor...</div>;
-
-            // CONTENT EDITOR FORM
-            const ContentEditor = () => (
-                <div className="space-y-2 pb-24 lg:pb-0">
-                    <AccordionItem title="Kişisel Bilgiler" icon={User} isOpen={openSection === 'personal'} onToggle={() => setOpenSection(openSection === 'personal' ? '' : 'personal')}>
-                        <div className="space-y-3">
-                            <input className="w-full p-2 border rounded text-sm" placeholder="Ad Soyad" value={cvData.formData.fullname} onChange={e => updateForm('fullname', e.target.value)} />
-                            <input className="w-full p-2 border rounded text-sm" placeholder="Unvan" value={cvData.formData.title} onChange={e => updateForm('title', e.target.value)} />
-                            <input className="w-full p-2 border rounded text-sm" placeholder="Email" value={cvData.formData.email} onChange={e => updateForm('email', e.target.value)} />
-                            <input className="w-full p-2 border rounded text-sm" placeholder="Telefon" value={cvData.formData.phone} onChange={e => updateForm('phone', e.target.value)} />
-                            <input className="w-full p-2 border rounded text-sm" placeholder="Adres" value={cvData.formData.address} onChange={e => updateForm('address', e.target.value)} />
-                            <textarea className="w-full p-2 border rounded text-sm" rows={4} placeholder="Özet / Hakkımda" value={cvData.formData.summary} onChange={e => updateForm('summary', e.target.value)} />
-                        </div>
-                    </AccordionItem>
-                    
-                    <AccordionItem title="İş Deneyimi" icon={Briefcase} isOpen={openSection === 'exp'} onToggle={() => setOpenSection(openSection === 'exp' ? '' : 'exp')}>
-                        {cvData.formData.experiences.map((exp, idx) => (
-                            <div key={exp.id} className="mb-4 p-3 bg-gray-50 rounded border border-gray-200 relative group">
-                                <button onClick={() => {
-                                    const newExps = cvData.formData.experiences.filter(e => e.id !== exp.id);
-                                    updateForm('experiences', newExps);
-                                }} className="absolute top-2 right-2 text-red-400 hover:text-red-600"><Trash2 size={16}/></button>
-                                <input className="w-full p-2 border rounded text-sm mb-2" placeholder="Pozisyon" value={exp.title} onChange={e => {
-                                    const exps = [...cvData.formData.experiences]; exps[idx].title = e.target.value; updateForm('experiences', exps);
-                                }} />
-                                <input className="w-full p-2 border rounded text-sm mb-2" placeholder="Şirket" value={exp.company} onChange={e => {
-                                    const exps = [...cvData.formData.experiences]; exps[idx].company = e.target.value; updateForm('experiences', exps);
-                                }} />
-                                <input className="w-full p-2 border rounded text-sm mb-2" placeholder="Tarih" value={exp.date} onChange={e => {
-                                    const exps = [...cvData.formData.experiences]; exps[idx].date = e.target.value; updateForm('experiences', exps);
-                                }} />
-                                <textarea className="w-full p-2 border rounded text-sm" rows={3} placeholder="Açıklama" value={exp.desc} onChange={e => {
-                                    const exps = [...cvData.formData.experiences]; exps[idx].desc = e.target.value; updateForm('experiences', exps);
-                                }} />
-                            </div>
-                        ))}
-                        <button onClick={() => updateForm('experiences', [...cvData.formData.experiences, { id: generateId(), title: '', company: '', date: '', desc: '' }])} className="w-full py-2 border-2 border-dashed border-blue-200 text-blue-600 rounded font-medium hover:bg-blue-50">+ Ekle</button>
-                    </AccordionItem>
-
-                    <AccordionItem title="Eğitim" icon={GraduationCap} isOpen={openSection === 'edu'} onToggle={() => setOpenSection(openSection === 'edu' ? '' : 'edu')}>
-                        {cvData.formData.education.map((edu, idx) => (
-                            <div key={edu.id} className="mb-4 p-3 bg-gray-50 rounded border border-gray-200 relative">
-                                <button onClick={() => updateForm('education', cvData.formData.education.filter(e => e.id !== edu.id))} className="absolute top-2 right-2 text-red-400 hover:text-red-600"><Trash2 size={16}/></button>
-                                <input className="w-full p-2 border rounded text-sm mb-2" placeholder="Bölüm / Derece" value={edu.degree} onChange={e => {
-                                    const edus = [...cvData.formData.education]; edus[idx].degree = e.target.value; updateForm('education', edus);
-                                }} />
-                                <input className="w-full p-2 border rounded text-sm mb-2" placeholder="Okul" value={edu.school} onChange={e => {
-                                    const edus = [...cvData.formData.education]; edus[idx].school = e.target.value; updateForm('education', edus);
-                                }} />
-                                <input className="w-full p-2 border rounded text-sm" placeholder="Tarih" value={edu.date} onChange={e => {
-                                    const edus = [...cvData.formData.education]; edus[idx].date = e.target.value; updateForm('education', edus);
-                                }} />
-                            </div>
-                        ))}
-                         <button onClick={() => updateForm('education', [...cvData.formData.education, { id: generateId(), degree: '', school: '', date: '' }])} className="w-full py-2 border-2 border-dashed border-blue-200 text-blue-600 rounded font-medium hover:bg-blue-50">+ Ekle</button>
-                    </AccordionItem>
-
-                    <AccordionItem title="Yetenekler" icon={PenTool} isOpen={openSection === 'skills'} onToggle={() => setOpenSection(openSection === 'skills' ? '' : 'skills')}>
-                        <textarea className="w-full p-2 border rounded text-sm" rows={4} placeholder="Yeteneklerinizi virgülle ayırarak yazın..." value={cvData.formData.skills} onChange={e => updateForm('skills', e.target.value)} />
-                    </AccordionItem>
-                </div>
-            );
-
-            // DESIGN EDITOR
-            const DesignEditor = () => (
-                <div className="space-y-6 p-4">
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2"><Palette size={16}/> Tema Rengi</label>
-                        <div className="flex flex-wrap gap-3">
-                            {['#2563eb', '#dc2626', '#16a34a', '#d97706', '#9333ea', '#27272a'].map(color => (
-                                <button key={color} onClick={() => updateTheme('color', color)} className={`w-8 h-8 rounded-full border-2 ${cvData.theme.color === color ? 'border-gray-900 scale-110' : 'border-transparent'}`} style={{ backgroundColor: color }} />
-                            ))}
-                        </div>
-                    </div>
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2"><Type size={16}/> Yazı Fontu</label>
-                        <select value={cvData.theme.font} onChange={e => updateTheme('font', e.target.value)} className="w-full p-2 border rounded bg-white">
-                            <option value="font-jakarta">Plus Jakarta (Modern)</option>
-                            <option value="font-ptserif">PT Serif (Klasik)</option>
-                            <option value="font-inter">Inter (Clean)</option>
-                            <option value="font-merriweather">Merriweather (Okunaklı)</option>
-                        </select>
-                    </div>
-                    <div className="border-t pt-4">
-                        <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2"><MoveVertical size={16}/> Yazı Boyutu: {cvData.layout.fontSize}pt</label>
-                        <input type="range" min="9" max="14" step="0.5" value={cvData.layout.fontSize} onChange={e => updateLayout('fontSize', parseFloat(e.target.value))} className="w-full accent-blue-600" />
-                    </div>
-                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2"><Layout size={16}/> Satır Aralığı: {cvData.layout.lineHeight}</label>
-                        <input type="range" min="1" max="2" step="0.1" value={cvData.layout.lineHeight} onChange={e => updateLayout('lineHeight', parseFloat(e.target.value))} className="w-full accent-blue-600" />
-                    </div>
-                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Kenar Boşluğu: {cvData.layout.margin}px</label>
-                        <input type="range" min="10" max="40" step="5" value={cvData.layout.margin} onChange={e => updateLayout('margin', parseInt(e.target.value))} className="w-full accent-blue-600" />
-                    </div>
-                </div>
-            );
-
-            return (
-                <div className="flex h-screen bg-gray-100 overflow-hidden font-jakarta">
-                    
-                    {/* --- DESKTOP LEFT SIDEBAR (EDITOR) --- */}
-                    <aside className={`flex flex-col w-full lg:w-[400px] bg-white shadow-xl z-20 transition-transform duration-300 ${isMobile && mobileView === 'preview' ? 'hidden' : 'flex'}`}>
-                        {/* Toolbar */}
-                        <div className="h-16 border-b flex items-center justify-between px-4 bg-white">
-                            <div className="flex gap-4">
-                                <button onClick={() => setActiveTab('content')} className={`pb-1 border-b-2 font-medium text-sm ${activeTab === 'content' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500'}`}>İçerik</button>
-                                <button onClick={() => setActiveTab('design')} className={`pb-1 border-b-2 font-medium text-sm ${activeTab === 'design' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500'}`}>Tasarım</button>
-                            </div>
-                            <button onClick={window.FirebaseService.logout} className="text-gray-400 hover:text-red-600"><LogOut size={18}/></button>
-                        </div>
-                        
-                        {/* Scrollable Form Area */}
-                        <div className="flex-1 overflow-y-auto custom-scroll p-4">
-                            {activeTab === 'content' ? <ContentEditor /> : <DesignEditor />}
-                        </div>
-                    </aside>
-
-                    {/* --- RIGHT SIDEBAR (PREVIEW) --- */}
-                    <main className={`flex-1 bg-gray-500/10 overflow-hidden relative flex flex-col ${isMobile && mobileView === 'edit' ? 'hidden' : 'flex'}`}>
-                        
-                        {/* Desktop Header */}
-                        <div className="h-16 bg-white border-b flex items-center justify-between px-6 shadow-sm z-10 hidden lg:flex">
-                            <h2 className="font-bold text-gray-700">Canlı Önizleme</h2>
-                            <button onClick={() => window.print()} className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
-                                <Download size={18} /> PDF İndir
-                            </button>
-                        </div>
-
-                        {/* Preview Area with NUCLEAR SCALING FIX */}
-                        <div className="flex-1 overflow-y-auto flex justify-center p-0 lg:p-8 bg-gray-100 lg:bg-gray-200">
-                             <div style={{
-                                width: isMobile ? `${794 * scale}px` : 'auto', // Mobile: Match scaled width. Desktop: auto
-                                height: isMobile ? `${1123 * scale + 40}px` : 'auto', // Mobile: Match scaled height + margin
-                                margin: isMobile ? '0 auto' : '0', // Mobile: Center it
-                                paddingTop: isMobile ? '20px' : '0',
-                                transform: !isMobile ? 'scale(1)' : 'none' // Desktop: No scaling needed on container
-                            }}>
-                                <div style={{
-                                    width: '794px',
-                                    height: '1123px',
-                                    transform: isMobile ? `scale(${scale})` : 'scale(1)', // Scale content
-                                    transformOrigin: 'top left', // Anchor to corner
-                                    backgroundColor: 'white',
-                                    boxShadow: isMobile ? '0 4px 6px -1px rgba(0, 0, 0, 0.1)' : 'none'
-                                }}>
-                                    <CVPreview cvData={cvData} />
-                                </div>
-                            </div>
-                        </div>
-                    </main>
-
-                    {/* --- MOBILE BOTTOM NAVIGATION --- */}
-                    {isMobile && (
-                        <nav className="fixed bottom-0 left-0 w-full bg-white border-t border-gray-200 flex justify-around items-center h-16 z-50 px-2 shadow-lg safe-area-pb no-print">
-                             <button onClick={() => setMobileView('edit')} className={`flex flex-col items-center gap-1 p-2 rounded-lg ${mobileView === 'edit' ? 'text-blue-600 bg-blue-50' : 'text-gray-500'}`}>
-                                <PenTool size={20} />
-                                <span className="text-xs font-medium">Düzenle</span>
-                            </button>
-                            <button onClick={() => setMobileView('preview')} className={`flex flex-col items-center gap-1 p-2 rounded-lg ${mobileView === 'preview' ? 'text-blue-600 bg-blue-50' : 'text-gray-500'}`}>
-                                <FileText size={20} />
-                                <span className="text-xs font-medium">Önizle</span>
-                            </button>
-                             <button onClick={() => window.print()} className="flex flex-col items-center gap-1 p-2 rounded-lg text-gray-500 hover:text-gray-900">
-                                <Download size={20} />
-                                <span className="text-xs font-medium">İndir</span>
-                            </button>
-                        </nav>
-                    )}
-                </div>
-            );
-        };
-        window.EditorView = EditorView;
-    </script>
-
-    <!-- 6. App Root -->
-    <script type="text/babel" data-type="module" data-presets="typescript,react">
-        import React, { useState, useEffect } from 'react';
-        import ReactDOM from 'react-dom/client';
-
-        const App = () => {
-            const [view, setView] = useState('landing');
-            const [user, setUser] = useState(null);
+            </form>
             
-            useEffect(() => {
-                return window.FirebaseService.onAuthStateChanged(window.FirebaseService.auth, (u) => {
-                    setUser(u);
-                    if(u && view === 'landing') setView('template'); // Go to template selection after login
-                    else if(!u) setView('landing');
-                });
-            }, []);
+            <div class="divider"><span>VEYA</span></div>
 
-            // Routing Logic
-            const renderView = () => {
-                switch(view) {
-                    case 'landing': return <window.LandingView setView={setView} />;
-                    case 'auth': return <window.AuthView setView={setView} />;
-                    case 'template': return <window.TemplateView onSelectTemplate={(tpl) => {
-                        // In a real app, save template choice here
-                        setView('editor');
-                    }} />;
-                    case 'editor': return <window.EditorView user={user} setView={setView} />;
-                    default: return <window.LandingView setView={setView} />;
-                }
-            };
+            <button class="auth-btn google-btn" onclick="loginWithGoogle()" type="button">
+                <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#FFC107" d="M43.611 20.083H42V20H24v8h11.303c-1.649 4.657-6.08 8-11.303 8-6.627 0-12-5.373-12-12s5.373-12 12-12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4 12.955 4 4 12.955 4 24s8.955 20 20 20 20-8.955 20-20c0-1.341-.138-2.65-.389-3.917z"/><path fill="#FF3D00" d="m6.306 14.691 6.571 4.819C14.655 15.108 18.961 12 24 12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4c-7.305 0-13.782 3.914-17.694 9.691z"/><path fill="#4CAF50" d="M24 44c5.166 0 9.86-1.977 13.409-5.192l-6.19-5.238A11.91 11.91 0 0 1 24 36c-5.202 0-9.619-3.317-11.283-7.946l-6.522 5.025C10.111 38.971 16.51 44 24 44z"/><path fill="#1976D2" d="M43.611 20.083H42V20H24v8h11.303a12.04 12.04 0 0 1-4.087 5.571l.003-.002 6.19 5.238C36.971 39.205 44 34 44 24c0-1.341-.138-2.65-.389-3.917z"/></svg>
+                <span>Google ile Devam Et</span>
+            </button>
+            
+            <p class="auth-toggle" onclick="toggleAuthMode()">
+                <span id="auth-toggle-msg">Hesabın yok mu?</span> 
+                <span id="auth-toggle-link" class="link-text">Hemen Kayıt Ol</span>
+            </p>
+        </div>
+    </section>
 
-            return renderView();
-        };
+    <!-- 2. ŞABLON SEÇİMİ -->
+    <section id="template-view" class="view-section">
+        <div class="template-header">
+            <h1 data-i18n="tpl_select_header">Profesyonel Bir Şablon Seçin</h1>
+        </div>
+        <div class="template-grid">
+            <div class="template-card" onclick="selectTemplate('tpl-classic')">
+                <div class="template-preview">
+                    <img src="https://cdn.prod.website-files.com/62f0854c1cef28185535ab61/65f992db51efa92ea7d033b5_Compact-1.png" alt="Klasik Şablon Önizleme">
+                </div>
+                <div class="template-info">
+                    <h3 data-i18n="tpl_classic">Klasik</h3>
+                    <p data-i18n="tpl_classic_desc">🏛️ Geleneksel & Akademik</p>
+                </div>
+            </div>
+            
+            <div class="template-card" onclick="selectTemplate('tpl-compact')">
+                <div class="template-preview">
+                    <img src="https://imgv2-2-f.scribdassets.com/img/document/649557521/original/ce87161cab/1?v=1g" alt="Kompakt Şablon Önizleme">
+                </div>
+                <div class="template-info">
+                    <h3 data-i18n="tpl_compact">Kompakt</h3>
+                    <p data-i18n="tpl_compact_desc">📄 Minimal & Tek Sayfa</p>
+                </div>
+            </div>
+        </div>
+    </section>
 
-        const root = ReactDOM.createRoot(document.getElementById('root'));
-        root.render(<App />);
-    </script>
+    <!-- 3. SPLIT EDİTÖR (FORM + PREVIEW) -->
+    <section id="editor-view" class="view-section">
+        <!-- Sidebar Navigation (Desktop Only) -->
+        <aside class="sidebar">
+            <div class="brand-container">
+                <div class="brand-logo">AF</div>
+                <div class="brand-text">ATS-Friendly</div>
+            </div>
+            
+            <div id="sync-status">
+                <div id="status-dot" class="status-dot"></div>
+                <span id="status-text" data-i18n="status_connecting">Bağlanıyor...</span>
+            </div>
+
+            <nav class="nav-menu">
+                <div class="nav-group">
+                    <span class="nav-label" data-i18n="nav_design">TASARIM & ŞABLON</span>
+                    <button class="nav-item" onclick="openThemeModal()">
+                        <span class="icon">🎨</span> <span data-i18n="btn_design">Tasarım Ayarları</span>
+                    </button>
+                    <!-- NEW LAYOUT BUTTON -->
+                    <button class="nav-item" onclick="openLayoutModal()">
+                        <span class="icon">📐</span> <span data-i18n="btn_layout">Sayfa Düzeni</span>
+                        <span class="badge-new">YENİ</span>
+                    </button>
+                    <button class="nav-item" onclick="backToTemplates()">
+                        <span class="icon">💠</span> <span data-i18n="btn_change_tpl">Şablonu Değiştir</span>
+                    </button>
+                </div>
+
+                <div class="nav-group">
+                    <span class="nav-label" data-i18n="nav_actions">İŞLEMLER</span>
+                    <button class="nav-item" onclick="window.print()">
+                        <span class="icon">🖨️</span> <span data-i18n="btn_download_pdf">PDF İndir</span>
+                    </button>
+                    <button class="nav-item danger" onclick="resetAll()">
+                        <span class="icon">🗑️</span> <span data-i18n="btn_reset">Sıfırla / Temizle</span>
+                    </button>
+                </div>
+            </nav>
+
+            <div class="sidebar-footer">
+                <button class="nav-item logout" onclick="logout()">
+                    <span class="icon">🚪</span> <span data-i18n="btn_logout">Çıkış Yap</span>
+                </button>
+            </div>
+        </aside>
+
+        <!-- SPLIT CONTAINER -->
+        <div class="editor-layout">
+            
+            <!-- LEFT PANEL: DATA ENTRY FORM -->
+            <div class="editor-panel-form" id="panel-form">
+                <div class="form-header-mini">
+                    <h2 data-i18n="form_title">Bilgilerinizi Düzenleyin</h2>
+                </div>
+                
+                <div class="form-body">
+                    <!-- Kişisel Bilgiler -->
+                    <div class="form-block">
+                        <h3 data-i18n="form_personal">Kişisel Bilgiler</h3>
+                        <div class="input-grid">
+                            <div class="input-group">
+                                <label data-i18n="form_lbl_fullname">Ad Soyad</label>
+                                <input type="text" id="inp-fullname" class="form-input" placeholder="Ad Soyad" oninput="generateCVFromForm()">
+                            </div>
+                            <div class="input-group">
+                                <label data-i18n="form_lbl_title">Unvan</label>
+                                <input type="text" id="inp-title" class="form-input" placeholder="Unvan" oninput="generateCVFromForm()">
+                            </div>
+                            <div class="input-group">
+                                <label data-i18n="form_lbl_email">E-posta</label>
+                                <input type="email" id="inp-email" class="form-input" placeholder="Email" oninput="generateCVFromForm()">
+                            </div>
+                            <div class="input-group">
+                                <label data-i18n="form_lbl_phone">Telefon</label>
+                                <input type="text" id="inp-phone" class="form-input" placeholder="Tel" oninput="generateCVFromForm()">
+                            </div>
+                            <div class="input-group full-width">
+                                <label data-i18n="form_lbl_address">Adres</label>
+                                <input type="text" id="inp-address" class="form-input" placeholder="Adres" oninput="generateCVFromForm()">
+                            </div>
+                            <div class="input-group">
+                                <label data-i18n="cv_label_birth">Doğum Yeri</label>
+                                <input type="text" id="inp-birthplace" class="form-input" placeholder="Şehir" oninput="generateCVFromForm()">
+                            </div>
+                            <div class="input-group">
+                                <label data-i18n="cv_label_license">Ehliyet</label>
+                                <input type="text" id="inp-license" class="form-input" placeholder="Sınıf" oninput="generateCVFromForm()">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Profil -->
+                    <div class="form-block">
+                        <h3 data-i18n="form_profile">Profil Özeti</h3>
+                        <textarea id="inp-summary" class="form-input" rows="4" placeholder="Kısa özet..." oninput="generateCVFromForm()"></textarea>
+                    </div>
+
+                    <!-- İş Deneyimi -->
+                    <div class="form-block">
+                        <h3 data-i18n="form_experience">İş Deneyimi</h3>
+                        <div id="form-experiences-list"></div>
+                        <button class="btn-secondary-dashed" onclick="addFormExperience()">+ <span data-i18n="btn_add_job">İş Ekle</span></button>
+                    </div>
+
+                    <!-- Eğitim -->
+                    <div class="form-block">
+                        <h3 data-i18n="form_education">Eğitim</h3>
+                        <div id="form-education-list"></div>
+                        <button class="btn-secondary-dashed" onclick="addFormEducation()">+ <span data-i18n="btn_add_edu">Okul Ekle</span></button>
+                    </div>
+
+                    <!-- Özel Bölümler -->
+                    <div class="form-block">
+                        <h3 data-i18n="form_custom">Özel Bölümler</h3>
+                        <div id="form-custom-list"></div>
+                        <button class="btn-secondary-dashed" onclick="addFormCustomSection()">+ <span data-i18n="btn_add_custom">Bölüm Ekle (Örn: Sertifikalar)</span></button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- RIGHT PANEL: PREVIEW -->
+            <div class="editor-panel-preview" id="panel-preview">
+                <div id="cv-scale-container">
+                    <div class="page cv-content" id="cv-root">
+                        <!-- CV Content generated here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- NEW MOBILE FLOATING ACTION MENU -->
+        <div class="mobile-fab-container">
+            <div class="fab-menu-items" id="fab-items">
+                <button class="fab-item" onclick="openThemeModal()">
+                    <span class="fab-label">Tasarım</span> 🎨 
+                </button>
+                <button class="fab-item" onclick="openLayoutModal()">
+                    <span class="fab-label">Düzen</span> 📐
+                </button>
+                <button class="fab-item" onclick="backToTemplates()">
+                    <span class="fab-label">Şablonlar</span> 💠
+                </button>
+                <button class="fab-item" onclick="window.print()">
+                    <span class="fab-label">PDF İndir</span> 🖨️
+                </button>
+                <button class="fab-item danger" onclick="resetAll()">
+                    <span class="fab-label">Temizle</span> 🗑️
+                </button>
+                 <button class="fab-item" onclick="logout()">
+                    <span class="fab-label">Çıkış</span> 🚪
+                </button>
+            </div>
+            <button class="fab-main-btn" onclick="toggleFabMenu()" id="fab-trigger">
+                ⚙️
+            </button>
+        </div>
+
+    </section>
+
+    <script type="module" src="script.js"></script>
 </body>
 </html>
