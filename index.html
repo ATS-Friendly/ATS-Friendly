@@ -38,15 +38,16 @@
     </style>
     <!-- Add Babel for in-browser JSX/TSX transpilation -->
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-    <!-- Clean importmap -->
+    
+    <!-- Clean importmap with consistent versions -->
     <script type="importmap">
 {
   "imports": {
     "react": "https://esm.sh/react@18.3.1",
     "react-dom/client": "https://esm.sh/react-dom@18.3.1/client",
-    "firebase/app": "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js",
-    "firebase/auth": "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js",
-    "firebase/firestore": "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js",
+    "firebase/app": "https://esm.sh/firebase@10.12.2/app",
+    "firebase/auth": "https://esm.sh/firebase@10.12.2/auth",
+    "firebase/firestore": "https://esm.sh/firebase@10.12.2/firestore",
     "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
     "react/": "https://esm.sh/react@^19.2.3/",
     "firebase/": "https://esm.sh/firebase@^12.8.0/"
@@ -57,13 +58,13 @@
   <body>
     <div id="root"></div>
     
-    <!-- Load scripts sequentially. Order matters! -->
-    <script type="text/babel" data-type="module" src="./services/firebaseService.ts"></script>
-    <script type="text/babel" data-type="module" src="./components/TemplateView.tsx"></script>
-    <script type="text/babel" data-type="module" src="./components/LandingView.tsx"></script>
-    <script type="text/babel" data-type="module" src="./components/AuthView.tsx"></script>
-    <script type="text/babel" data-type="module" src="./components/EditorView.tsx"></script>
-    <script type="text/babel" data-type="module" src="./App.tsx"></script>
-    <script type="text/babel" data-type="module" src="./index.tsx"></script>
+    <!-- Load scripts sequentially with TypeScript preset enabled -->
+    <script type="text/babel" data-type="module" data-presets="env,react,typescript" src="./services/firebaseService.ts"></script>
+    <script type="text/babel" data-type="module" data-presets="env,react,typescript" src="./components/TemplateView.tsx"></script>
+    <script type="text/babel" data-type="module" data-presets="env,react,typescript" src="./components/LandingView.tsx"></script>
+    <script type="text/babel" data-type="module" data-presets="env,react,typescript" src="./components/AuthView.tsx"></script>
+    <script type="text/babel" data-type="module" data-presets="env,react,typescript" src="./components/EditorView.tsx"></script>
+    <script type="text/babel" data-type="module" data-presets="env,react,typescript" src="./App.tsx"></script>
+    <script type="text/babel" data-type="module" data-presets="env,react,typescript" src="./index.tsx"></script>
   </body>
 </html>
