@@ -209,17 +209,20 @@ window.toggleMobileView = (mode) => {
     const layout = document.querySelector('.editor-layout');
     const btnForm = document.getElementById('btn-show-form');
     const btnPreview = document.getElementById('btn-show-preview');
-    
+    const fab = document.querySelector('.mobile-fab-container');
+
     if (mode === 'form') {
         layout.classList.add('mobile-show-form');
         layout.classList.remove('mobile-show-preview');
         btnForm.classList.add('active');
         btnPreview.classList.remove('active');
+        if(fab) fab.style.display = 'none'; // Hide FAB on form
     } else {
         layout.classList.add('mobile-show-preview');
         layout.classList.remove('mobile-show-form');
         btnForm.classList.remove('active');
         btnPreview.classList.add('active');
+        if(fab) fab.style.display = 'flex'; // Show FAB on preview
         
         // Trigger resize to scale content after it becomes visible
         setTimeout(window.resizePreview, 50);
@@ -231,30 +234,39 @@ window.resizePreview = () => {
     if (window.innerWidth > 1024) {
         // Desktop: Reset
         const container = document.getElementById('cv-scale-container');
-        if(container) container.style.transform = 'none';
+        if(container) {
+            container.style.transform = 'none';
+            container.style.marginLeft = '0'; // Reset margin
+        }
         return;
     }
 
     const previewPanel = document.getElementById('panel-preview');
     const scaleContainer = document.getElementById('cv-scale-container');
-    const page = document.getElementById('cv-root');
     
-    if (!previewPanel || !scaleContainer || !page) return;
+    if (!previewPanel || !scaleContainer) return;
 
-    // Calculate available width vs needed width
-    // 210mm is approx 794px at 96dpi. We use scrollWidth to get the real pixel width.
-    const pageWidth = 794; // Standard A4 width in pixels roughly
-    const availableWidth = previewPanel.clientWidth - 20; // 20px padding
+    // A4 Width approx 794px
+    const pageWidth = 794; 
+    const availableWidth = previewPanel.clientWidth - 20; // Padding
     
     const scale = availableWidth / pageWidth;
     
     if (scale < 1) {
+        // IMPORTANT: Calculate the margin needed to center it after scaling
+        // (Screen Width - (Scaled Width)) / 2
+        // Actually, transforming with 'top center' origin + flex parent usually centers it,
+        // but explicit margin is safer to prevent left alignment.
+        
         scaleContainer.style.transform = `scale(${scale})`;
-        // Adjust the height of the container so scrolling works properly with the scaled content
-        // 1123 is approx A4 height in pixels
+        
+        // Adjust height for scroll
         const scaledHeight = 1123 * scale;
         scaleContainer.style.height = scaledHeight + 'px';
-        scaleContainer.style.width = pageWidth + 'px'; // Fix width to prevent wrapping before scale
+        scaleContainer.style.width = pageWidth + 'px';
+        
+        // Center alignment is handled by CSS flex on .editor-panel-preview
+        // coupled with transform-origin: top center;
     } else {
         scaleContainer.style.transform = 'none';
         scaleContainer.style.height = 'auto';
@@ -266,11 +278,24 @@ window.resizePreview = () => {
 window.addEventListener('resize', window.resizePreview);
 
 
+// --- MOBILE FAB MENU ---
+window.toggleFabMenu = () => {
+    const items = document.getElementById('fab-items');
+    const btn = document.getElementById('fab-trigger');
+    items.classList.toggle('show');
+    btn.classList.toggle('active');
+};
+
+
 // --- MODAL YÖNETİMİ (TEMA & LAYOUT) ---
 function openModal(modalId) {
     const modal = document.getElementById(modalId);
     modal.classList.add('active');
     
+    // Close FAB when opening modal
+    document.getElementById('fab-items').classList.remove('show');
+    document.getElementById('fab-trigger').classList.remove('active');
+
     // Center modal or simple fixed positioning for mobile stability
     if(window.innerWidth > 1024) {
         if (!modal.style.top || !modal.style.left) {
@@ -281,7 +306,6 @@ function openModal(modalId) {
         initDragElement(modal.querySelector('.modal-content'));
     } else {
         // Mobile positioning handled by CSS (bottom sheet)
-        // Reset inline styles if any
         const content = modal.querySelector('.modal-content');
         content.style.top = '';
         content.style.left = '';

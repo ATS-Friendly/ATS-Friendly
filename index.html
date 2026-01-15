@@ -161,7 +161,7 @@
 
     <!-- 3. SPLIT EDİTÖR (FORM + PREVIEW) -->
     <section id="editor-view" class="view-section">
-        <!-- Sidebar Navigation -->
+        <!-- Sidebar Navigation (Desktop Only) -->
         <aside class="sidebar">
             <div class="brand-container">
                 <div class="brand-logo">AF</div>
@@ -295,6 +295,34 @@
                 </div>
             </div>
         </div>
+
+        <!-- NEW MOBILE FLOATING ACTION MENU -->
+        <div class="mobile-fab-container">
+            <div class="fab-menu-items" id="fab-items">
+                <button class="fab-item" onclick="openThemeModal()">
+                    <span class="fab-label">Tasarım</span> 🎨 
+                </button>
+                <button class="fab-item" onclick="openLayoutModal()">
+                    <span class="fab-label">Düzen</span> 📐
+                </button>
+                <button class="fab-item" onclick="backToTemplates()">
+                    <span class="fab-label">Şablonlar</span> 💠
+                </button>
+                <button class="fab-item" onclick="window.print()">
+                    <span class="fab-label">PDF İndir</span> 🖨️
+                </button>
+                <button class="fab-item danger" onclick="resetAll()">
+                    <span class="fab-label">Temizle</span> 🗑️
+                </button>
+                 <button class="fab-item" onclick="logout()">
+                    <span class="fab-label">Çıkış</span> 🚪
+                </button>
+            </div>
+            <button class="fab-main-btn" onclick="toggleFabMenu()" id="fab-trigger">
+                ⚙️
+            </button>
+        </div>
+
     </section>
 
     <script type="module" src="script.js"></script>

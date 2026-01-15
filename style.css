@@ -115,7 +115,7 @@ body {
         padding: 3px;
         opacity: 0.9;
     }
-    /* Hide lang switcher on form view to give more space, only show on preview or template */
+    /* Hide lang switcher on form view to give more space */
     .editor-layout.mobile-show-form ~ .lang-switcher {
         display: none; 
     }
@@ -270,55 +270,8 @@ body {
 }
 
 @media screen and (max-width: 1024px) {
-    .sidebar { 
-        position: fixed; 
-        bottom: 0; 
-        left: 0; 
-        width: 100%;
-        height: 60px; /* Fixed height for mobile */
-        flex-direction: row; 
-        align-items: center;
-        justify-content: space-around;
-        padding: 0;
-        background: #1e272e;
-        overflow: hidden;
-        z-index: 2900;
-        box-shadow: 0 -5px 15px rgba(0,0,0,0.1);
-    }
-    .brand-container, .nav-label, .sidebar-footer, #sync-status { display: none !important; }
-    
-    .nav-menu { 
-        display: flex; 
-        flex-direction: row; 
-        gap: 0; 
-        width: 100%; 
-        justify-content: space-evenly;
-        padding: 0;
-        height: 100%;
-        align-items: center;
-    }
-    
-    .nav-group { 
-        margin: 0; 
-        border: none; 
-        padding: 0; 
-        display: flex; 
-        flex-direction: row;
-        gap: 15px;
-    }
-    
-    .nav-item { 
-        margin: 0; 
-        padding: 8px; 
-        border-radius: 8px; 
-        justify-content: center;
-        width: 44px; /* Slightly bigger touch target */
-        height: 44px;
-    }
-    
-    .nav-item span:last-child { display: none; }
-    .nav-item .icon { margin: 0; font-size: 22px; }
-    .badge-new { display: none; }
+    /* HIDE OLD SIDEBAR ON MOBILE COMPLETELY */
+    .sidebar { display: none !important; }
 }
 
 /* Sidebar Components */
@@ -472,7 +425,7 @@ body {
     .editor-layout {
         flex-direction: column;
         padding-left: 0;
-        padding-bottom: 60px; /* Space for mobile nav */
+        padding-bottom: 0; 
         height: auto;
     }
     
@@ -517,6 +470,7 @@ body {
         width: 100%;
         border-right: none;
         border-bottom: 1px solid #eee;
+        padding-bottom: 80px; /* Space for FAB */
     }
 }
 
@@ -528,6 +482,7 @@ body {
     flex-grow: 1;
     background: #f0f2f5;
     overflow-y: auto;
+    overflow-x: hidden; /* Prevent horizontal scroll causing alignment issues */
     padding: 40px;
     display: flex;
     justify-content: center;
@@ -536,11 +491,11 @@ body {
 @media screen and (max-width: 1024px) {
     .editor-panel-preview {
         padding: 10px;
-        min-height: calc(100vh - 120px); /* Height minus toggles and bottom bar */
+        min-height: calc(100vh - 120px); 
         display: flex;
-        justify-content: center;
-        align-items: flex-start;
-        overflow-x: hidden;
+        flex-direction: column;
+        align-items: center; /* Center horizontally */
+        justify-content: flex-start;
     }
 }
 
@@ -647,7 +602,7 @@ textarea.form-input { resize: vertical; }
     animation: fadeInScale 0.2s ease-out;
 }
 
-/* MOBILE BOTTOM SHEET STYLE */
+/* MOBILE BOTTOM SHEET STYLE WITH TRANSPARENCY */
 @media screen and (max-width: 1024px) {
     #theme-modal .modal-content, #layout-modal .modal-content {
         width: 100% !important;
@@ -658,9 +613,14 @@ textarea.form-input { resize: vertical; }
         border-radius: 20px 20px 0 0;
         transform: none !important; /* Disable drag position */
         animation: slideUp 0.3s ease-out;
-        max-height: 80vh;
+        max-height: 60vh; /* Limit height so users can see CV behind */
         overflow-y: auto;
         box-shadow: 0 -5px 25px rgba(0,0,0,0.2);
+        
+        /* Glassmorphism attempt for transparency */
+        background: rgba(255, 255, 255, 0.92);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
     }
 }
 
@@ -686,7 +646,10 @@ textarea.form-input { resize: vertical; }
 }
 /* Disable drag cursor on mobile */
 @media screen and (max-width: 1024px) {
-    .modal-header { cursor: default; }
+    .modal-header { 
+        cursor: default; 
+        background: rgba(248, 249, 250, 0.8);
+    }
 }
 
 .modal-header h3 { margin: 0; font-size: 16px; color: #2d3436; }
@@ -715,6 +678,10 @@ textarea.form-input { resize: vertical; }
 .font-btn:hover { border-color: var(--primary-color); background: #f0faff; }
 .modal-footer { padding: 15px; border-top: 1px solid #eee; background: #fff; }
 
+@media screen and (max-width: 1024px) {
+    .modal-footer { background: rgba(255, 255, 255, 0.8); }
+}
+
 /* Range Sliders */
 .range-header {
     display: flex;
@@ -739,6 +706,9 @@ input[type=range] {
 #cv-scale-container {
     transform-origin: top center;
     transition: transform 0.2s;
+    /* IMPORTANT for centering: let it take natural width, flex parent handles alignment */
+    margin: 0 auto; 
+    box-shadow: 0 5px 20px rgba(0,0,0,0.1);
 }
 
 .page { 
@@ -746,9 +716,8 @@ input[type=range] {
     width: 210mm; /* Fixed A4 Width */
     min-height: 297mm; 
     padding: var(--cv-padding); 
-    box-shadow: 0 5px 20px rgba(0,0,0,0.08); 
     position: relative; 
-    /* No transformation here, done on wrapper */
+    /* Box shadow removed here, applied to container for better visual when scaled */
 }
 
 .cv-content { 
@@ -861,10 +830,10 @@ body.tpl-compact .entry .right-col { width: 100%; padding-right: 130px; }
         -webkit-print-color-adjust: exact;
         print-color-adjust: exact;
     }
-    .sidebar, #auth-view, #template-view, .editor-panel-form, .lang-switcher, #toast, .modal-overlay, #theme-modal, #layout-modal, .mobile-view-toggle { display: none !important; }
+    .sidebar, #auth-view, #template-view, .editor-panel-form, .lang-switcher, #toast, .modal-overlay, #theme-modal, #layout-modal, .mobile-view-toggle, .mobile-fab-container { display: none !important; }
     .editor-layout { display: block; padding: 0; width: 100%; height: auto; }
     .editor-panel-preview { padding: 0; background: white; overflow: visible; display: block; height: auto !important; }
-    #cv-scale-container { transform: none !important; width: 100%; }
+    #cv-scale-container { transform: none !important; width: 100%; box-shadow: none; margin: 0; }
     .page { 
         width: 100%; 
         max-width: 210mm; /* Force A4 Width */
@@ -875,3 +844,85 @@ body.tpl-compact .entry .right-col { width: 100%; padding-right: 130px; }
         overflow: hidden; /* Ensure content stays in */
     }
 }
+
+/* --- MOBILE FLOATING ACTION MENU --- */
+.mobile-fab-container {
+    display: none;
+    position: fixed;
+    bottom: 30px;
+    left: 20px;
+    z-index: 2800;
+    flex-direction: column-reverse;
+    align-items: flex-start;
+    gap: 15px;
+}
+
+@media screen and (max-width: 1024px) {
+    .mobile-fab-container { display: flex; }
+}
+
+.fab-main-btn {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    font-size: 24px;
+    box-shadow: 0 4px 15px rgba(52, 152, 219, 0.4);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.3s ease;
+    z-index: 2802;
+}
+.fab-main-btn.active {
+    transform: rotate(45deg);
+    background: #e74c3c;
+}
+
+.fab-menu-items {
+    display: flex;
+    flex-direction: column-reverse; /* Bottom to top */
+    gap: 12px;
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(20px);
+    transition: all 0.3s ease;
+    align-items: flex-start;
+}
+.fab-menu-items.show {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateY(0);
+}
+
+.fab-item {
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    border: 1px solid rgba(0,0,0,0.05);
+    padding: 10px 15px;
+    border-radius: 30px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    cursor: pointer;
+    font-size: 14px;
+    color: #2d3436;
+    font-weight: 600;
+    transition: 0.2s;
+}
+.fab-item:active {
+    transform: scale(0.95);
+}
+.fab-label {
+    margin-right: 5px;
+}
+.fab-item.danger {
+    color: #e74c3c;
+    background: rgba(255, 230, 230, 0.9);
+}
+
