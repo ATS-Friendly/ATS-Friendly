@@ -38,7 +38,7 @@
     </style>
     <!-- Add Babel for in-browser JSX/TSX transpilation -->
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-    <!-- Update importmap for stability and direct module resolution -->
+    <!-- Correct and clean importmap -->
     <script type="importmap">
 {
   "imports": {
@@ -56,7 +56,7 @@
   </head>
   <body>
     <div id="root"></div>
-    <!-- Change script type to "text/babel" to enable transpilation -->
-    <script type="text/babel" data-presets="react,typescript" data-type="module" src="/index.tsx"></script>
+    <!-- Use relative path for src to work on GitHub Pages -->
+    <script type="text/babel" data-presets="react,typescript" data-type="module" src="./index.tsx"></script>
   </body>
 </html>
