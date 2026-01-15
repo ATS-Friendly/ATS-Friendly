@@ -1372,7 +1372,7 @@ body.tpl-compact .entry .right-col { width: 100%; padding-right: 130px; }
         background: white !important;
         box-sizing: border-box !important;
     }
-}
+
 
 .fab-overlay {
     display: none;
@@ -1476,58 +1476,3 @@ body.tpl-compact .entry .right-col { width: 100%; padding-right: 130px; }
     border-color: rgba(255, 0, 0, 0.1);
 }
 
-@media print {
-    /* 1. Sayfa Kenar Boşluklarını Sıfırla */
-    @page {
-        margin: 0;
-        size: auto;
-    }
-
-    /* 2. Gereksiz Öğeleri Gizle (Butonlar, Yan Menü vb.) */
-    .sidebar, 
-    .fab-container, 
-    .fab-main-btn, 
-    .nav-buttons,
-    button,
-    .no-print {
-        display: none !important;
-    }
-
-    /* 3. Ana Kapsayıcı Ayarları */
-    html, body {
-        width: 100%;
-        height: auto !important; /* Yükseklik sınırını kaldırır */
-        margin: 0 !important;
-        padding: 0 !important;
-        overflow: visible !important; /* Kesilmeyi engeller */
-        background-color: white !important;
-    }
-
-    /* 4. Arka planın (Sidebar) gri alanını kaldırıp tam sayfa yapma */
-    .main-content {
-        margin-left: 0 !important; /* Sidebar boşluğunu kaldır */
-        width: 100% !important;
-        height: auto !important;
-        padding: 0 !important;
-        overflow: visible !important;
-        display: block !important;
-    }
-
-    /* 5. CV Kağıdının Kendisi */
-    #cv-preview, .cv-paper { 
-        /* Not: HTML'de CV'yi kapsayan div'in ID'si veya class'ı neyse onu buraya yazmalısın */
-        width: 100% !important;
-        max-width: 100% !important;
-        position: static !important; /* Sayfa akışına bırak */
-        box-shadow: none !important; /* Gölgeleri kaldır */
-        margin: 0 !important;
-        padding: 0 !important; /* Gerekirse padding verebilirsin ama margin 0 olsun */
-        transform: none !important; /* Ölçekleme varsa iptal et */
-        page-break-inside: auto;
-    }
-
-    /* 6. İçeriklerin Bölünmemesi İçin (Opsiyonel) */
-    .cv-section, .cv-item {
-        page-break-inside: avoid; /* Bir maddeyi iki sayfaya bölmeyi engellemeye çalışır */
-    }
-}
