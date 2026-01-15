@@ -119,8 +119,8 @@
             </div>
             <div class="header-actions">
                 <div class="lang-switcher-minimal">
-                    <button class="lang-btn-mini active" onclick="setLanguage('tr')">TR</button>
-                    <button class="lang-btn-mini" onclick="setLanguage('en')">EN</button>
+                    <button class="lang-btn-mini active" data-lang="tr" onclick="setLanguage('tr')">TR</button>
+                    <button class="lang-btn-mini" data-lang="en" onclick="setLanguage('en')">EN</button>
                 </div>
                 <button class="btn-text" onclick="showAuth(true)">Giriş Yap</button>
                 <button class="btn-primary-small" onclick="showAuth(false)">Kayıt Ol</button>
@@ -129,11 +129,11 @@
 
         <main class="landing-hero">
             <div class="hero-content">
-                <h1>İşe Alım Robotlarını<br><span class="highlight-text">Yenecek CV'nizi Oluşturun</span></h1>
-                <p class="hero-subtitle">Modern işe alım sistemleri (ATS) ile %100 uyumlu, profesyonel ve sade CV'ler hazırlayın. Üstelik tamamen ücretsiz.</p>
+                <h1 data-i18n="landing_h1">İşe Alım Robotlarını<br><span class="highlight-text">Yenecek CV'nizi Oluşturun</span></h1>
+                <p class="hero-subtitle" data-i18n="landing_subtitle">Modern işe alım sistemleri (ATS) ile %100 uyumlu, profesyonel ve sade CV'ler hazırlayın. Üstelik tamamen ücretsiz.</p>
                 <div class="hero-buttons">
-                    <button class="btn-hero-primary" onclick="showAuth(false)">Hemen Ücretsiz Başla</button>
-                    <button class="btn-hero-secondary" onclick="scrollToFeatures()">Nasıl Çalışır?</button>
+                    <button class="btn-hero-primary" onclick="showAuth(false)" data-i18n="btn_start_free">Hemen Ücretsiz Başla</button>
+                    <button class="btn-hero-secondary" onclick="scrollToFeatures()" data-i18n="btn_how_it_works">Nasıl Çalışır?</button>
                 </div>
             </div>
             <div class="hero-image">
@@ -158,18 +158,18 @@
         <section id="features" class="features-section">
             <div class="feature-card">
                 <div class="f-icon">🤖</div>
-                <h3>ATS Dostu Format</h3>
-                <p>Karmaşık grafikler yok. İnsan kaynakları yazılımlarının (ATS) kolayca okuyabileceği temiz kod yapısı.</p>
+                <h3 data-i18n="feat_1_title">ATS Dostu Format</h3>
+                <p data-i18n="feat_1_desc">Karmaşık grafikler yok. İnsan kaynakları yazılımlarının (ATS) kolayca okuyabileceği temiz kod yapısı.</p>
             </div>
             <div class="feature-card">
                 <div class="f-icon">💸</div>
-                <h3>%100 Ücretsiz</h3>
-                <p>Gizli ödeme yok, filigran yok. Sınırsız düzenleme ve PDF indirme hakkı.</p>
+                <h3 data-i18n="feat_2_title">%100 Ücretsiz</h3>
+                <p data-i18n="feat_2_desc">Gizli ödeme yok, filigran yok. Sınırsız düzenleme ve PDF indirme hakkı.</p>
             </div>
             <div class="feature-card">
                 <div class="f-icon">☁️</div>
-                <h3>Bulut Kayıt</h3>
-                <p>CV'niz bulutta güvende. İstediğiniz cihazdan (PC veya Mobil) kaldığınız yerden devam edin.</p>
+                <h3 data-i18n="feat_3_title">Bulut Kayıt</h3>
+                <p data-i18n="feat_3_desc">CV'niz bulutta güvende. İstediğiniz cihazdan (PC veya Mobil) kaldığınız yerden devam edin.</p>
             </div>
         </section>
 
@@ -272,6 +272,11 @@
             <button class="mobile-tab-btn" onclick="switchMobileTab('preview')" id="tab-preview">
                 <span data-i18n="tab_preview">Önizle</span>
             </button>
+            
+            <div class="lang-switcher-mobile-tabs">
+                <button class="lang-btn-mini active" data-lang="tr" onclick="setLanguage('tr')">TR</button>
+                <button class="lang-btn-mini" data-lang="en" onclick="setLanguage('en')">EN</button>
+            </div>
         </div>
 
         <!-- Sidebar Navigation (Desktop Only) -->
@@ -284,6 +289,11 @@
             <div id="sync-status">
                 <div id="status-dot" class="status-dot"></div>
                 <span id="status-text" data-i18n="status_connecting">Bağlanıyor...</span>
+                
+                <div class="lang-switcher-sidebar">
+                    <button class="lang-btn-mini active" data-lang="tr" onclick="setLanguage('tr')">TR</button>
+                    <button class="lang-btn-mini" data-lang="en" onclick="setLanguage('en')">EN</button>
+                </div>
             </div>
 
             <nav class="nav-menu">
@@ -441,8 +451,8 @@
                     <span class="fab-label">Çıkış</span> 🚪
                 </button>
                 <div class="fab-item lang-selector-fab">
-                    <button class="lang-btn-fab" onclick="setLanguage('tr')">TR</button>
-                    <button class="lang-btn-fab" onclick="setLanguage('en')">EN</button>
+                    <button class="lang-btn-fab active" data-lang="tr" onclick="setLanguage('tr')">TR</button>
+                    <button class="lang-btn-fab" data-lang="en" onclick="setLanguage('en')">EN</button>
                 </div>
             </div>
             <button class="fab-main-btn" onclick="toggleFabMenu()" id="fab-trigger" aria-label="Open settings menu">

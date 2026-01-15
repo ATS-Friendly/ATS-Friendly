@@ -103,6 +103,16 @@ const translations = {
         btn_design: "Özelleştir",
         tab_edit: "Düzenle",
         tab_preview: "Önizle",
+        landing_h1: "İşe Alım Robotlarını<br><span class='highlight-text'>Yenecek CV'nizi Oluşturun</span>",
+        landing_subtitle: "Modern işe alım sistemleri (ATS) ile %100 uyumlu, profesyonel ve sade CV'ler hazırlayın. Üstelik tamamen ücretsiz.",
+        btn_start_free: "Hemen Ücretsiz Başla",
+        btn_how_it_works: "Nasıl Çalışır?",
+        feat_1_title: "ATS Dostu Format",
+        feat_1_desc: "Karmaşık grafikler yok. İnsan kaynakları yazılımlarının (ATS) kolayca okuyabileceği temiz kod yapısı.",
+        feat_2_title: "%100 Ücretsiz",
+        feat_2_desc: "Gizli ödeme yok, filigran yok. Sınırsız düzenleme ve PDF indirme hakkı.",
+        feat_3_title: "Bulut Kayıt",
+        feat_3_desc: "CV'niz bulutta güvende. İstediğiniz cihazdan (PC veya Mobil) kaldığınız yerden devam edin.",
         // Form Translations
         form_title: "Bilgilerinizi Düzenleyin",
         form_personal: "Kişisel Bilgiler",
@@ -174,6 +184,16 @@ const translations = {
         btn_design: "Customize",
         tab_edit: "Edit",
         tab_preview: "Preview",
+        landing_h1: "Build Your CV to<br><span class='highlight-text'>Beat Recruitment Robots</span>",
+        landing_subtitle: "Create professional and simple CVs 100% compatible with modern recruitment systems (ATS). And it's completely free.",
+        btn_start_free: "Start Free Now",
+        btn_how_it_works: "How It Works?",
+        feat_1_title: "ATS Friendly Format",
+        feat_1_desc: "No complex graphics. Clean code structure that human resources software (ATS) can easily read.",
+        feat_2_title: "100% Free",
+        feat_2_desc: "No hidden payments, no watermarks. Unlimited editing and PDF download rights.",
+        feat_3_title: "Cloud Save",
+        feat_3_desc: "Your CV is safe in the cloud. Continue where you left off from any device (PC or Mobile).",
         // Form Translations
         form_title: "Edit Your Details",
         form_personal: "Personal Details",
@@ -206,17 +226,19 @@ window.setLanguage = (lang) => {
     // UI Güncelle
     document.querySelectorAll('[data-i18n]').forEach(el => {
         const key = el.getAttribute('data-i18n');
-        if (translations[lang][key]) {
-            el.innerText = translations[lang][key];
+        const translation = translations[lang][key];
+        if (translation) {
+            if (translation.includes('<')) {
+                el.innerHTML = translation;
+            } else {
+                el.innerText = translation;
+            }
         }
     });
 
     // Toggle Button Style
-    document.querySelectorAll('.lang-btn-mini, .lang-btn-fab').forEach(btn => {
-        btn.classList.remove('active');
-        if (btn.getAttribute('onclick').includes(`'${lang}'`)) {
-            btn.classList.add('active');
-        }
+    document.querySelectorAll('[data-lang]').forEach(btn => {
+        btn.classList.toggle('active', btn.getAttribute('data-lang') === lang);
     });
 
     // Update Auth Labels Manually
@@ -984,3 +1006,7 @@ window.resetAll = async (skipConfirm = false) => {
 window.createNewSection = () => {
     alert("Yeni sistemde 'Özel Bölümler' alanını kullanarak ekleme yapabilirsiniz.");
 };
+
+// Initial setup
+setLanguage('tr');
+window.resizePreview();
