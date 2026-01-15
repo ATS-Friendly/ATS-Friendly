@@ -39,6 +39,38 @@ body {
     overflow-x: hidden;
 }
 
+/* --- TOAST --- */
+#toast {
+    visibility: hidden;
+    min-width: 200px;
+    background-color: var(--success-color);
+    color: white;
+    text-align: center;
+    border-radius: 8px;
+    padding: 12px;
+    position: fixed;
+    z-index: 3000;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    font-weight: 700;
+}
+#toast.show {
+    visibility: visible;
+    animation: fadein 0.5s, fadeout 0.5s 2.5s;
+}
+
+@keyframes fadein {
+  from {top: 0; opacity: 0;}
+  to {top: 20px; opacity: 1;}
+}
+
+@keyframes fadeout {
+  from {top: 20px; opacity: 1;}
+  to {top: 0; opacity: 0;}
+}
+
 /* --- LANGUAGE SWITCHER --- */
 .lang-switcher {
     position: fixed;
@@ -225,22 +257,50 @@ body {
         position: fixed; 
         bottom: 0; 
         left: 0; 
-        right: 0;
-        top: auto;
-        height: auto;
+        width: 100%;
+        height: 60px; /* Fixed height for mobile */
         flex-direction: row; 
         align-items: center;
-        overflow-x: auto;
-        padding: 10px;
-        white-space: nowrap;
+        justify-content: space-around;
+        padding: 0;
         background: #1e272e;
+        overflow: hidden;
+        z-index: 2900;
     }
     .brand-container, .nav-label, .sidebar-footer, #sync-status { display: none !important; }
-    .nav-menu { display: flex; flex-direction: row; gap: 10px; width: 100%; justify-content: space-around;}
-    .nav-group { margin: 0; border: none; padding: 0; display: flex; gap: 10px;}
-    .nav-item { margin: 0; padding: 10px; border-radius: 8px; justify-content: center;}
+    
+    .nav-menu { 
+        display: flex; 
+        flex-direction: row; 
+        gap: 0; 
+        width: 100%; 
+        justify-content: space-evenly;
+        padding: 0;
+        height: 100%;
+        align-items: center;
+    }
+    
+    .nav-group { 
+        margin: 0; 
+        border: none; 
+        padding: 0; 
+        display: flex; 
+        flex-direction: row;
+        gap: 15px;
+    }
+    
+    .nav-item { 
+        margin: 0; 
+        padding: 8px; 
+        border-radius: 8px; 
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+    }
+    
     .nav-item span:last-child { display: none; }
-    .nav-item .icon { margin: 0; font-size: 18px; }
+    .nav-item .icon { margin: 0; font-size: 20px; }
+    .badge-new { display: none; }
 }
 
 /* Sidebar Components */
@@ -360,6 +420,35 @@ body {
     box-sizing: border-box;
 }
 
+/* MOBILE TOGGLE (Defaults to hidden on desktop) */
+.mobile-view-toggle {
+    display: none;
+    width: 100%;
+    background: #fff;
+    border-bottom: 1px solid #ddd;
+    padding: 10px;
+    box-sizing: border-box;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    gap: 10px;
+}
+.mv-btn {
+    flex: 1;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background: #f8f9fa;
+    font-weight: 600;
+    color: #636e72;
+    cursor: pointer;
+}
+.mv-btn.active {
+    background: var(--primary-color);
+    color: white;
+    border-color: var(--primary-color);
+}
+
 @media screen and (max-width: 1024px) {
     .editor-layout {
         flex-direction: column;
@@ -367,6 +456,30 @@ body {
         padding-bottom: 80px; /* Space for mobile nav */
         height: auto;
     }
+    
+    .mobile-view-toggle {
+        display: flex;
+    }
+
+    /* Mobile Logic: Hide one panel based on state */
+    .editor-layout.mobile-show-preview .editor-panel-form { display: none; }
+    .editor-layout.mobile-show-preview .editor-panel-preview { display: block; }
+    
+    .editor-layout.mobile-show-form .editor-panel-form { display: block; }
+    .editor-layout.mobile-show-form .editor-panel-preview { display: none; }
+    
+    /* Default state for simple load (handled via JS but CSS fallback) */
+    .editor-panel-preview { display: none; } /* Default hide preview on mobile */
+    .editor-panel-form { width: 100%; display: block;}
+}
+
+@media screen and (min-width: 1025px) {
+    /* Ensure both are visible on desktop regardless of mobile classes */
+    .editor-layout.mobile-show-preview .editor-panel-form,
+    .editor-layout.mobile-show-form .editor-panel-form { display: block; }
+    
+    .editor-layout.mobile-show-preview .editor-panel-preview,
+    .editor-layout.mobile-show-form .editor-panel-preview { display: flex; }
 }
 
 /* LEFT PANEL: FORM */
@@ -404,6 +517,7 @@ body {
 @media screen and (max-width: 1024px) {
     .editor-panel-preview {
         padding: 20px;
+        min-height: 80vh; /* Ensure height in mobile preview */
     }
 }
 
@@ -687,7 +801,7 @@ body.tpl-compact .entry .right-col { width: 100%; padding-right: 130px; }
         -webkit-print-color-adjust: exact;
         print-color-adjust: exact;
     }
-    .sidebar, #auth-view, #template-view, .editor-panel-form, .lang-switcher, #toast, .modal-overlay, #theme-modal, #layout-modal { display: none !important; }
+    .sidebar, #auth-view, #template-view, .editor-panel-form, .lang-switcher, #toast, .modal-overlay, #theme-modal, #layout-modal, .mobile-view-toggle { display: none !important; }
     .editor-layout { display: block; padding: 0; width: 100%; height: auto; }
     .editor-panel-preview { padding: 0; background: white; overflow: visible; display: block; }
     .page { 

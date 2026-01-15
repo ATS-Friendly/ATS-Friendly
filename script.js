@@ -197,20 +197,52 @@ function showView(viewId) {
     document.querySelectorAll('.view-section').forEach(v => v.classList.remove('active'));
     const target = document.getElementById(viewId);
     if (target) target.classList.add('active');
+    
+    // Reset Mobile View to Form when switching screens
+    if(viewId === 'editor-view') {
+        window.toggleMobileView('form');
+    }
 }
+
+// --- MOBILE VIEW MANAGEMENT ---
+window.toggleMobileView = (mode) => {
+    const layout = document.querySelector('.editor-layout');
+    const btnForm = document.getElementById('btn-show-form');
+    const btnPreview = document.getElementById('btn-show-preview');
+    
+    if (mode === 'form') {
+        layout.classList.add('mobile-show-form');
+        layout.classList.remove('mobile-show-preview');
+        btnForm.classList.add('active');
+        btnPreview.classList.remove('active');
+    } else {
+        layout.classList.add('mobile-show-preview');
+        layout.classList.remove('mobile-show-form');
+        btnForm.classList.remove('active');
+        btnPreview.classList.add('active');
+    }
+};
 
 // --- MODAL YÖNETİMİ (TEMA & LAYOUT) ---
 function openModal(modalId) {
     const modal = document.getElementById(modalId);
     modal.classList.add('active');
     
-    if (!modal.style.top || !modal.style.left) {
-        modal.style.top = "100px";
-        const initialLeft = Math.max(20, window.innerWidth - 360);
-        modal.style.left = initialLeft + "px";
+    // Center modal or simple fixed positioning for mobile stability
+    if(window.innerWidth > 768) {
+        if (!modal.style.top || !modal.style.left) {
+            modal.style.top = "100px";
+            const initialLeft = Math.max(20, window.innerWidth - 360);
+            modal.style.left = initialLeft + "px";
+        }
+        initDragElement(modal.querySelector('.modal-content'));
+    } else {
+        // Mobile positioning defaults
+        modal.style.top = "50px";
+        modal.style.left = "50%";
+        modal.querySelector('.modal-content').style.transform = "translateX(-50%)";
+        modal.querySelector('.modal-content').style.width = "90%";
     }
-    
-    initDragElement(modal.querySelector('.modal-content'));
 }
 
 window.openThemeModal = () => openModal('theme-modal');
@@ -704,6 +736,12 @@ async function saveToCloud(formData = null) {
         console.error("Save failed:", e);
     } finally {
         isSyncing = false;
+        
+        // Mobile specific toast handling
+        const t = document.getElementById('toast');
+        t.innerText = translations[currentLang].status_syncing.replace('...','!');
+        t.classList.add('show');
+        setTimeout(() => t.classList.remove('show'), 2000);
     }
 }
 

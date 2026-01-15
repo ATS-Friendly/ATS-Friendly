@@ -3,7 +3,7 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>ATS-Friendly | Profesyonel Bulut CV Oluşturucu</title>
     
     <!-- Fonts -->
@@ -209,8 +209,14 @@
 
         <!-- SPLIT CONTAINER -->
         <div class="editor-layout">
+            <!-- MOBILE VIEW TOGGLER -->
+            <div class="mobile-view-toggle">
+                <button class="mv-btn active" id="btn-show-form" onclick="toggleMobileView('form')">✏️ Bilgileri Düzenle</button>
+                <button class="mv-btn" id="btn-show-preview" onclick="toggleMobileView('preview')">👁️ CV Önizleme</button>
+            </div>
+
             <!-- LEFT PANEL: DATA ENTRY FORM -->
-            <div class="editor-panel-form">
+            <div class="editor-panel-form" id="panel-form">
                 <div class="form-header-mini">
                     <h2 data-i18n="form_title">Bilgilerinizi Düzenleyin</h2>
                 </div>
@@ -281,7 +287,7 @@
             </div>
 
             <!-- RIGHT PANEL: PREVIEW -->
-            <div class="editor-panel-preview">
+            <div class="editor-panel-preview" id="panel-preview">
                 <div class="page cv-content" id="cv-root">
                     <!-- CV Content generated here -->
                 </div>
