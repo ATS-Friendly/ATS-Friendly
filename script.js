@@ -657,11 +657,16 @@ window.scrollToFeatures = () => {
 };
 
 window.showAuth = (loginMode) => {
-    // If user is already logged in, don't show login screen, go to app
-    if (currentUser) {
-        window.showView('template-view');
-        return;
-    }
+    // DEBUG: Always show auth screen for testing
+    console.log("showAuth called with loginMode:", loginMode);
+    console.log("Current user:", currentUser);
+    
+    // If user is already logged in, don"t show login screen, go to app
+    // if (currentUser) {
+    //     window.showView('template-view');
+    //     return;
+    // }
+    
     isLoginMode = loginMode;
     updateAuthUI();
     window.showView('auth-view');
