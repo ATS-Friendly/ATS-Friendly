@@ -1596,3 +1596,16 @@ window.addEventListener('afterprint', () => {
     // Re-scale preview for mobile if needed after print
     if (window.resizePreview) window.resizePreview();
 });
+
+// LinkedIn URL Tip
+window.addEventListener('load', () => {
+    if (!localStorage.getItem('linkedin_tip_shown')) {
+        setTimeout(() => {
+            const tip = currentLang === 'tr' 
+                ? "İpucu: LinkedIn profil linkinizi 'Genel profil ve URL' kısmından kopyalarsanız CV'nizde daha şık (temiz) görünecektir." 
+                : "Tip: For a cleaner look on your CV, copy your LinkedIn URL from the 'Public profile & URL' section of your profile.";
+            alert(tip);
+            localStorage.setItem('linkedin_tip_shown', 'true');
+        }, 1500);
+    }
+});
