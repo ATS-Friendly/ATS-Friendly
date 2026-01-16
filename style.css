@@ -572,7 +572,7 @@ body {
 }
 .template-preview { 
     width: 100%;
-    aspect-ratio: 210/297; 
+    height: 250px; 
     background: #eee; 
     display: flex; 
     align-items: center; 
