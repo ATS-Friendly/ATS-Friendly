@@ -18,7 +18,7 @@ exports.parseResumeWithAI = onCall({ secrets: [GEMINI_API_KEY] }, async (request
 
     try {
         const genAI = new GoogleGenerativeAI(GEMINI_API_KEY.value());
-        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash-002" });
+        const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash-lite-preview-02-05" });
 
         const prompt = `
             Extract the following information from the resume text provided below. 
