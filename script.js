@@ -151,7 +151,12 @@ const translations = {
         menu_profile_desc: "Hesap ve e-posta ayarları",
         menu_faq: "Sıkça Sorulan Sorular",
         menu_faq_desc: "Yardım ve destek",
-        menu_logout_desc: "Oturumu güvenli bir şekilde kapat"
+        menu_logout_desc: "Oturumu güvenli bir şekilde kapat",
+        privacy_policy_title: "Gizlilik Politikası",
+        privacy_policy_content: `Veri Toplama: Bu platform, yalnızca CV oluşturma amacıyla sağladığınız kişisel bilgileri (ad, iletişim, deneyim vb.) işler.<br><br>Veri Kullanımı: Bilgileriniz hiçbir şekilde üçüncü şahıslarla paylaşılmaz veya reklam amaçlı kullanılmaz.<br><br>Yerel Depolama: Verileriniz tarayıcınızın yerel depolama alanında (Local Storage) veya güvenli sunucularımızda saklanır. İstediğiniz zaman verilerinizi silebilirsiniz.<br><br>Çerezler: Deneyiminizi iyileştirmek için temel çerezler kullanılmaktadır.`,
+        terms_of_service_title: "Kullanım Koşulları",
+        terms_of_service_content: `Hizmet Tanımı: Bu web sitesi, kullanıcıların profesyonel özgeçmişler oluşturmasına yardımcı olan bir araçtır.<br><br>Sorumluluk: Kullanıcılar, CV'lerinde sağladıkları bilgilerin doğruluğundan kendileri sorumludur.<br><br>Fikri Mülkiyet: Şablon tasarımları ve platform kodları bu projeye aittir, izinsiz kopyalanamaz.<br><br>Değişiklikler: Hizmet şartları önceden haber verilmeksizin güncellenebilir.`,
+        auth_terms_text: `<a href="javascript:void(0)" onclick="openPolicyModal('terms')">Kullanım Koşulları</a>'nı ve <a href="javascript:void(0)" onclick="openPolicyModal('privacy')">Gizlilik Politikasını</a> okudum, kabul ediyorum.`
     },
     en: {
         auth_title: "Login to your account",
@@ -248,7 +253,12 @@ const translations = {
         menu_profile_desc: "Account and email settings",
         menu_faq: "FAQ",
         menu_faq_desc: "Help and support",
-        menu_logout_desc: "Sign out securely"
+        menu_logout_desc: "Sign out securely",
+        privacy_policy_title: "Privacy Policy",
+        privacy_policy_content: `Data Collection: This platform processes only the personal information you provide (name, contact, experience, etc.) for the sole purpose of resume creation.<br><br>Data Usage: Your information is never shared with third parties or used for advertising purposes.<br><br>Storage: Your data is stored in your browser's Local Storage or on our secure servers. You can delete your data at any time.<br><br>Cookies: Essential cookies are used to enhance your user experience.`,
+        terms_of_service_title: "Terms of Service",
+        terms_of_service_content: `Service Description: This website is a tool designed to help users create professional resumes.<br><br>Responsibility: Users are solely responsible for the accuracy of the information provided in their resumes.<br><br>Intellectual Property: Template designs and platform code belong to this project and may not be copied without permission.<br><br>Changes: Terms of service may be updated without prior notice.`,
+        auth_terms_text: `I have read and agree to the <a href="javascript:void(0)" onclick="openPolicyModal('terms')">Terms of Service</a> and <a href="javascript:void(0)" onclick="openPolicyModal('privacy')">Privacy Policy</a>.`
     }
 };
 
@@ -482,6 +492,26 @@ window.openProfile = () => {
 window.openFAQ = () => {
     alert("Sıkça sorulan sorular sayfası çok yakında!");
     closeAccountModal();
+};
+
+window.openPolicyModal = (type) => {
+    const t = translations[currentLang];
+    const titleEl = document.getElementById('policy-title');
+    const contentEl = document.getElementById('policy-content');
+    
+    if (type === 'privacy') {
+        titleEl.innerText = t.privacy_policy_title;
+        contentEl.innerHTML = t.privacy_policy_content;
+    } else {
+        titleEl.innerText = t.terms_of_service_title;
+        contentEl.innerHTML = t.terms_of_service_content;
+    }
+    
+    openModal('policy-modal');
+};
+
+window.closePolicyModal = () => {
+    document.getElementById('policy-modal').classList.remove('active');
 };
 
 
