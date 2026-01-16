@@ -278,6 +278,20 @@ const translations = {
         menu_faq: "Sıkça Sorulan Sorular",
         menu_faq_desc: "Yardım ve destek",
         menu_logout_desc: "Oturumu güvenli bir şekilde kapat",
+        footer_faq: "Sıkça Sorulan Sorular",
+        footer_privacy: "Gizlilik Politikası",
+        footer_terms: "Kullanım Koşulları",
+        footer_contact: "İletişim",
+        faq_content: `
+            <strong>🔒 Verilerim güvende mi?</strong><br>
+            Evet! CV verileriniz Google Firebase'in güvenli bulut altyapısında şifrelenmiş olarak saklanır. Verileriniz sadece size aittir ve asla üçüncü taraflarla paylaşılmaz.<br><br>
+            <strong>💰 Gerçekten tamamen ücretsiz mi?</strong><br>
+            Kesinlikle! Gizli ücret, abonelik veya filigran yok. Sınırsız sayıda CV oluşturabilir, düzenleyebilir ve PDF olarak indirebilirsiniz.<br><br>
+            <strong>🤖 ATS nedir ve neden önemli?</strong><br>
+            ATS (Applicant Tracking System), şirketlerin başvuruları otomatik olarak taramak için kullandığı yazılımdır. Karmaşık grafikler ve tablolar içeren CV'ler ATS tarafından okunamaz. Bizim şablonlarımız, ATS'nin kolayca anlayabileceği temiz yapıya sahiptir.<br><br>
+            <strong>📱 Mobil cihazlardan kullanabilir miyim?</strong><br>
+            Elbette! Platform tamamen responsive tasarıma sahip. Bilgisayar, tablet veya telefon - hangi cihazı kullanırsanız kullanın, CV'nizi rahatlıkla düzenleyebilirsiniz.
+        `,
         privacy_policy_title: "Gizlilik Politikası",
         privacy_policy_content: `Veri Toplama: Bu platform, yalnızca CV oluşturma amacıyla sağladığınız kişisel bilgileri (ad, iletişim, deneyim vb.) işler.<br><br>Veri Kullanımı: Bilgileriniz hiçbir şekilde üçüncü şahıslarla paylaşılmaz veya reklam amaçlı kullanılmaz.<br><br>Yerel Depolama: Verileriniz tarayıcınızın yerel depolama alanında (Local Storage) veya güvenli sunucularımızda saklanır. İstediğiniz zaman verilerinizi silebilirsiniz.<br><br>Çerezler: Deneyiminizi iyileştirmek için temel çerezler kullanılmaktadır.`,
         terms_of_service_title: "Kullanım Koşulları",
@@ -407,6 +421,20 @@ const translations = {
         menu_faq: "FAQ",
         menu_faq_desc: "Help and support",
         menu_logout_desc: "Sign out securely",
+        footer_faq: "FAQ",
+        footer_privacy: "Privacy Policy",
+        footer_terms: "Terms of Service",
+        footer_contact: "Contact",
+        faq_content: `
+            <strong>🔒 Is my data safe?</strong><br>
+            Yes! Your CV data is stored encrypted in Google Firebase's secure cloud infrastructure. Your data belongs only to you and is never shared with third parties.<br><br>
+            <strong>💰 Is it really completely free?</strong><br>
+            Absolutely! No hidden fees, subscriptions or watermarks. Unlimited CV creation, editing and PDF download.<br><br>
+            <strong>🤖 What is ATS and why is it important?</strong><br>
+            ATS (Applicant Tracking System) is software companies use to scan applications. CVs with complex graphics cannot be read by ATS. Our templates have a clean structure that ATS can easily understand.<br><br>
+            <strong>📱 Can I use it from mobile devices?</strong><br>
+            Of course! The platform has a fully responsive design. Computer, tablet or phone - whatever device you use, you can easily edit your CV.
+        `,
         privacy_policy_title: "Privacy Policy",
         privacy_policy_content: `Data Collection: This platform processes only the personal information you provide (name, contact, experience, etc.) for the sole purpose of resume creation.<br><br>Data Usage: Your information is never shared with third parties or used for advertising purposes.<br><br>Storage: Your data is stored in your browser's Local Storage or on our secure servers. You can delete your data at any time.<br><br>Cookies: Essential cookies are used to enhance your user experience.`,
         terms_of_service_title: "Terms of Service",
@@ -628,7 +656,7 @@ window.openProfile = () => {
 };
 
 window.openFAQ = () => {
-    alert("Sıkça sorulan sorular sayfası çok yakında!");
+    openPolicyModal('faq');
     closeAccountModal();
 };
 
@@ -640,9 +668,12 @@ window.openPolicyModal = (type) => {
     if (type === 'privacy') {
         titleEl.innerText = t.privacy_policy_title;
         contentEl.innerHTML = t.privacy_policy_content;
-    } else {
+    } else if (type === 'terms') {
         titleEl.innerText = t.terms_of_service_title;
         contentEl.innerHTML = t.terms_of_service_content;
+    } else if (type === 'faq') {
+        titleEl.innerText = t.faq_title;
+        contentEl.innerHTML = t.faq_content;
     }
     
     openModal('policy-modal');
