@@ -31,6 +31,19 @@ let currentLayout = {
     sectionGap: 15
 };
 const appId = "mono-cv-app";
+
+// --- UTILS ---
+const escapeHTML = (str) => {
+    if (!str) return "";
+    return str.toString().replace(/[&<>"']/g, (m) => ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#39;'
+    }[m]));
+};
+
 const firebaseConfig = {
     apiKey: "AIzaSyBbxgCMw5dO5T-kt7Njapo5ST04MRp7JKU",
     authDomain: "ats-friendly-93377.firebaseapp.com",
@@ -1082,6 +1095,12 @@ window.generateCVFromForm = (triggerSave = true) => {
     const isCompact = document.body.classList.contains('tpl-compact');
     let html = "";
     
+    // Helper to escape and optionally handle newlines
+    const h = (str, allowNewlines = false) => {
+        let escaped = escapeHTML(str);
+        return allowNewlines ? escaped.replace(/\n/g, '<br>') : escaped;
+    };
+
     // Labels based on Lang
     const labels = {
         exp: currentLang === 'tr' ? 'İŞ DENEYİMİ' : 'EMPLOYMENT HISTORY',
@@ -1096,8 +1115,8 @@ window.generateCVFromForm = (triggerSave = true) => {
     if (data.experiences.length > 0) {
         let entries = data.experiences.map(exp => `
             <div class="entry">
-                <div class="left-col">${exp.date}</div>
-                <div class="right-col"><h3>${exp.title}, ${exp.company}</h3><p>${exp.desc.replace(/\n/g, '<br>')}</p></div>
+                <div class="left-col">${h(exp.date)}</div>
+                <div class="right-col"><h3>${h(exp.title)}, ${h(exp.company)}</h3><p>${h(exp.desc, true)}</p></div>
             </div>`).join('');
         
         expContent = `
@@ -1112,8 +1131,8 @@ window.generateCVFromForm = (triggerSave = true) => {
     if (data.education.length > 0) {
         let entries = data.education.map(edu => `
             <div class="entry">
-                <div class="left-col">${edu.date}</div>
-                <div class="right-col"><h3>${edu.degree}</h3><p>${edu.school}</p></div>
+                <div class="left-col">${h(edu.date)}</div>
+                <div class="right-col"><h3>${h(edu.degree)}</h3><p>${h(edu.school)}</p></div>
             </div>`).join('');
 
         eduContent = `
@@ -1128,9 +1147,9 @@ window.generateCVFromForm = (triggerSave = true) => {
     if (data.customSections.length > 0) {
         customContent = data.customSections.map(sec => `
             <div class="section">
-                <div class="section-header"><span class="section-title">${sec.title}</span></div>
+                <div class="section-header"><span class="section-title">${h(sec.title)}</span></div>
                 <div class="entry">
-                    <div class="right-col"><p>${sec.content.replace(/\n/g, '<br>')}</p></div>
+                    <div class="right-col"><p>${h(sec.content, true)}</p></div>
                 </div>
             </div>
         `).join('');
@@ -1141,10 +1160,10 @@ window.generateCVFromForm = (triggerSave = true) => {
     if (visible.certs && data.certificates.length > 0) {
         let entries = data.certificates.map(cert => `
             <div class="entry">
-                <div class="left-col">${cert.date}</div>
-                <div class="right-col"><h3>${cert.name}</h3><p>${cert.issuer}</p></div>
+                <div class="left-col">${h(cert.date)}</div>
+                <div class="right-col"><h3>${h(cert.name)}</h3><p>${h(cert.issuer)}</p></div>
             </div>`).join('');
-        certContent = `<div class="section"><div class="section-header"><span class="section-title">${titles.certs}</span></div>${entries}</div>`;
+        certContent = `<div class="section"><div class="section-header"><span class="section-title">${h(titles.certs)}</span></div>${entries}</div>`;
     }
 
     // -- REFERENCES (Restored / Optimized) --
@@ -1152,28 +1171,28 @@ window.generateCVFromForm = (triggerSave = true) => {
     if (visible.refs && data.references.length > 0) {
         let entries = data.references.map(ref => `
             <div class="entry">
-                <div class="right-col"><h3>${ref.name}</h3><p>${ref.title} | ${ref.contact}</p></div>
+                <div class="right-col"><h3>${h(ref.name)}</h3><p>${h(ref.title)} | ${h(ref.contact)}</p></div>
             </div>`).join('');
-        refContent = `<div class="section"><div class="section-header"><span class="section-title">${titles.refs}</span></div>${entries}</div>`;
+        refContent = `<div class="section"><div class="section-header"><span class="section-title">${h(titles.refs)}</span></div>${entries}</div>`;
     }
 
 
     if (isCompact) {
         html = `
         <header>
-            <h1>${data.fullname || 'ADINIZ SOYADINIZ'}</h1>
-            <div class="subtitle">${data.title}</div>
-            <div class="address-line">${data.address}</div>
-            <div class="contact-row"><span>${data.phone}</span><span>${data.email}</span></div>
+            <h1>${h(data.fullname) || 'ADINIZ SOYADINIZ'}</h1>
+            <div class="subtitle">${h(data.title)}</div>
+            <div class="address-line">${h(data.address)}</div>
+            <div class="contact-row"><span>${h(data.phone)}</span><span>${h(data.email)}</span></div>
             <div class="compact-separator"></div>
             <div class="personal-details">
-                <div class="detail-item"><span class="lbl">${labels.lic}</span><span class="dots"></span><span class="val">${data.license}</span></div>
+                <div class="detail-item"><span class="lbl">${labels.lic}</span><span class="dots"></span><span class="val">${h(data.license)}</span></div>
             </div>
         </header>
         <div id="main-content">
              <div class="section">
                 <div class="section-header"><span class="section-title">${labels.prof}</span></div>
-                <div class="entry"><div class="right-col">${data.summary}</div></div>
+                <div class="entry"><div class="right-col">${h(data.summary, true)}</div></div>
             </div>
             ${expContent}
             ${eduContent}
@@ -1184,16 +1203,16 @@ window.generateCVFromForm = (triggerSave = true) => {
     } else if (document.body.classList.contains('tpl-elegant')) {
         html = `
         <header>
-            <h1>${data.fullname || 'ADINIZ SOYADINIZ'}</h1>
-            <div class="subtitle">${data.title}</div>
+            <h1>${h(data.fullname) || 'ADINIZ SOYADINIZ'}</h1>
+            <div class="subtitle">${h(data.title)}</div>
             <div class="contact-info">
-                <span>✉️ ${data.email}</span> | <span>📞 ${data.phone}</span> | <span>📍 ${data.address}</span>
+                <span>✉️ ${h(data.email)}</span> | <span>📞 ${h(data.phone)}</span> | <span>📍 ${h(data.address)}</span>
             </div>
         </header>
         <div id="main-content">
              <div class="section">
                 <div class="section-header"><span class="section-title">${labels.prof}</span></div>
-                <div class="entry"><div class="right-col">${data.summary}</div></div>
+                <div class="entry"><div class="right-col">${h(data.summary, true)}</div></div>
             </div>
             ${expContent}
             ${eduContent}
@@ -1204,22 +1223,22 @@ window.generateCVFromForm = (triggerSave = true) => {
     } else {
         html = `
         <header>
-            <h1>${data.fullname || 'ADINIZ SOYADINIZ'}</h1>
-            <div class="subtitle">${data.title}</div>
+            <h1>${h(data.fullname) || 'ADINIZ SOYADINIZ'}</h1>
+            <div class="subtitle">${h(data.title)}</div>
             <div class="contact-info">
-                <span>📍 ${data.address}</span> | <span>📞 ${data.phone}</span> | <span>✉️ ${data.email}</span>
+                <span>📍 ${h(data.address)}</span> | <span>📞 ${h(data.phone)}</span> | <span>✉️ ${h(data.email)}</span>
             </div>
             <!-- Hidden Fields for switch compatibility -->
-            <div class="address-line" style="display:none">${data.address}</div>
-            <div class="contact-row" style="display:none"><span>${data.phone}</span><span>${data.email}</span></div>
+            <div class="address-line" style="display:none">${h(data.address)}</div>
+            <div class="contact-row" style="display:none"><span>${h(data.phone)}</span><span>${h(data.email)}</span></div>
             <div class="personal-details" style="display:none">
-                <div class="detail-item"><span class="lbl">${labels.lic}</span><span class="dots"></span><span class="val">${data.license}</span></div>
+                <div class="detail-item"><span class="lbl">${labels.lic}</span><span class="dots"></span><span class="val">${h(data.license)}</span></div>
             </div>
         </header>
         <div id="main-content">
              <div class="section">
                 <div class="section-header"><span class="section-title">${labels.prof}</span></div>
-                <div class="entry"><div class="right-col">${data.summary}</div></div>
+                <div class="entry"><div class="right-col">${h(data.summary, true)}</div></div>
             </div>
             ${expContent}
             ${eduContent}
