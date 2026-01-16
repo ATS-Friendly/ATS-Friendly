@@ -1364,20 +1364,20 @@ body.tpl-compact .compact-separator,
 body.tpl-compact .personal-details { display: block; }
 body.tpl-compact .contact-row,
 body.tpl-compact .personal-details { display: flex; }
-body.tpl-compact #cv-root header { border-bottom: none; margin-bottom: 20px; padding-bottom: 0; padding-top: 5mm !important; text-align: center; }
+body.tpl-compact #cv-root header { border-bottom: none; margin-bottom: 20px; padding-bottom: 0; padding-top: 2mm !important; text-align: center; }
 body.tpl-compact h1 { font-size: 2.0em; letter-spacing: 2px; margin-bottom: 8px; }
 body.tpl-compact .subtitle { font-size: 1.0em; font-weight: 700; color: #222; margin-bottom: 8px; }
 body.tpl-compact .address-line { font-size: 1em; color: #222; margin-bottom: 20px; }
 body.tpl-compact .contact-row { justify-content: space-between; font-weight: 700; font-size: 1em; color: var(--cv-accent-color); margin-bottom: 5px; }
 body.tpl-compact .compact-separator { height: 4px; border-top: 2px solid var(--cv-accent-color); border-bottom: 1px solid var(--cv-accent-color); margin-bottom: 15px; }
-body.tpl-compact .personal-details { flex-wrap: wrap; gap: 30px; margin-bottom: 25px; justify-content: space-between; }
+body.tpl-compact .personal-details { flex-wrap: wrap; gap: 5px; margin-bottom: 25px; justify-content: space-between; }
 body.tpl-compact .detail-item { display: flex; align-items: baseline; width: 45%; font-size: 1em; font-style: italic; color: #222; }
 body.tpl-compact .detail-item .lbl { flex-shrink: 0; color: #555; font-style: normal; }
 body.tpl-compact .detail-item .val { flex-shrink: 0; font-weight: 700; font-style: italic; }
 body.tpl-compact .detail-item .dots { flex-grow: 1; border-bottom: 1px dotted #999; margin: 0 5px; position: relative; top: -4px; }
 body.tpl-compact .section-header { 
     border-bottom: none; display: flex; align-items: center; justify-content: center; 
-    margin: 25px 0 15px 0; text-align: center; background: #f4f4f4; 
+    margin: 4px 0 10px 0; text-align: center; background: #f4f4f4; 
     border-top: 1px solid #ccc; border-bottom: 1px solid #ccc; padding: 6px 0;
 }
 body.tpl-compact .section-title { font-size: 1.0em; font-weight: 700; letter-spacing: 2px; color: var(--cv-accent-color); }
@@ -1452,6 +1452,24 @@ body.tpl-elegant .section-title {
 
 /* --- KESİN ÇÖZÜM PRINT AYARLARI (RESTORED & OPTIMIZED) --- */
 @media print {
+
+    body.tpl-elegant #cv-root {
+        /* Arka plan rengini zorla yazdır */
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+        
+        /* Sayfanın en tepesine yapışmasını sağla */
+        border-top: 15px solid var(--cv-accent-color) !important; 
+        padding-top: 0 !important;
+        margin-top: 0 !important;
+    }
+
+    /* Sayfa yapısının yukarı kaymasını engellemek için */
+    .page {
+        padding-top: 0 !important; /* Üst boşluğu sıfırla */
+        margin-top: 0 !important;
+    }
+
     @page {
         margin: 0;
         size: A4;
@@ -1534,7 +1552,7 @@ body.tpl-elegant .section-title {
         box-shadow: none !important;
         border: none !important;
         margin: 0 !important;
-        padding: 20mm 20mm 20mm 20mm !important; /* Ideal 20mm Margin */
+        padding: 11mm 20mm 11mm 20mm !important; /* Ideal 20mm Margin */
         background: white !important;
         box-sizing: border-box !important;
     }
