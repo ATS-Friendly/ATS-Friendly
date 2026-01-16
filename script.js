@@ -134,8 +134,17 @@ const translations = {
         lbl_desc: "Açıklama",
         lbl_school: "Okul / Üniversite",
         lbl_degree: "Bölüm / Derece",
+        lbl_certificate_name: "Sertifika Adı",
+        lbl_issuer: "Kurum / Yer",
+        lbl_reference_name: "Referans Adı",
+        lbl_reference_title: "Unvan / Şirket",
+        lbl_reference_contact: "İletişim Bilgisi",
         lbl_section_title: "Bölüm Başlığı",
-        lbl_section_content: "İçerik / Açıklama"
+        lbl_section_content: "İçerik / Açıklama",
+        form_certificates: "Sertifikalar",
+        form_references: "Referanslar",
+        btn_add_cert: "Sertifika Ekle",
+        btn_add_ref: "Referans Ekle"
     },
     en: {
         auth_title: "Login to your account",
@@ -215,8 +224,17 @@ const translations = {
         lbl_desc: "Description",
         lbl_school: "School / University",
         lbl_degree: "Degree / Field",
+        lbl_certificate_name: "Certificate Name",
+        lbl_issuer: "Issuer / Where",
+        lbl_reference_name: "Reference Name",
+        lbl_reference_title: "Title / Company",
+        lbl_reference_contact: "Contact Info",
         lbl_section_title: "Section Title",
-        lbl_section_content: "Content / Description"
+        lbl_section_content: "Content / Description",
+        form_certificates: "Certificates",
+        form_references: "References",
+        btn_add_cert: "Add Certificate",
+        btn_add_ref: "Add Reference"
     }
 };
 
@@ -612,6 +630,21 @@ onAuthStateChanged(auth, async (user) => {
             if (data.formData) {
                 loadUserDataIntoForm(data.formData);
             }
+
+            if (data.sectionSettings) {
+                const ss = data.sectionSettings;
+                if (ss.titles) {
+                    document.getElementById('title-certificates').value = ss.titles.certs || 'Sertifikalar';
+                    document.getElementById('title-references').value = ss.titles.refs || 'Referanslar';
+                }
+                if (ss.visible) {
+                    document.getElementById('form-certificates-block').style.display = ss.visible.certs ? 'block' : 'none';
+                    document.getElementById('form-references-block').style.display = ss.visible.refs ? 'block' : 'none';
+                    
+                    document.getElementById('form-certificates-block').parentElement.style.opacity = ss.visible.certs ? '1' : '0.5';
+                    document.getElementById('form-references-block').parentElement.style.opacity = ss.visible.refs ? '1' : '0.5';
+                }
+            }
             
             document.body.className = data.template || '';
             if (data.theme) {
@@ -734,6 +767,73 @@ window.addFormCustomSection = (data = null) => {
     if (!data) generateCVFromForm();
 };
 
+window.addFormReference = (data = null) => {
+    const container = document.getElementById('form-references-list');
+    const div = document.createElement('div');
+    div.className = 'dynamic-item';
+    const t = translations[currentLang];
+    
+    div.innerHTML = `
+        <button class="remove-dynamic-btn" onclick="removeItemAndRefresh(this)" aria-label="Remove item">×</button>
+        <div class="input-grid">
+            <div class="input-group">
+                <label>${t.lbl_reference_name}</label>
+                <input type="text" class="form-input ref-name" placeholder="Ex: John Doe" value="${data ? data.name : ''}" oninput="generateCVFromForm()">
+            </div>
+            <div class="input-group">
+                <label>${t.lbl_reference_title}</label>
+                <input type="text" class="form-input ref-title" placeholder="Ex: HR Manager" value="${data ? data.title : ''}" oninput="generateCVFromForm()">
+            </div>
+            <div class="input-group full-width">
+                <label>${t.lbl_reference_contact}</label>
+                <input type="text" class="form-input ref-contact" placeholder="Ex: john@company.com" value="${data ? data.contact : ''}" oninput="generateCVFromForm()">
+            </div>
+        </div>
+    `;
+    container.appendChild(div);
+    if (!data) generateCVFromForm();
+};
+
+window.addFormCertificate = (data = null) => {
+    const container = document.getElementById('form-certificates-list');
+    const div = document.createElement('div');
+    div.className = 'dynamic-item';
+    const t = translations[currentLang];
+    
+    div.innerHTML = `
+        <button class="remove-dynamic-btn" onclick="removeItemAndRefresh(this)" aria-label="Remove item">×</button>
+        <div class="input-grid">
+            <div class="input-group">
+                <label>${t.lbl_certificate_name}</label>
+                <input type="text" class="form-input cert-name" placeholder="Ex: PMP" value="${data ? data.name : ''}" oninput="generateCVFromForm()">
+            </div>
+            <div class="input-group">
+                <label>${t.lbl_issuer}</label>
+                <input type="text" class="form-input cert-issuer" placeholder="Ex: PMI" value="${data ? data.issuer : ''}" oninput="generateCVFromForm()">
+            </div>
+            <div class="input-group full-width">
+                <label>${t.lbl_date}</label>
+                <input type="text" class="form-input cert-date" placeholder="Ex: 2023" value="${data ? data.date : ''}" oninput="generateCVFromForm()">
+            </div>
+        </div>
+    `;
+    container.appendChild(div);
+    if (!data) generateCVFromForm();
+};
+
+window.toggleSection = (id) => {
+    const block = document.getElementById(id);
+    const parent = block.parentElement;
+    if (block.style.display === 'none') {
+        block.style.display = 'block';
+        parent.style.opacity = '1';
+    } else {
+        block.style.display = 'none';
+        parent.style.opacity = '0.5';
+    }
+    generateCVFromForm();
+};
+
 window.removeItemAndRefresh = (btn) => {
     btn.parentElement.remove();
     generateCVFromForm();
@@ -752,9 +852,12 @@ window.generateCVFromForm = (triggerSave = true) => {
         summary: document.getElementById('inp-summary').value,
         experiences: [],
         education: [],
+        certificates: [],
+        references: [],
         customSections: []
     };
 
+    // Collect Dynamic Lists
     document.querySelectorAll('#form-experiences-list .dynamic-item').forEach(item => {
         data.experiences.push({
             title: item.querySelector('.job-title').value,
@@ -772,12 +875,40 @@ window.generateCVFromForm = (triggerSave = true) => {
         });
     });
 
+    document.querySelectorAll('#form-certificates-list .dynamic-item').forEach(item => {
+        data.certificates.push({
+            name: item.querySelector('.cert-name').value,
+            issuer: item.querySelector('.cert-issuer').value,
+            date: item.querySelector('.cert-date').value
+        });
+    });
+
+    document.querySelectorAll('#form-references-list .dynamic-item').forEach(item => {
+        data.references.push({
+            name: item.querySelector('.ref-name').value,
+            title: item.querySelector('.ref-title').value,
+            contact: item.querySelector('.ref-contact').value
+        });
+    });
+
     document.querySelectorAll('#form-custom-list .dynamic-item').forEach(item => {
         data.customSections.push({
             title: item.querySelector('.custom-title').value,
             content: item.querySelector('.custom-content').value
         });
     });
+
+    // Section Titles (Editable)
+    const titles = {
+        certs: document.getElementById('title-certificates').value,
+        refs: document.getElementById('title-references').value
+    };
+
+    // Visible Status
+    const visible = {
+        certs: document.getElementById('form-certificates-block').style.display !== 'none',
+        refs: document.getElementById('form-references-block').style.display !== 'none'
+    };
 
     // 2. Generate HTML
     const isCompact = document.body.classList.contains('tpl-compact');
@@ -837,6 +968,27 @@ window.generateCVFromForm = (triggerSave = true) => {
         `).join('');
     }
 
+    // -- CERTIFICATES (Restored / Optimized) --
+    let certContent = "";
+    if (visible.certs && data.certificates.length > 0) {
+        let entries = data.certificates.map(cert => `
+            <div class="entry">
+                <div class="left-col">${cert.date}</div>
+                <div class="right-col"><h3>${cert.name}</h3><p>${cert.issuer}</p></div>
+            </div>`).join('');
+        certContent = `<div class="section"><div class="section-header"><span class="section-title">${titles.certs}</span></div>${entries}</div>`;
+    }
+
+    // -- REFERENCES (Restored / Optimized) --
+    let refContent = "";
+    if (visible.refs && data.references.length > 0) {
+        let entries = data.references.map(ref => `
+            <div class="entry">
+                <div class="right-col"><h3>${ref.name}</h3><p>${ref.title} | ${ref.contact}</p></div>
+            </div>`).join('');
+        refContent = `<div class="section"><div class="section-header"><span class="section-title">${titles.refs}</span></div>${entries}</div>`;
+    }
+
 
     if (isCompact) {
         html = `
@@ -857,30 +1009,10 @@ window.generateCVFromForm = (triggerSave = true) => {
             </div>
             ${expContent}
             ${eduContent}
+            ${certContent}
+            ${refContent}
             ${customContent}
         </div>`;
-    } else if (document.body.classList.contains('tpl-modern')) {
-        html = `
-        <aside class="cv-sidebar">
-            <div class="contact-sidebar">
-                <p>✉️ ${data.email}</p>
-                <p>📞 ${data.phone}</p>
-                <p>📍 ${data.address}</p>
-            </div>
-        </aside>
-        <main class="cv-main">
-            <header>
-                <h1>${data.fullname || 'ADINIZ SOYADINIZ'}</h1>
-                <div class="subtitle">${data.title}</div>
-            </header>
-            <div class="section">
-                <div class="section-header"><span class="section-title">${labels.prof}</span></div>
-                <p>${data.summary}</p>
-            </div>
-            ${expContent}
-            ${eduContent}
-            ${customContent}
-        </main>`;
     } else if (document.body.classList.contains('tpl-elegant')) {
         html = `
         <header>
@@ -897,6 +1029,8 @@ window.generateCVFromForm = (triggerSave = true) => {
             </div>
             ${expContent}
             ${eduContent}
+            ${certContent}
+            ${refContent}
             ${customContent}
         </div>`;
     } else {
@@ -921,6 +1055,8 @@ window.generateCVFromForm = (triggerSave = true) => {
             </div>
             ${expContent}
             ${eduContent}
+            ${certContent}
+            ${refContent}
             ${customContent}
         </div>`;
     }
@@ -959,6 +1095,18 @@ function loadUserDataIntoForm(data) {
         data.education.forEach(edu => addFormEducation(edu));
     }
 
+    const certList = document.getElementById('form-certificates-list');
+    certList.innerHTML = '';
+    if (data.certificates) {
+        data.certificates.forEach(cert => addFormCertificate(cert));
+    }
+
+    const refList = document.getElementById('form-references-list');
+    refList.innerHTML = '';
+    if (data.references) {
+        data.references.forEach(ref => addFormReference(ref));
+    }
+
     const customList = document.getElementById('form-custom-list');
     customList.innerHTML = '';
     if (data.customSections) {
@@ -993,9 +1141,22 @@ async function saveToCloud(formData = null) {
     
     const docRef = doc(db, 'artifacts', appId, 'users', currentUser.uid, 'data', 'cvContent');
     
+    // Gather Section Settings
+    const sectionSettings = {
+        titles: {
+            certs: document.getElementById('title-certificates').value,
+            refs: document.getElementById('title-references').value
+        },
+        visible: {
+            certs: document.getElementById('form-certificates-block').style.display !== 'none',
+            refs: document.getElementById('form-references-block').style.display !== 'none'
+        }
+    };
+
     try {
         await setDoc(docRef, { 
             formData: formData, 
+            sectionSettings: sectionSettings,
             template: document.body.className,
             theme: currentTheme,
             layout: currentLayout,
@@ -1046,7 +1207,17 @@ window.resetAll = async (skipConfirm = false) => {
     inputs.forEach(i => i.value = '');
     document.getElementById('form-experiences-list').innerHTML = '';
     document.getElementById('form-education-list').innerHTML = '';
+    document.getElementById('form-certificates-list').innerHTML = '';
+    document.getElementById('form-references-list').innerHTML = '';
     document.getElementById('form-custom-list').innerHTML = '';
+    
+    document.getElementById('title-certificates').value = translations[currentLang].form_certificates;
+    document.getElementById('title-references').value = translations[currentLang].form_references;
+    
+    document.getElementById('form-certificates-block').style.display = 'block';
+    document.getElementById('form-references-block').style.display = 'block';
+    document.getElementById('form-certificates-block').parentElement.style.opacity = '1';
+    document.getElementById('form-references-block').parentElement.style.opacity = '1';
     
     generateCVFromForm();
     if(!skipConfirm) {

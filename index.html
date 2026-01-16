@@ -260,16 +260,6 @@
                 </div>
             </div>
 
-            <div class="template-card" onclick="selectTemplate('tpl-modern')">
-                <div class="template-preview">
-                    <div style="background:#f4f4f4; height:100%; display:flex; align-items:center; justify-content:center; color:#666;">Modern Preview</div>
-                </div>
-                <div class="template-info">
-                    <h3>Modern</h3>
-                    <p>🚀 2-Column Sidebar Layout</p>
-                </div>
-            </div>
-
             <div class="template-card" onclick="selectTemplate('tpl-elegant')">
                 <div class="template-preview">
                     <div style="background:#f4f4f4; height:100%; display:flex; align-items:center; justify-content:center; color:#666;">Elegant Preview</div>
@@ -408,6 +398,30 @@
                         <h3 data-i18n="form_education">Eğitim</h3>
                         <div id="form-education-list"></div>
                         <button class="btn-secondary-dashed" onclick="addFormEducation()">+ <span data-i18n="btn_add_edu">Okul Ekle</span></button>
+                    </div>
+
+                    <!-- Sertifikalar -->
+                    <div class="form-block">
+                        <div class="section-title-edit">
+                            <input type="text" id="title-certificates" class="section-header-input" value="Sertifikalar" data-i18n-val="form_certificates" oninput="generateCVFromForm()">
+                            <button class="remove-section-btn" onclick="toggleSection('form-certificates-block')">×</button>
+                        </div>
+                        <div id="form-certificates-block">
+                            <div id="form-certificates-list"></div>
+                            <button class="btn-secondary-dashed" onclick="addFormCertificate()">+ <span data-i18n="btn_add_cert">Sertifika Ekle</span></button>
+                        </div>
+                    </div>
+
+                    <!-- Referanslar -->
+                    <div class="form-block">
+                        <div class="section-title-edit">
+                            <input type="text" id="title-references" class="section-header-input" value="Referanslar" data-i18n-val="form_references" oninput="generateCVFromForm()">
+                            <button class="remove-section-btn" onclick="toggleSection('form-references-block')">×</button>
+                        </div>
+                        <div id="form-references-block">
+                            <div id="form-references-list"></div>
+                            <button class="btn-secondary-dashed" onclick="addFormReference()">+ <span data-i18n="btn_add_ref">Referans Ekle</span></button>
+                        </div>
                     </div>
 
                     <!-- Özel Bölümler -->
