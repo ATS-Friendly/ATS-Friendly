@@ -430,13 +430,6 @@ function openModal(modalId) {
     }
 }
 
-window.openThemeModal = () => openModal('theme-modal');
-window.closeThemeModal = () => {
-    document.getElementById('theme-modal').classList.remove('active');
-    // Save happens via debounce or explicit change
-    saveToCloud(); 
-};
-
 window.openLayoutModal = () => {
     // If we are in the editor view, we should ensure the CV is rendered first
     if(document.getElementById('editor-view').classList.contains('active')) {
@@ -623,10 +616,16 @@ window.handleAuth = async () => {
     }
 };
 
-window.logout = () => signOut(auth).then(() => {
-    localStorage.removeItem('monoCvData_v2');
-    location.reload();
-});
+window.logout = async () => {
+    try {
+        await signOut(auth);
+        currentUser = null;
+        window.showView('landing-view');
+        location.reload(); 
+    } catch (e) {
+        alert("Çıkış hatası: " + e.message);
+    }
+};
 
 onAuthStateChanged(auth, async (user) => {
     if (user) {
@@ -686,22 +685,11 @@ onAuthStateChanged(auth, async (user) => {
     }
 });
 
-// --- EDITOR LOGIC ---
+// Logout handled by consolidated window.logout
 window.selectTemplate = (tpl) => {
     document.body.className = tpl;
     window.showView('editor-view');
     generateCVFromForm();
-};
-
-window.handleSignOut = async () => {
-    try {
-        await signOut(auth);
-        currentUser = null;
-        window.showView('landing-view');
-        location.reload(); // Hard reload to clear all states for privacy
-    } catch (e) {
-        alert("Çıkış hatası: " + e.message);
-    }
 };
 
 window.backToTemplates = () => {

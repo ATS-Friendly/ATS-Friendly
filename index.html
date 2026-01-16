@@ -22,14 +22,15 @@
 
     <div id="toast">Kaydedildi!</div>
 
-    <!-- THEME MODAL -->
-    <div id="theme-modal" class="modal-overlay">
+    <!-- SETTINGS MODAL (CONSOLIDATED) -->
+    <div id="layout-modal" class="modal-overlay">
         <div class="modal-content">
             <div class="modal-header">
-                <h3 data-i18n="modal_theme_title">Tasarım Ayarları</h3>
-                <button class="close-modal" onclick="closeThemeModal()" aria-label="Close modal">×</button>
+                <h3 data-i18n="modal_settings_title">Görünüm ve Düzen</h3>
+                <button class="close-modal" onclick="closeLayoutModal()" aria-label="Close modal">×</button>
             </div>
             <div class="modal-body">
+                <!-- Color Section -->
                 <div class="setting-group">
                     <label data-i18n="lbl_color">Vurgu Rengi</label>
                     <div class="color-options">
@@ -43,6 +44,8 @@
                         <button class="color-btn" style="background-color: #7f8c8d;" onclick="applyColor('#7f8c8d')" title="Concrete Grey"></button>
                     </div>
                 </div>
+
+                <!-- Font Section -->
                 <div class="setting-group">
                     <label data-i18n="lbl_font">Yazı Tipi</label>
                     <div class="font-options-grid">
@@ -57,21 +60,10 @@
                         <button class="font-btn" style="font-family: 'Merriweather', serif;" onclick="applyFont('merriweather')">Merriweather</button>
                     </div>
                 </div>
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-primary" onclick="closeThemeModal()" style="width:100%" data-i18n="btn_save_close">Kaydet & Kapat</button>
-            </div>
-        </div>
-    </div>
 
-    <!-- LAYOUT MODAL -->
-    <div id="layout-modal" class="modal-overlay">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 data-i18n="modal_layout_title">Sayfa Düzeni</h3>
-                <button class="close-modal" onclick="closeLayoutModal()" aria-label="Close modal">×</button>
-            </div>
-            <div class="modal-body">
+                <hr style="border:0; border-top:1px solid #eee; margin:20px 0;">
+
+                <!-- Layout Section -->
                 <div class="setting-group">
                     <div class="range-header">
                         <label data-i18n="lbl_fontsize">Yazı Boyutu</label>
@@ -308,13 +300,9 @@
 
             <nav class="nav-menu">
                 <div class="nav-group">
-                    <span class="nav-label" data-i18n="nav_design">TASARIM & ŞABLON</span>
-                    <button class="nav-item" onclick="openThemeModal()">
-                        <span class="icon">🎨</span> <span data-i18n="btn_design">Tasarım Ayarları</span>
-                    </button>
-                    <!-- NEW LAYOUT BUTTON -->
+                    <span class="nav-label" data-i18n="nav_design">TASARIM & DÜZEN</span>
                     <button class="nav-item" onclick="openLayoutModal()">
-                        <span class="icon">📐</span> <span data-i18n="btn_layout">Sayfa Düzeni</span>
+                        <span class="icon">🎨</span> <span data-i18n="btn_design">Tasarım & Düzen</span>
                     </button>
                     <button class="nav-item" onclick="backToTemplates()">
                         <span class="icon">💠</span> <span data-i18n="btn_change_tpl">Şablonu Değiştir</span>
@@ -457,14 +445,15 @@
         <div id="fab-overlay" class="fab-overlay" onclick="toggleFabMenu()"></div>
         <div class="mobile-fab-container">
             <div class="fab-menu-items" id="fab-items">
-                <button class="fab-item" onclick="openThemeModal()">
-                    <span class="fab-label">Tasarım</span> 🎨 
+                <button class="fab-item danger" onclick="logout()">
+                    <span class="fab-label">Çıkış Yap</span> 🚪
                 </button>
-                <button class="fab-item" onclick="openLayoutModal()">
-                    <span class="fab-label">Düzen</span> 📐
-                </button>
-                <button class="fab-item" onclick="openThemeModal()">
-                    <span class="fab-label">Tasarım</span> 🎨
+                <div class="fab-item lang-selector-fab">
+                    <button class="lang-btn-fab active" data-lang="tr" onclick="setLanguage('tr')">TR</button>
+                    <button class="lang-btn-fab" data-lang="en" onclick="setLanguage('en')">EN</button>
+                </div>
+                <button class="fab-item danger" onclick="resetAll()">
+                    <span class="fab-label">Temizle</span> 🗑️
                 </button>
                 <button class="fab-item" onclick="backToTemplates()">
                     <span class="fab-label">Şablonlar</span> 💠
@@ -472,19 +461,6 @@
                 <button class="fab-item" onclick="window.print()">
                     <span class="fab-label">Kaydet (PDF)</span> 🖨️
                 </button>
-                <button class="fab-item danger" onclick="resetAll()">
-                    <span class="fab-label">Temizle</span> 🗑️
-                </button>
-                <button class="fab-item danger" onclick="handleSignOut()">
-                    <span class="fab-label">Çıkış Yap</span> 🚪
-                </button>
-                 <button class="fab-item" onclick="logout()">
-                    <span class="fab-label">Çıkış</span> 🚪
-                </button>
-                <div class="fab-item lang-selector-fab">
-                    <button class="lang-btn-fab active" data-lang="tr" onclick="setLanguage('tr')">TR</button>
-                    <button class="lang-btn-fab" data-lang="en" onclick="setLanguage('en')">EN</button>
-                </div>
             </div>
             <button class="fab-main-btn" onclick="toggleFabMenu()" id="fab-trigger" aria-label="Open settings menu">
                 ⚙️

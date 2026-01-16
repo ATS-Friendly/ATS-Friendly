@@ -1084,7 +1084,7 @@ textarea.form-input { resize: vertical; }
     }
 }
 
-#theme-modal, #layout-modal {
+#layout-modal {
     display: none;
     position: fixed;
     top: 0; left: 0;
@@ -1093,19 +1093,19 @@ textarea.form-input { resize: vertical; }
     background: rgba(0,0,0,0.4);
     z-index: 5000;
 }
-#theme-modal.active, #layout-modal.active { 
+#layout-modal.active { 
     display: flex; 
     align-items: center; 
     justify-content: center; 
 }
 
 @media screen and (max-width: 1024px) {
-    #theme-modal.active, #layout-modal.active {
+    #layout-modal.active {
         align-items: flex-end;
     }
 }
 
-#theme-modal .modal-content, #layout-modal .modal-content {
+#layout-modal .modal-content {
     background: white;
     width: 320px; 
     position: absolute;
@@ -1118,7 +1118,7 @@ textarea.form-input { resize: vertical; }
 
 /* MOBILE BOTTOM SHEET STYLE WITH TRANSPARENCY */
 @media screen and (max-width: 1024px) {
-    #theme-modal .modal-content, #layout-modal .modal-content {
+    #layout-modal .modal-content {
         width: 100% !important;
         max-width: 100% !important;
         left: 0 !important;
@@ -1175,7 +1175,23 @@ textarea.form-input { resize: vertical; }
 }
 .close-modal:hover { color: var(--danger-color); }
 .modal-body { padding: 15px; }
+.modal-body hr {
+    border: 0;
+    border-top: 1px solid #f1f2f6;
+    margin: 20px 0;
+}
+
+.modal-section-title {
+    font-size: 11px;
+    text-transform: uppercase;
+    color: #95a5a6;
+    margin-bottom: 12px;
+    font-weight: 800;
+    letter-spacing: 1px;
+}
+
 .setting-group { margin-bottom: 20px; }
+
 .setting-group label { display: block; font-weight: 700; margin-bottom: 8px; font-size: 13px; color: #555; }
 .color-options { display: flex; gap: 8px; flex-wrap: wrap; }
 .color-btn {
