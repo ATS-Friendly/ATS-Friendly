@@ -1758,7 +1758,7 @@ h1 {
     color: var(--cv-accent-color);
 }
 .entry { display: flex; margin-bottom: 15px; }
-.left-col { width: 140px; flex-shrink: 0; font-size: 0.9em; font-weight: 700; color: #636e72; }
+.left-col { width: 170px; flex-shrink: 0; font-size: 0.9em; font-weight: 700; color: #636e72; padding-right: 15px; }
 .right-col { width: 100%; word-break: break-word; }
 .entry h3 { margin: 0 0 4px 0; font-size: 1.05em; font-weight: 700; }
 .entry p { margin: 0; font-size: 1em; color: #444; }
@@ -1790,6 +1790,7 @@ body.tpl-compact .section-header {
 body.tpl-compact .section-title { font-size: 1.0em; font-weight: 700; letter-spacing: 2px; color: var(--cv-accent-color); }
 body.tpl-compact .entry { display: block; position: relative; margin-bottom: 15px; }
 body.tpl-compact .entry .left-col { position: absolute; top: 0; right: 0; width: auto; text-align: right; font-weight: 600; font-size: 0.9em; color: var(--cv-accent-color); }
+body.tpl-compact .entry .right-col { padding-right: 180px; }
 
 /* Elegant Template License */
 .elegant-license {

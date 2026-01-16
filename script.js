@@ -475,12 +475,14 @@ const translations = {
 
 window.setLanguage = (lang) => {
     currentLang = lang;
-    document.documentElement.lang = lang; // Set HTML lang attribute to fix text-transform issues
+    document.documentElement.lang = lang; 
     
+    const t = translations[lang];
+
     // UI Güncelle
     document.querySelectorAll('[data-i18n]').forEach(el => {
         const key = el.getAttribute('data-i18n');
-        const translation = translations[lang][key];
+        const translation = t[key];
         if (translation) {
             if (translation.includes('<')) {
                 el.innerHTML = translation;
@@ -488,6 +490,18 @@ window.setLanguage = (lang) => {
                 el.innerText = translation;
             }
         }
+    });
+
+    // Update placeholders
+    document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+        const key = el.getAttribute('data-i18n-placeholder');
+        if (t[key]) el.placeholder = t[key];
+    });
+
+    // Update dynamic values (like section titles)
+    document.querySelectorAll('[data-i18n-val]').forEach(el => {
+        const key = el.getAttribute('data-i18n-val');
+        if (t[key]) el.value = t[key];
     });
 
     // Toggle Button Style
@@ -966,28 +980,28 @@ window.addFormExperience = (data = null) => {
         <button class="remove-dynamic-btn" onclick="removeItemAndRefresh(this)" aria-label="Remove item">×</button>
         <div class="input-grid">
             <div class="input-group">
-                <label>${t.lbl_job_title}</label>
-                <input type="text" class="form-input job-title" placeholder="Ex: Manager" value="${data ? data.title : ''}" oninput="generateCVFromForm()">
+                <label data-i18n="lbl_job_title">${t.lbl_job_title}</label>
+                <input type="text" class="form-input job-title" data-i18n-placeholder="lbl_job_title" placeholder="Ex: Manager" value="${data ? data.title : ''}" oninput="generateCVFromForm()">
             </div>
             <div class="input-group">
-                <label>${t.lbl_company}</label>
-                <input type="text" class="form-input job-company" placeholder="Ex: Google" value="${data ? data.company : ''}" oninput="generateCVFromForm()">
+                <label data-i18n="lbl_company">${t.lbl_company}</label>
+                <input type="text" class="form-input job-company" data-i18n-placeholder="lbl_company" placeholder="Ex: Google" value="${data ? data.company : ''}" oninput="generateCVFromForm()">
             </div>
             <div class="input-group">
-                <label>${t.lbl_date_start}</label>
+                <label data-i18n="lbl_date_start">${t.lbl_date_start}</label>
                 <input type="text" class="form-input job-date-start date-picker-month" value="${data ? data.startDate : ''}" oninput="generateCVFromForm()">
             </div>
             <div class="input-group">
-                <label>${t.lbl_date_end}</label>
+                <label data-i18n="lbl_date_end">${t.lbl_date_end}</label>
                 <div class="date-end-wrapper">
                     <input type="text" class="form-input job-date-end date-picker-month" value="${data ? data.endDate : ''}" oninput="generateCVFromForm()" ${data && data.present ? 'disabled' : ''}>
                     <label class="present-label">
-                        <input type="checkbox" class="job-present" onchange="toggleDateEnd(this)" ${data && data.present ? 'checked' : ''}> ${t.lbl_present}
+                        <input type="checkbox" class="job-present" onchange="toggleDateEnd(this)" ${data && data.present ? 'checked' : ''}> <span data-i18n="lbl_present">${t.lbl_present}</span>
                     </label>
                 </div>
             </div>
             <div class="input-group full-width">
-                <label>${t.lbl_desc}</label>
+                <label data-i18n="lbl_desc">${t.lbl_desc}</label>
                 <textarea class="form-input job-desc" rows="3" oninput="generateCVFromForm()">${data ? data.desc : ''}</textarea>
             </div>
         </div>
@@ -1009,19 +1023,19 @@ window.addFormEducation = (data = null) => {
         <button class="remove-dynamic-btn" onclick="removeItemAndRefresh(this)" aria-label="Remove item">×</button>
         <div class="input-grid">
             <div class="input-group">
-                <label>${t.lbl_school}</label>
-                <input type="text" class="form-input edu-school" placeholder="Ex: MIT" value="${data ? data.school : ''}" oninput="generateCVFromForm()">
+                <label data-i18n="lbl_school">${t.lbl_school}</label>
+                <input type="text" class="form-input edu-school" data-i18n-placeholder="lbl_school" placeholder="Ex: MIT" value="${data ? data.school : ''}" oninput="generateCVFromForm()">
             </div>
             <div class="input-group">
-                <label>${t.lbl_degree}</label>
-                <input type="text" class="form-input edu-degree" placeholder="Ex: CS" value="${data ? data.degree : ''}" oninput="generateCVFromForm()">
+                <label data-i18n="lbl_degree">${t.lbl_degree}</label>
+                <input type="text" class="form-input edu-degree" data-i18n-placeholder="lbl_degree" placeholder="Ex: CS" value="${data ? data.degree : ''}" oninput="generateCVFromForm()">
             </div>
             <div class="input-group">
-                <label>${t.lbl_date_start}</label>
+                <label data-i18n="lbl_date_start">${t.lbl_date_start}</label>
                 <input type="text" class="form-input edu-date-start date-picker-month" value="${data ? data.startDate : ''}" oninput="generateCVFromForm()">
             </div>
             <div class="input-group">
-                <label>${t.lbl_date_end}</label>
+                <label data-i18n="lbl_date_end">${t.lbl_date_end}</label>
                 <input type="text" class="form-input edu-date-end date-picker-month" value="${data ? data.endDate : ''}" oninput="generateCVFromForm()">
             </div>
         </div>
@@ -1042,11 +1056,11 @@ window.addFormCustomSection = (data = null) => {
     div.innerHTML = `
         <button class="remove-dynamic-btn" onclick="removeItemAndRefresh(this)" aria-label="Remove item">×</button>
         <div class="input-group" style="margin-bottom:10px;">
-            <label>${t.lbl_section_title}</label>
+            <label data-i18n="lbl_section_title">${t.lbl_section_title}</label>
             <input type="text" class="form-input custom-title" placeholder="Ex: Certificates" value="${data ? data.title : ''}" oninput="generateCVFromForm()">
         </div>
         <div class="input-group full-width">
-            <label>${t.lbl_section_content}</label>
+            <label data-i18n="lbl_section_content">${t.lbl_section_content}</label>
             <textarea class="form-input custom-content" rows="3" placeholder="Details..." oninput="generateCVFromForm()">${data ? data.content : ''}</textarea>
         </div>
     `;
@@ -1064,15 +1078,15 @@ window.addFormReference = (data = null) => {
         <button class="remove-dynamic-btn" onclick="removeItemAndRefresh(this)" aria-label="Remove item">×</button>
         <div class="input-grid">
             <div class="input-group">
-                <label>${t.lbl_reference_name}</label>
+                <label data-i18n="lbl_reference_name">${t.lbl_reference_name}</label>
                 <input type="text" class="form-input ref-name" placeholder="Ex: John Doe" value="${data ? data.name : ''}" oninput="generateCVFromForm()">
             </div>
             <div class="input-group">
-                <label>${t.lbl_reference_title}</label>
+                <label data-i18n="lbl_reference_title">${t.lbl_reference_title}</label>
                 <input type="text" class="form-input ref-title" placeholder="Ex: HR Manager" value="${data ? data.title : ''}" oninput="generateCVFromForm()">
             </div>
             <div class="input-group full-width">
-                <label>${t.lbl_reference_contact}</label>
+                <label data-i18n="lbl_reference_contact">${t.lbl_reference_contact}</label>
                 <input type="text" class="form-input ref-contact" placeholder="Ex: john@company.com" value="${data ? data.contact : ''}" oninput="generateCVFromForm()">
             </div>
         </div>
@@ -1091,15 +1105,15 @@ window.addFormCertificate = (data = null) => {
         <button class="remove-dynamic-btn" onclick="removeItemAndRefresh(this)" aria-label="Remove item">×</button>
         <div class="input-grid">
             <div class="input-group">
-                <label>${t.lbl_certificate_name}</label>
+                <label data-i18n="lbl_certificate_name">${t.lbl_certificate_name}</label>
                 <input type="text" class="form-input cert-name" placeholder="Ex: PMP" value="${data ? data.name : ''}" oninput="generateCVFromForm()">
             </div>
             <div class="input-group">
-                <label>${t.lbl_issuer}</label>
+                <label data-i18n="lbl_issuer">${t.lbl_issuer}</label>
                 <input type="text" class="form-input cert-issuer" placeholder="Ex: PMI" value="${data ? data.issuer : ''}" oninput="generateCVFromForm()">
             </div>
             <div class="input-group full-width">
-                <label>${t.lbl_date}</label>
+                <label data-i18n="lbl_date">${t.lbl_date}</label>
                 <input type="text" class="form-input cert-date" placeholder="Ex: 2023" value="${data ? data.date : ''}" oninput="generateCVFromForm()">
             </div>
         </div>
@@ -1676,7 +1690,10 @@ window.initDatePicker = () => {
                 })
             ],
             locale: currentLang === 'tr' ? 'tr' : 'en',
-            onChange: function() {
+            maxDate: "today", // Restrict future dates
+            onChange: function(selectedDates, dateStr, instance) {
+                // Manually update the input value so generateCVFromForm picks it up
+                instance.element.value = dateStr;
                 generateCVFromForm();
             }
         });
