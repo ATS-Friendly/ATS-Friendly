@@ -7,7 +7,8 @@ A modern, web-based CV builder designed specifically to beat Applicant Tracking 
 ## ✨ Features
 
 - **🤖 AI-Powered Parsing**: Upload your existing PDF resume and let Gemini 1.5 Pro automatically extract your details into the form.
-- **📄 ATS-Optimized Templates**: Choose from "Classic", "Compact", or "Elegant" templates designed with clean code structures that HR software can easily read.
+- **📄 ATS-Optimized Templates**: Choose from "Classic", "Compact", "Elegant", or the photo-friendly "Modern" template designed with clean code structures that HR software can easily read.
+- **🔗 Professional Connectivity**: Add your LinkedIn profile link to any template to ensure a complete, ATS-compatible professional profile.
 - **☁️ Real-time Cloud Sync**: Your progress is automatically saved to Firebase Firestore. Start on your PC and finish on your phone.
 - **🌍 Bilingual Support**: Full localization for both Turkish (TR) and English (EN) users.
 - **🎨 Live Customization**: Adjust fonts, colors, margins, and section gaps in real-time with an interactive preview.

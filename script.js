@@ -30,6 +30,7 @@ let currentLayout = {
     margin: 20,
     sectionGap: 15
 };
+let profilePhotoBase64 = null;
 const appId = "mono-cv-app";
 
 // --- UTILS ---
@@ -61,6 +62,28 @@ const db = getFirestore(app);
 const functions = getFunctions(app); // Initialize Functions
 const googleProvider = new GoogleAuthProvider();
 // --- CV UPLOAD & PARSING ---
+window.handlePhotoUpload = (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        profilePhotoBase64 = e.target.result;
+        document.getElementById('btn-remove-photo').style.display = 'inline-block';
+        generateCVFromForm();
+        triggerDebounceSave();
+    };
+    reader.readAsDataURL(file);
+};
+
+window.removePhoto = () => {
+    profilePhotoBase64 = null;
+    document.getElementById('inp-photo').value = '';
+    document.getElementById('btn-remove-photo').style.display = 'none';
+    generateCVFromForm();
+    triggerDebounceSave();
+};
+
 window.handleCvUpload = async (event) => {
     const file = event.target.files[0];
     if (!file) return;
@@ -144,6 +167,8 @@ const translations = {
         tpl_classic_desc: "🏛️ Geleneksel",
         tpl_compact: "Kompakt",
         tpl_compact_desc: "📄 Minimal",
+        tpl_modern: "Modern",
+        tpl_modern_desc: "✨ Fotoğraflı & Şık",
         btn_design: "Tasarım Ayarları",
         btn_layout: "Sayfa Düzeni",
         btn_change_tpl: "Şablonu Değiştir",
@@ -211,7 +236,11 @@ const translations = {
         form_lbl_title: "Unvan",
         form_lbl_email: "E-posta",
         form_lbl_phone: "Telefon",
+        form_lbl_linkedin: "LinkedIn",
         form_lbl_address: "Adres",
+        form_lbl_photo: "Profil Fotoğrafı",
+        btn_choose_photo: "Fotoğraf Seç",
+        btn_remove_photo: "Kaldır",
         btn_add_job: "İş Ekle",
         btn_add_edu: "Okul Ekle",
         btn_add_custom: "Bölüm Ekle",
@@ -267,6 +296,8 @@ const translations = {
         tpl_classic_desc: "🏛️ Traditional",
         tpl_compact: "Compact",
         tpl_compact_desc: "📄 Minimal",
+        tpl_modern: "Modern",
+        tpl_modern_desc: "✨ Photo & Stylish",
         btn_design: "Design Settings",
         btn_layout: "Page Layout",
         btn_change_tpl: "Change Template",
@@ -334,7 +365,11 @@ const translations = {
         form_lbl_title: "Job Title",
         form_lbl_email: "Email",
         form_lbl_phone: "Phone",
+        form_lbl_linkedin: "LinkedIn",
         form_lbl_address: "Address",
+        form_lbl_photo: "Profile Photo",
+        btn_choose_photo: "Choose Photo",
+        btn_remove_photo: "Remove",
         btn_add_job: "Add Job",
         btn_add_edu: "Add Education",
         btn_add_custom: "Add Section",
@@ -1028,9 +1063,11 @@ window.generateCVFromForm = (triggerSave = true) => {
         title: document.getElementById('inp-title').value,
         email: document.getElementById('inp-email').value,
         phone: document.getElementById('inp-phone').value,
+        linkedin: document.getElementById('inp-linkedin').value,
         address: document.getElementById('inp-address').value,
         license: document.getElementById('inp-license').value,
         summary: document.getElementById('inp-summary').value,
+        photo: profilePhotoBase64,
         experiences: [],
         education: [],
         certificates: [],
@@ -1093,6 +1130,7 @@ window.generateCVFromForm = (triggerSave = true) => {
 
     // 2. Generate HTML
     const isCompact = document.body.classList.contains('tpl-compact');
+    const isModern = document.body.classList.contains('tpl-modern');
     let html = "";
     
     // Helper to escape and optionally handle newlines
@@ -1183,7 +1221,11 @@ window.generateCVFromForm = (triggerSave = true) => {
             <h1>${h(data.fullname) || 'ADINIZ SOYADINIZ'}</h1>
             <div class="subtitle">${h(data.title)}</div>
             <div class="address-line">${h(data.address)}</div>
-            <div class="contact-row"><span>${h(data.phone)}</span><span>${h(data.email)}</span></div>
+            <div class="contact-row">
+                <span>${h(data.phone)}</span>
+                <span>${h(data.email)}</span>
+                ${data.linkedin ? `<span>${h(data.linkedin)}</span>` : ''}
+            </div>
             <div class="compact-separator"></div>
             <div class="personal-details">
                 <div class="detail-item"><span class="lbl">${labels.lic}</span><span class="dots"></span><span class="val">${h(data.license)}</span></div>
@@ -1207,6 +1249,35 @@ window.generateCVFromForm = (triggerSave = true) => {
             <div class="subtitle">${h(data.title)}</div>
             <div class="contact-info">
                 <span>✉️ ${h(data.email)}</span> | <span>📞 ${h(data.phone)}</span> | <span>📍 ${h(data.address)}</span>
+                ${data.linkedin ? ` | <span>🔗 ${h(data.linkedin)}</span>` : ''}
+            </div>
+        </header>
+        <div id="main-content">
+             <div class="section">
+                <div class="section-header"><span class="section-title">${labels.prof}</span></div>
+                <div class="entry"><div class="right-col">${h(data.summary, true)}</div></div>
+            </div>
+            ${expContent}
+            ${eduContent}
+            ${certContent}
+            ${refContent}
+            ${customContent}
+        </div>`;
+    } else if (isModern) {
+        html = `
+        <header class="modern-header">
+            <div class="modern-header-content">
+                <div class="modern-text">
+                    <h1>${h(data.fullname) || 'ADINIZ SOYADINIZ'}</h1>
+                    <div class="subtitle">${h(data.title)}</div>
+                    <div class="contact-grid">
+                        <div class="contact-item">✉️ ${h(data.email)}</div>
+                        <div class="contact-item">📞 ${h(data.phone)}</div>
+                        <div class="contact-item">📍 ${h(data.address)}</div>
+                        ${data.linkedin ? `<div class="contact-item">🔗 ${h(data.linkedin)}</div>` : ''}
+                    </div>
+                </div>
+                ${data.photo ? `<div class="modern-photo"><img src="${data.photo}" alt="Profile"></div>` : ''}
             </div>
         </header>
         <div id="main-content">
@@ -1227,10 +1298,15 @@ window.generateCVFromForm = (triggerSave = true) => {
             <div class="subtitle">${h(data.title)}</div>
             <div class="contact-info">
                 <span>📍 ${h(data.address)}</span> | <span>📞 ${h(data.phone)}</span> | <span>✉️ ${h(data.email)}</span>
+                ${data.linkedin ? ` | <span>🔗 ${h(data.linkedin)}</span>` : ''}
             </div>
             <!-- Hidden Fields for switch compatibility -->
             <div class="address-line" style="display:none">${h(data.address)}</div>
-            <div class="contact-row" style="display:none"><span>${h(data.phone)}</span><span>${h(data.email)}</span></div>
+            <div class="contact-row" style="display:none">
+                <span>${h(data.phone)}</span>
+                <span>${h(data.email)}</span>
+                ${data.linkedin ? `<span>${h(data.linkedin)}</span>` : ''}
+            </div>
             <div class="personal-details" style="display:none">
                 <div class="detail-item"><span class="lbl">${labels.lic}</span><span class="dots"></span><span class="val">${h(data.license)}</span></div>
             </div>
@@ -1266,9 +1342,19 @@ function loadUserDataIntoForm(data) {
     document.getElementById('inp-title').value = data.title || '';
     document.getElementById('inp-email').value = data.email || '';
     document.getElementById('inp-phone').value = data.phone || '';
+    document.getElementById('inp-linkedin').value = data.linkedin || '';
     document.getElementById('inp-address').value = data.address || '';
     document.getElementById('inp-license').value = data.license || '';
     document.getElementById('inp-summary').value = data.summary || '';
+
+    // Handle Photo
+    if (data.photo) {
+        profilePhotoBase64 = data.photo;
+        document.getElementById('btn-remove-photo').style.display = 'inline-block';
+    } else {
+        profilePhotoBase64 = null;
+        document.getElementById('btn-remove-photo').style.display = 'none';
+    }
 
     const expList = document.getElementById('form-experiences-list');
     expList.innerHTML = '';
@@ -1394,6 +1480,11 @@ window.resetAll = async (skipConfirm = false) => {
     // Clear Form Inputs
     const inputs = document.querySelectorAll('.form-input');
     inputs.forEach(i => i.value = '');
+    
+    // Clear Photo
+    profilePhotoBase64 = null;
+    document.getElementById('btn-remove-photo').style.display = 'none';
+    
     document.getElementById('form-experiences-list').innerHTML = '';
     document.getElementById('form-education-list').innerHTML = '';
     document.getElementById('form-certificates-list').innerHTML = '';

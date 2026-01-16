@@ -282,6 +282,13 @@
                     <h3>Elegant</h3>
                     <p>💎 Modern & Estetik</p>
                 </div>
+                <div class="showcase-card">
+                    <div class="showcase-img-wrapper">
+                        <img src="assets/modern-cv.png" alt="Modern CV Şablonu" loading="lazy">
+                    </div>
+                    <h3 data-i18n="tpl_modern">Modern</h3>
+                    <p data-i18n="tpl_modern_desc">✨ Fotoğraflı & Şık</p>
+                </div>
             </div>
         </section>
 
@@ -442,6 +449,16 @@
                     <p>💎 Modern </p>
                 </div>
             </div>
+
+            <div class="template-card" onclick="selectTemplate('tpl-modern')">
+                <div class="template-preview">
+                    <img src="assets/modern-cv.png" alt="Modern Şablon Önizleme">
+                </div>
+                <div class="template-info">
+                    <h3 data-i18n="tpl_modern">Modern</h3>
+                    <p data-i18n="tpl_modern_desc">✨ Fotoğraflı & Şık</p>
+                </div>
+            </div>
         </div>
     </section>
 
@@ -542,6 +559,10 @@
                                 <label data-i18n="form_lbl_phone">Telefon</label>
                                 <input type="text" id="inp-phone" class="form-input" placeholder="Tel" oninput="generateCVFromForm()">
                             </div>
+                            <div class="input-group">
+                                <label data-i18n="form_lbl_linkedin">LinkedIn</label>
+                                <input type="text" id="inp-linkedin" class="form-input" placeholder="linkedin.com/in/username" oninput="generateCVFromForm()">
+                            </div>
                             <div class="input-group full-width">
                                 <label data-i18n="form_lbl_address">Adres</label>
                                 <input type="text" id="inp-address" class="form-input" placeholder="Adres" oninput="generateCVFromForm()">
@@ -549,6 +570,14 @@
                             <div class="input-group">
                                 <label data-i18n="cv_label_license">Ehliyet</label>
                                 <input type="text" id="inp-license" class="form-input" placeholder="Sınıf" oninput="generateCVFromForm()">
+                            </div>
+                            <div class="input-group">
+                                <label data-i18n="form_lbl_photo">Profil Fotoğrafı</label>
+                                <div class="photo-upload-container">
+                                    <input type="file" id="inp-photo" class="form-input" accept="image/*" onchange="handlePhotoUpload(event)" style="display:none;">
+                                    <button class="btn-secondary-dashed btn-small" onclick="document.getElementById('inp-photo').click()" data-i18n="btn_choose_photo">Fotoğraf Seç</button>
+                                    <button id="btn-remove-photo" class="btn-text danger btn-small" onclick="removePhoto()" style="display:none;" data-i18n="btn_remove_photo">Kaldır</button>
+                                </div>
                             </div>
                         </div>
                     </div>
