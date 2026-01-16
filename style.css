@@ -278,13 +278,13 @@ body {
 }
 .showcase-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    grid-template-columns: repeat(3, 1fr);
     gap: 30px;
     margin-top: 40px;
 }
 .showcase-card {
     background: white;
-    padding: 30px;
+    padding: 20px;
     border-radius: 16px;
     box-shadow: 0 5px 20px rgba(0,0,0,0.08);
     transition: 0.3s;
@@ -296,7 +296,7 @@ body {
 }
 .showcase-img-wrapper {
     width: 100%;
-    height: 280px;
+    height: 220px;
     overflow: hidden;
     border-radius: 12px;
     margin-bottom: 20px;
@@ -406,11 +406,14 @@ body {
         font-size: 1rem;
     }
     .showcase-grid {
-        grid-template-columns: 1fr;
-        gap: 25px;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 15px;
+    }
+    .showcase-card {
+        padding: 15px;
     }
     .showcase-img-wrapper {
-        height: 240px;
+        height: 180px;
     }
     .trust-badges {
         flex-direction: column;
