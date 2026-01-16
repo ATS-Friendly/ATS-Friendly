@@ -102,6 +102,42 @@
         </div>
     </div>
 
+    <!-- ACCOUNT MODAL -->
+    <div id="account-modal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 data-i18n="modal_account_title">Hesabım</h3>
+                <button class="close-modal" onclick="closeAccountModal()" aria-label="Close modal">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="account-menu">
+                    <button class="account-item" onclick="openProfile()">
+                        <span class="icon">👤</span>
+                        <div class="account-item-text">
+                            <span class="title" data-i18n="menu_profile">Profil Bilgilerim</span>
+                            <span class="desc" data-i18n="menu_profile_desc">Hesap ve e-posta ayarları</span>
+                        </div>
+                    </button>
+                    <button class="account-item" onclick="openFAQ()">
+                        <span class="icon">❓</span>
+                        <div class="account-item-text">
+                            <span class="title" data-i18n="menu_faq">Sıkça Sorulan Sorular</span>
+                            <span class="desc" data-i18n="menu_faq_desc">Yardım ve destek</span>
+                        </div>
+                    </button>
+                    <hr style="border:0; border-top:1px solid #eee; margin:10px 0;">
+                    <button class="account-item danger" onclick="logout()">
+                        <span class="icon">🚪</span>
+                        <div class="account-item-text">
+                            <span class="title" data-i18n="btn_logout">Çıkış Yap</span>
+                            <span class="desc" data-i18n="menu_logout_desc">Oturumu güvenli bir şekilde kapat</span>
+                        </div>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- 0. LANDING PAGE (DEFAULT VIEW) -->
     <section id="landing-view" class="view-section active">
         <header class="landing-header">
@@ -437,7 +473,10 @@
                 <span class="icon">📏</span> <span data-i18n="btn_layout">Düzen</span>
             </button>
             <button class="mobile-action-btn primary" onclick="window.print()">
-                <span data-i18n="btn_download_pdf">Kaydet (PDF)</span>
+                <span data-i18n="btn_download_pdf">Kaydet</span>
+            </button>
+            <button class="mobile-action-btn secondary" onclick="openAccountModal()">
+                <span class="icon">👤</span> <span data-i18n="btn_account">Hesabım</span>
             </button>
         </div>
 
@@ -445,13 +484,6 @@
         <div id="fab-overlay" class="fab-overlay" onclick="toggleFabMenu()"></div>
         <div class="mobile-fab-container">
             <div class="fab-menu-items" id="fab-items">
-                <button class="fab-item danger" onclick="logout()">
-                    <span class="fab-label">Çıkış Yap</span> 🚪
-                </button>
-                <div class="fab-item lang-selector-fab">
-                    <button class="lang-btn-fab active" data-lang="tr" onclick="setLanguage('tr')">TR</button>
-                    <button class="lang-btn-fab" data-lang="en" onclick="setLanguage('en')">EN</button>
-                </div>
                 <button class="fab-item danger" onclick="resetAll()">
                     <span class="fab-label">Temizle</span> 🗑️
                 </button>

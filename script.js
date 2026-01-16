@@ -144,7 +144,14 @@ const translations = {
         form_certificates: "Sertifikalar",
         form_references: "Referanslar",
         btn_add_cert: "Sertifika Ekle",
-        btn_add_ref: "Referans Ekle"
+        btn_add_ref: "Referans Ekle",
+        btn_account: "Hesabım",
+        modal_account_title: "Hesabım",
+        menu_profile: "Profil Bilgilerim",
+        menu_profile_desc: "Hesap ve e-posta ayarları",
+        menu_faq: "Sıkça Sorulan Sorular",
+        menu_faq_desc: "Yardım ve destek",
+        menu_logout_desc: "Oturumu güvenli bir şekilde kapat"
     },
     en: {
         auth_title: "Login to your account",
@@ -234,7 +241,14 @@ const translations = {
         form_certificates: "Certificates",
         form_references: "References",
         btn_add_cert: "Add Certificate",
-        btn_add_ref: "Add Reference"
+        btn_add_ref: "Add Reference",
+        btn_account: "Account",
+        modal_account_title: "My Account",
+        menu_profile: "My Profile",
+        menu_profile_desc: "Account and email settings",
+        menu_faq: "FAQ",
+        menu_faq_desc: "Help and support",
+        menu_logout_desc: "Sign out securely"
     }
 };
 
@@ -455,6 +469,19 @@ window.openLayoutModal = () => {
 window.closeLayoutModal = () => {
     document.getElementById('layout-modal').classList.remove('active');
     saveToCloud();
+};
+
+window.openAccountModal = () => openModal('account-modal');
+window.closeAccountModal = () => document.getElementById('account-modal').classList.remove('active');
+
+window.openProfile = () => {
+    alert("Profil sayfası çok yakında!");
+    closeAccountModal();
+};
+
+window.openFAQ = () => {
+    alert("Sıkça sorulan sorular sayfası çok yakında!");
+    closeAccountModal();
 };
 
 
