@@ -80,11 +80,22 @@ window.handleCvUpload = async (event) => {
         // Basic Parsing Logic
         const parsedData = parseCvText(fullText);
         
-        // Fill form fields
+        // Fill static fields
         if (parsedData.name) document.getElementById('inp-fullname').value = parsedData.name;
+        if (parsedData.title) document.getElementById('inp-title').value = parsedData.title;
         if (parsedData.email) document.getElementById('inp-email').value = parsedData.email;
         if (parsedData.phone) document.getElementById('inp-phone').value = parsedData.phone;
         if (parsedData.summary) document.getElementById('inp-summary').value = parsedData.summary;
+
+        // Populate Dynamic Lists
+        if (parsedData.experiences && parsedData.experiences.length > 0) {
+            document.getElementById('form-experiences-list').innerHTML = '';
+            parsedData.experiences.forEach(exp => window.addFormExperience(exp));
+        }
+        if (parsedData.education && parsedData.education.length > 0) {
+            document.getElementById('form-education-list').innerHTML = '';
+            parsedData.education.forEach(edu => window.addFormEducation(edu));
+        }
 
         // Trigger updates
         window.generateCVFromForm();
@@ -104,34 +115,115 @@ window.handleCvUpload = async (event) => {
 };
 
 function parseCvText(text) {
+    // 0. Pre-process: Normalize "spaced out" text (e.g. "H Ü S E Y İ N" -> "HÜSEYİN")
+    // This regex looks for single chars followed by space followed by another single char
+    let normalized = text.replace(/([a-zA-ZçğışöüÇĞİŞÖÜ])\s(?=[a-zA-ZçğışöüÇĞİŞÖÜ]\s|[a-zA-ZçğışöüÇĞİŞÖÜ]$)/g, '$1');
+    // Also fix double spaces that might occur from normalization or PDF weirdness
+    normalized = normalized.replace(/\s\s+/g, ' ');
+
     const data = {
         name: "",
+        title: "",
         email: "",
         phone: "",
-        summary: ""
+        summary: "",
+        experiences: [],
+        education: []
     };
 
-    // 1. Email Regex
-    const emailMatch = text.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/);
+    const lines = normalized.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+    
+    // 1. Basic Info (Email & Phone)
+    const emailMatch = normalized.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/);
     if (emailMatch) data.email = emailMatch[0];
 
-    // 2. Phone Regex (Simple)
-    const phoneMatch = text.match(/(\+?\d{1,3}[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}/);
+    const phoneMatch = normalized.match(/(\+?\d{1,3}[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}/);
     if (phoneMatch) data.phone = phoneMatch[0];
 
-    // 3. Name (Assuming it's at the beginning of the file)
-    const lines = text.split('\n').map(l => l.trim()).filter(l => l.length > 2);
+    // 2. Name & Title (Heuristic: First lines before a major section or contact info)
     if (lines.length > 0) {
-        // Simple heuristic: Usually the first non-empty line is the name
-        data.name = lines[0].substring(0, 50); 
+        // Find if the first line contains common stop words or symbols
+        if (!lines[0].includes('@') && !lines[0].match(/\d{4}/)) {
+            data.name = lines[0];
+            // Look for title in the next few lines
+            for (let i = 1; i < Math.min(lines.length, 4); i++) {
+                if (lines[i].length > 3 && !lines[i].includes('@') && !lines[i].match(/\d/) && lines[i].length < 60) {
+                    data.title = lines[i];
+                    break;
+                }
+            }
+        }
     }
 
-    // 4. Summary (Basic heuristic)
-    const lowerText = text.toLowerCase();
-    const summaryStart = lowerText.indexOf("profile") !== -1 ? lowerText.indexOf("profile") : lowerText.indexOf("summary");
-    if (summaryStart !== -1) {
-        const afterSummary = text.substring(summaryStart + 7).trim();
-        data.summary = afterSummary.split('\n')[0].substring(0, 250);
+    // 3. Section Parsing
+    const sectionKeywords = {
+        summary: ['profil', 'summary', 'özgeçmiş', 'özet', 'about', 'professional profile'],
+        experience: ['deneyim', 'experience', 'iş deneyimi', 'work history', 'employment history'],
+        education: ['eğitim', 'education', 'okul', 'academic background'],
+    };
+
+    let currentSection = null;
+    let sectionText = { summary: "", experience: "", education: "" };
+
+    lines.forEach(line => {
+        const lowerLine = line.toLowerCase();
+        let foundHeader = false;
+        
+        for (const [key, keywords] of Object.entries(sectionKeywords)) {
+            if (keywords.some(k => lowerLine === k || lowerLine.startsWith(k + " "))) {
+                currentSection = key;
+                foundHeader = true;
+                break;
+            }
+        }
+
+        if (!foundHeader && currentSection && sectionText[currentSection] !== undefined) {
+            sectionText[currentSection] += line + "\n";
+        }
+    });
+
+    // 4. Clean and Extract Items
+    data.summary = sectionText.summary.trim();
+
+    // Heuristic for Experience: Split by lines that look like "Title, Company" or have Dates
+    if (sectionText.experience) {
+        const expLines = sectionText.experience.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+        let currentExp = null;
+
+        expLines.forEach(line => {
+            const dateMatch = line.match(/\d{4}/);
+            // If line contains a date and is relatively short, it's likely a new entry or metadata
+            if (dateMatch && line.length < 100) {
+                if (currentExp) data.experiences.push(currentExp);
+                currentExp = { title: line.split(',')[0].trim(), company: line.split(',')[1]?.trim() || "", date: line, desc: "" };
+            } else if (currentExp) {
+                currentExp.desc += line + " ";
+            } else {
+                // First line of experience section if no date found yet
+                currentExp = { title: line.split(',')[0].trim(), company: line.split(',')[1]?.trim() || "", date: "", desc: "" };
+            }
+        });
+        if (currentExp) data.experiences.push(currentExp);
+    }
+
+    // Heuristic for Education: Similar to Experience
+    if (sectionText.education) {
+        const eduLines = sectionText.education.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+        let currentEdu = null;
+
+        eduLines.forEach(line => {
+            const dateMatch = line.match(/\d{4}/);
+            if (dateMatch && line.length < 80) {
+                if (currentEdu) data.education.push(currentEdu);
+                currentEdu = { school: "", degree: line.replace(/\d{4}.*/, '').trim(), date: line.match(/\d{4}.*?\d{4}|\d{4}/)?.[0] || "" };
+            } else if (currentEdu) {
+                if (!currentEdu.school) currentEdu.school = line;
+                else currentEdu.degree += " " + line;
+            } else {
+                currentEdu = { school: line, degree: "", date: "" };
+            }
+        });
+        if (currentEdu) data.education.push(currentEdu);
     }
 
     return data;
