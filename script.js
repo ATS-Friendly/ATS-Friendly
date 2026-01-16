@@ -559,6 +559,11 @@ window.scrollToFeatures = () => {
 };
 
 window.showAuth = (loginMode) => {
+    // If user is already logged in, don't show login screen, go to app
+    if (currentUser) {
+        window.showView('template-view');
+        return;
+    }
     isLoginMode = loginMode;
     updateAuthUI();
     window.showView('auth-view');
@@ -659,6 +664,13 @@ onAuthStateChanged(auth, async (user) => {
         }
         
         updateStatus('online');
+
+        // IF the user is currently on the login screen (auth-view), 
+        // redirect them to the app since they just successfully authenticated.
+        const currentView = document.querySelector('.view-section.active');
+        if (currentView && currentView.id === 'auth-view') {
+            window.showView('template-view');
+        }
     } else {
         // Not Logged In - Show Landing Page by default unless manually navigated to Auth
         // If we are already on Auth view (e.g. failed login), stay there.
@@ -1172,11 +1184,13 @@ async function saveToCloud(formData = null) {
         
         updateStatus('online');
         
-        // Only show toast AFTER successful save
-        const t = document.getElementById('toast');
-        t.innerText = translations[currentLang].status_saved;
-        t.classList.add('show');
-        setTimeout(() => t.classList.remove('show'), 2000);
+        // Only show toast IF the user is actually in the editor
+        if (document.getElementById('editor-view').classList.contains('active')) {
+            const t = document.getElementById('toast');
+            t.innerText = translations[currentLang].status_saved;
+            t.classList.add('show');
+            setTimeout(() => t.classList.remove('show'), 2000);
+        }
 
     } catch (e) { 
         updateStatus('error'); 
