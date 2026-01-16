@@ -1600,6 +1600,19 @@ body.tpl-compact .section-header {
 body.tpl-compact .section-title { font-size: 1.0em; font-weight: 700; letter-spacing: 2px; color: var(--cv-accent-color); }
 body.tpl-compact .entry { display: block; position: relative; margin-bottom: 15px; }
 body.tpl-compact .entry .left-col { position: absolute; top: 0; right: 0; width: auto; text-align: right; font-weight: 600; font-size: 0.9em; color: var(--cv-accent-color); }
+
+/* Elegant Template License */
+.elegant-license {
+    margin-top: 8px;
+    font-size: 0.9em;
+    color: #636e72;
+    font-style: italic;
+}
+.elegant-license strong {
+    color: var(--cv-accent-color);
+    font-weight: 700;
+}
+
 /* Template 3: Modern (Photo Friendly - Two Column Layout) */
 body.tpl-modern #cv-root {
     background: white;
@@ -1857,13 +1870,12 @@ body.tpl-elegant .section-title {
     }
 
     /* 1. Hide EVERYTHING except the CV container */
-    body > *,
+    body > *:not(#editor-view),
     #landing-view,
     #template-view,
-    #editor-view > *:not(.editor-layout),
-    .editor-layout > *:not(.editor-panel-preview),
-    .editor-panel-preview > *:not(#cv-scale-container),
+    #auth-view,
     .sidebar,
+    .editor-panel-form,
     .fab-container,
     .mobile-editor-tabs,
     .mobile-bottom-bar,
@@ -1877,9 +1889,7 @@ body.tpl-elegant .section-title {
     textarea,
     select {
         display: none !important;
-        opacity: 0 !important;
         visibility: hidden !important;
-        pointer-events: none !important;
     }
 
     /* 2. Reset containers to be simple blocks without fixed positioning or transformations */
@@ -1909,17 +1919,24 @@ body.tpl-elegant .section-title {
     }
 
     /* 3. The CV Paper Container - The ONLY thing visible */
-    #cv-scale-container {
+    #cv-scale-container,
+    #cv-root,
+    #cv-root *,
+    .page,
+    .page * {
         display: block !important;
         visibility: visible !important;
         opacity: 1 !important;
-        position: absolute !important;
+    }
+    
+    #cv-scale-container {
+        position: relative !important;
         left: 0 !important;
         top: 0 !important;
         width: 210mm !important;
         height: auto !important;
         min-height: 297mm !important;
-        margin: 0 !important;
+        margin: 0 auto !important;
         padding: 0 !important;
         transform: none !important;
         transform-origin: top left !important;
@@ -1930,9 +1947,6 @@ body.tpl-elegant .section-title {
     }
 
     #cv-root, .page {
-        display: block !important;
-        visibility: visible !important;
-        opacity: 1 !important;
         width: 210mm !important;
         margin: 0 !important;
         padding: 0 !important;
@@ -1947,7 +1961,6 @@ body.tpl-elegant .section-title {
     .page {
         padding: 15mm 20mm !important;
         box-sizing: border-box !important;
-        page-break-after: always;
     }
 
     /* Ensure backgrounds and colors are preserved */

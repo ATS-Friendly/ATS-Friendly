@@ -1257,6 +1257,7 @@ window.generateCVFromForm = (triggerSave = true) => {
                 <span>✉️ ${h(data.email)}</span> | <span>📞 ${h(data.phone)}</span> | <span>📍 ${h(data.address)}</span>
                 ${data.linkedin ? ` | <span>🔗 ${h(data.linkedin)}</span>` : ''}
             </div>
+            ${data.license ? `<div class="elegant-license"><strong>${labels.lic}:</strong> ${h(data.license)}</div>` : ''}
         </header>
         <div id="main-content">
              <div class="section">
