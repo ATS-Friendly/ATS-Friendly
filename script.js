@@ -15,7 +15,25 @@ import { getFunctions, httpsCallable } from "https://www.gstatic.com/firebasejs/
 // DEBUG: Add logging to see if module loads
 console.log("Firebase modules loaded successfully");
 
-// --- FIREBASE YAPILANDIRMASI ---
+// --- GLOBAL VARIABLES (DEFINE EARLY) ---
+let isLoginMode = true;
+let currentUser = null;
+let isSyncing = false;
+let saveTimeout = null; // For debouncing save
+let currentLang = 'tr';
+// Theme Defaults
+let currentTheme = {
+    color: '#2c3e50',
+    font: 'ptserif' 
+};
+// Layout Defaults
+let currentLayout = {
+    fontSize: 11,
+    lineHeight: 1.4,
+    margin: 20,
+    sectionGap: 15
+};
+const appId = "mono-cv-app";
 const firebaseConfig = {
     apiKey: "AIzaSyBbxgCMw5dO5T-kt7Njapo5ST04MRp7JKU",
     authDomain: "ats-friendly-93377.firebaseapp.com",
@@ -32,7 +50,6 @@ const auth = getAuth(app);
 const db = getFirestore(app);
 const functions = getFunctions(app); // Initialize Functions
 const googleProvider = new GoogleAuthProvider();
-const appId = "mono-cv-app";
 // --- CV UPLOAD & PARSING ---
 window.handleCvUpload = async (event) => {
     const file = event.target.files[0];
