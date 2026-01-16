@@ -589,7 +589,7 @@ body {
     transition: object-position 3s ease-in-out;;
 }
 .template-card:hover .template-preview img {
-    object-position: bottom;;
+    object-position: bottom;
 }
 .template-info { 
     padding: 20px; 
