@@ -12,9 +12,6 @@ import {
 import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 import { getFunctions, httpsCallable } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-functions.js";
 
-// DEBUG: Add logging to see if module loads
-console.log("Firebase modules loaded successfully");
-
 // --- GLOBAL VARIABLES (DEFINE EARLY) ---
 let isLoginMode = true;
 let currentUser = null;
@@ -678,16 +675,11 @@ window.scrollToFeatures = () => {
 };
 
 window.showAuth = (loginMode) => {
-    console.log("showAuth called with loginMode:", loginMode);
-    console.log("Current user:", currentUser);
-    
-    // DEBUG: Always show auth screen for testing
     // If user is already logged in, don't show login screen, go to app
-    // if (currentUser) {
-    //     window.showView('template-view');
-    //     return;
-    // }
-    
+    if (currentUser) {
+        window.showView('template-view');
+        return;
+    }
     isLoginMode = loginMode;
     updateAuthUI();
     window.showView('auth-view');
