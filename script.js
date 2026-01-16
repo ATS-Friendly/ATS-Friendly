@@ -148,10 +148,12 @@ window.handleCvUpload = async (event) => {
         if (parsedData.experiences && parsedData.experiences.length > 0) {
             document.getElementById('form-experiences-list').innerHTML = '';
             parsedData.experiences.forEach(exp => window.addFormExperience(exp));
+            window.initDatePicker();
         }
         if (parsedData.education && parsedData.education.length > 0) {
             document.getElementById('form-education-list').innerHTML = '';
             parsedData.education.forEach(edu => window.addFormEducation(edu));
+            window.initDatePicker();
         }
 
         // Trigger updates
@@ -319,7 +321,8 @@ const translations = {
         privacy_policy_content: `Veri Toplama: Bu platform, yalnızca CV oluşturma amacıyla sağladığınız kişisel bilgileri (ad, iletişim, deneyim vb.) işler.<br><br>Veri Kullanımı: Bilgileriniz hiçbir şekilde üçüncü şahıslarla paylaşılmaz veya reklam amaçlı kullanılmaz.<br><br>Yerel Depolama: Verileriniz tarayıcınızın yerel depolama alanında (Local Storage) veya güvenli sunucularımızda saklanır. İstediğiniz zaman verilerinizi silebilirsiniz.<br><br>Çerezler: Deneyiminizi iyileştirmek için temel çerezler kullanılmaktadır.`,
         terms_of_service_title: "Kullanım Koşulları",
         terms_of_service_content: `Hizmet Tanımı: Bu web sitesi, kullanıcıların profesyonel özgeçmişler oluşturmasına yardımcı olan bir araçtır.<br><br>Sorumluluk: Kullanıcılar, CV'lerinde sağladıkları bilgilerin doğruluğundan kendileri sorumludur.<br><br>Fikri Mülkiyet: Şablon tasarımları ve platform kodları bu projeye aittir, izinsiz kopyalanamaz.<br><br>Değişiklikler: Hizmet şartları önceden haber verilmeksizin güncellenebilir.`,
-        auth_terms_text: `<a href="javascript:void(0)" onclick="openPolicyModal('terms')">Kullanım Koşulları</a>'nı ve <a href="javascript:void(0)" onclick="openPolicyModal('privacy')">Gizlilik Politikasını</a> okudum, kabul ediyorum.`
+        auth_terms_text: `<a href="javascript:void(0)" onclick="openPolicyModal('terms')">Kullanım Koşulları</a>'nı ve <a href="javascript:void(0)" onclick="openPolicyModal('privacy')">Gizlilik Politikasını</a> okudum, kabul ediyorum.`,
+        linkedin_tip_text: "İpucu: LinkedIn profil linkinizi 'Genel profil ve URL' kısmından kopyalarsanız CV'nizde daha şık (temiz) görünecektir."
     },
     en: {
         auth_title: "Login to your account",
@@ -465,7 +468,8 @@ const translations = {
         privacy_policy_content: `Data Collection: This platform processes only the personal information you provide (name, contact, experience, etc.) for the sole purpose of resume creation.<br><br>Data Usage: Your information is never shared with third parties or used for advertising purposes.<br><br>Storage: Your data is stored in your browser's Local Storage or on our secure servers. You can delete your data at any time.<br><br>Cookies: Essential cookies are used to enhance your user experience.`,
         terms_of_service_title: "Terms of Service",
         terms_of_service_content: `Service Description: This website is a tool designed to help users create professional resumes.<br><br>Responsibility: Users are solely responsible for the accuracy of the information provided in their resumes.<br><br>Intellectual Property: Template designs and platform code belong to this project and may not be copied without permission.<br><br>Changes: Terms of service may be updated without prior notice.`,
-        auth_terms_text: `I have read and agree to the <a href="javascript:void(0)" onclick="openPolicyModal('terms')">Terms of Service</a> and <a href="javascript:void(0)" onclick="openPolicyModal('privacy')">Privacy Policy</a>.`
+        auth_terms_text: `I have read and agree to the <a href="javascript:void(0)" onclick="openPolicyModal('terms')">Terms of Service</a> and <a href="javascript:void(0)" onclick="openPolicyModal('privacy')">Privacy Policy</a>.`,
+        linkedin_tip_text: "Tip: For a cleaner look on your CV, copy your LinkedIn URL from the 'Public profile & URL' section of your profile."
     }
 };
 
@@ -971,12 +975,12 @@ window.addFormExperience = (data = null) => {
             </div>
             <div class="input-group">
                 <label>${t.lbl_date_start}</label>
-                <input type="month" class="form-input job-date-start" value="${data ? data.startDate : ''}" oninput="generateCVFromForm()">
+                <input type="text" class="form-input job-date-start date-picker-month" value="${data ? data.startDate : ''}" oninput="generateCVFromForm()">
             </div>
             <div class="input-group">
                 <label>${t.lbl_date_end}</label>
                 <div class="date-end-wrapper">
-                    <input type="month" class="form-input job-date-end" value="${data ? data.endDate : ''}" oninput="generateCVFromForm()" ${data && data.present ? 'disabled' : ''}>
+                    <input type="text" class="form-input job-date-end date-picker-month" value="${data ? data.endDate : ''}" oninput="generateCVFromForm()" ${data && data.present ? 'disabled' : ''}>
                     <label class="present-label">
                         <input type="checkbox" class="job-present" onchange="toggleDateEnd(this)" ${data && data.present ? 'checked' : ''}> ${t.lbl_present}
                     </label>
@@ -989,7 +993,10 @@ window.addFormExperience = (data = null) => {
         </div>
     `;
     container.appendChild(div);
-    if (!data) generateCVFromForm();
+    if (!data) {
+        generateCVFromForm();
+        window.initDatePicker();
+    }
 };
 
 window.addFormEducation = (data = null) => {
@@ -1011,16 +1018,19 @@ window.addFormEducation = (data = null) => {
             </div>
             <div class="input-group">
                 <label>${t.lbl_date_start}</label>
-                <input type="month" class="form-input edu-date-start" value="${data ? data.startDate : ''}" oninput="generateCVFromForm()">
+                <input type="text" class="form-input edu-date-start date-picker-month" value="${data ? data.startDate : ''}" oninput="generateCVFromForm()">
             </div>
             <div class="input-group">
                 <label>${t.lbl_date_end}</label>
-                <input type="month" class="form-input edu-date-end" value="${data ? data.endDate : ''}" oninput="generateCVFromForm()">
+                <input type="text" class="form-input edu-date-end date-picker-month" value="${data ? data.endDate : ''}" oninput="generateCVFromForm()">
             </div>
         </div>
     `;
     container.appendChild(div);
-    if (!data) generateCVFromForm();
+    if (!data) {
+        generateCVFromForm();
+        window.initDatePicker();
+    }
 };
 
 window.addFormCustomSection = (data = null) => {
@@ -1508,6 +1518,7 @@ function loadUserDataIntoForm(data) {
     if (data.education) {
         data.education.forEach(edu => addFormEducation(edu));
     }
+    window.initDatePicker();
 
     const certList = document.getElementById('form-certificates-list');
     certList.innerHTML = '';
@@ -1653,26 +1664,30 @@ window.createNewSection = () => {
     alert("Yeni sistemde 'Özel Bölümler' alanını kullanarak ekleme yapabilirsiniz.");
 };
 
-// LinkedIn URL Tip & Focus Logic
-const setupLinkedInTip = () => {
-    const inp = document.getElementById('inp-linkedin');
-    if (!inp) return;
-    
-    inp.addEventListener('focus', () => {
-        if (!localStorage.getItem('linkedin_tip_shown')) {
-            const tip = currentLang === 'tr' 
-                ? "İpucu: LinkedIn profil linkinizi 'Genel profil ve URL' kısmından kopyalarsanız CV'nizde daha şık (temiz) görünecektir." 
-                : "Tip: For a cleaner look on your CV, copy your LinkedIn URL from the 'Public profile & URL' section of your profile.";
-            alert(tip);
-            localStorage.setItem('linkedin_tip_shown', 'true');
-        }
-    });
+window.initDatePicker = () => {
+    if (typeof flatpickr !== 'undefined') {
+        flatpickr(".date-picker-month", {
+            plugins: [
+                new monthSelectPlugin({
+                    shorthand: true, 
+                    dateFormat: "Y-m", 
+                    altFormat: "F Y", 
+                    theme: "light"
+                })
+            ],
+            locale: currentLang === 'tr' ? 'tr' : 'en',
+            onChange: function() {
+                generateCVFromForm();
+            }
+        });
+    }
 };
 
 // Initial setup
 setLanguage('tr');
 window.resizePreview();
-setupLinkedInTip();
+window.initDatePicker();
+
 window.addEventListener('beforeprint', () => {
     // 1. Force a final render without saving to ensure latest data
     if (window.generateCVFromForm) window.generateCVFromForm(false);

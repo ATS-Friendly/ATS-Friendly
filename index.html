@@ -52,6 +52,10 @@
     
     <link rel="stylesheet" href="style.css">
     
+    <!-- Flatpickr for Modern Date Pickers -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <link rel="stylesheet" type="text/css" href="https://npmcdn.com/flatpickr/dist/themes/material_blue.css">
+    
     
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#3498db">
@@ -523,7 +527,13 @@
                                 <input type="text" id="inp-phone" class="form-input" placeholder="Tel" oninput="generateCVFromForm()">
                             </div>
                             <div class="input-group">
-                                <label data-i18n="form_lbl_linkedin">LinkedIn</label>
+                                <div class="label-with-info">
+                                    <label data-i18n="form_lbl_linkedin">LinkedIn</label>
+                                    <div class="info-tooltip-container">
+                                        <span class="info-icon">i</span>
+                                        <div class="tooltip-box" data-i18n="linkedin_tip_text">İpucu: LinkedIn profil linkinizi 'Genel profil ve URL' kısmından kopyalarsanız CV'nizde daha şık (temiz) görünecektir.</div>
+                                    </div>
+                                </div>
                                 <input type="text" id="inp-linkedin" class="form-input" placeholder="linkedin.com/in/username" oninput="generateCVFromForm()">
                                 <small class="input-hint" style="font-size: 10px; color: #636e72; display: block; margin-top: 4px;">Örn: www.linkedin.com/in/adiniz</small>
                             </div>
@@ -644,5 +654,10 @@
     </section>
 
     <script type="module" src="script.js"></script>
+    <!-- Flatpickr JS -->
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://npmcdn.com/flatpickr/dist/l10n/tr.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/plugins/monthSelect/index.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/plugins/monthSelect/style.css">
 </body>
 </html>

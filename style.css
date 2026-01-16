@@ -1100,6 +1100,18 @@ body {
     .editor-panel-preview { display: block; width: 100%; }
 }
 
+/* Flatpickr Modern Overrides */
+.flatpickr-calendar {
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1) !important;
+    border: none !important;
+}
+.flatpickr-monthSelect-month {
+    border-radius: 8px !important;
+}
+.flatpickr-monthSelect-month.selected {
+    background: var(--primary-color) !important;
+}
+
 .editor-panel-form {
     width: 40%;
     min-width: 350px;
@@ -1237,6 +1249,142 @@ body {
     transform: scale(1.2);
 }
 
+
+.label-with-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 5px;
+}
+.label-with-info label {
+    margin: 0 !important;
+}
+.info-tooltip-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+.info-icon {
+    width: 16px;
+    height: 16px;
+    background: #dfe6e9;
+    color: #636e72;
+    border-radius: 50%;
+    font-size: 11px;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: help;
+    transition: 0.2s;
+}
+.info-icon:hover {
+    background: var(--primary-color);
+    color: white;
+}
+.tooltip-box {
+    visibility: hidden;
+    width: 200px;
+    background-color: rgba(45, 52, 54, 0.95);
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 10px;
+    position: absolute;
+    z-index: 1001;
+    bottom: 125%;
+    left: 50%;
+    margin-left: -100px;
+    opacity: 0;
+    transition: opacity 0.3s;
+    font-size: 11px;
+    line-height: 1.4;
+    font-weight: 500;
+    pointer-events: none;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+.tooltip-box::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    margin-left: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: rgba(45, 52, 54, 0.95) transparent transparent transparent;
+}
+.info-tooltip-container:hover .tooltip-box {
+    visibility: visible;
+    opacity: 1;
+}
+
+.label-with-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 5px;
+}
+.label-with-info label {
+    margin: 0 !important;
+}
+.info-tooltip-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+.info-icon {
+    width: 16px;
+    height: 16px;
+    background: #dfe6e9;
+    color: #636e72;
+    border-radius: 50%;
+    font-size: 11px;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: help;
+    transition: 0.2s;
+}
+.info-icon:hover {
+    background: var(--primary-color);
+    color: white;
+}
+.tooltip-box {
+    visibility: hidden;
+    width: 200px;
+    background-color: rgba(45, 52, 54, 0.95);
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 10px;
+    position: absolute;
+    z-index: 1001;
+    bottom: 125%;
+    left: 50%;
+    margin-left: -100px;
+    opacity: 0;
+    transition: opacity 0.3s;
+    font-size: 11px;
+    line-height: 1.4;
+    font-weight: 500;
+    pointer-events: none;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+.tooltip-box::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    margin-left: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: rgba(45, 52, 54, 0.95) transparent transparent transparent;
+}
+.info-tooltip-container:hover .tooltip-box {
+    visibility: visible;
+    opacity: 1;
+}
 
 .input-grid {
     display: grid;
