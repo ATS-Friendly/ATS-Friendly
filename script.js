@@ -573,6 +573,7 @@ window.loginWithGoogle = async () => {
     try {
         updateStatus('syncing'); 
         await signInWithPopup(auth, googleProvider);
+        // Successful login is handled by onAuthStateChanged, which will now redirect from auth-view
     } catch (e) {
         let msg = "Google Giriş Hatası: " + e.message;
         if(e.code === 'auth/popup-blocked') {
@@ -630,11 +631,8 @@ window.logout = () => signOut(auth).then(() => {
 onAuthStateChanged(auth, async (user) => {
     if (user) {
         currentUser = user;
-        // Check if we just logged in or if we are returning.
-        // If we are already on the editor or template view, don't force a redirect to landing.
-        // But if we are fresh, don't force them into the editor immediately to allow viewing the landing page.
         
-        // Load data in background
+        // 1. Background Data Fetch
         const docRef = doc(db, 'artifacts', appId, 'users', user.uid, 'data', 'cvContent');
         const snap = await getDoc(docRef);
         
@@ -665,11 +663,17 @@ onAuthStateChanged(auth, async (user) => {
         
         updateStatus('online');
 
-        // IF the user is currently on the login screen (auth-view), 
-        // redirect them to the app since they just successfully authenticated.
+        // 2. Navigation Logic:
+        // ONLY redirect to the app if the user is currently looking at the login/signup screen (auth-view).
+        // If they are on the landing page, stay on the landing page (logged in state).
         const currentView = document.querySelector('.view-section.active');
         if (currentView && currentView.id === 'auth-view') {
-            window.showView('template-view');
+            if (snap.exists()) {
+                window.showView('editor-view');
+                generateCVFromForm(false);
+            } else {
+                window.showView('template-view');
+            }
         }
     } else {
         // Not Logged In - Show Landing Page by default unless manually navigated to Auth
