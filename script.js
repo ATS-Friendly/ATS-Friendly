@@ -438,6 +438,11 @@ window.closeThemeModal = () => {
 };
 
 window.openLayoutModal = () => {
+    // If we are in the editor view, we should ensure the CV is rendered first
+    if(document.getElementById('editor-view').classList.contains('active')) {
+        generateCVFromForm(false);
+    }
+    
     // Sync slider values with current state
     document.getElementById('rng-fontsize').value = currentLayout.fontSize;
     document.getElementById('val-fontsize').innerText = currentLayout.fontSize + 'pt';
@@ -619,18 +624,18 @@ window.logout = () => signOut(auth).then(() => {
 
 onAuthStateChanged(auth, async (user) => {
     if (user) {
-        // Logged In
         currentUser = user;
+        // Check if we just logged in or if we are returning.
+        // If we are already on the editor or template view, don't force a redirect to landing.
+        // But if we are fresh, don't force them into the editor immediately to allow viewing the landing page.
+        
+        // Load data in background
         const docRef = doc(db, 'artifacts', appId, 'users', user.uid, 'data', 'cvContent');
         const snap = await getDoc(docRef);
         
         if (snap.exists()) {
             const data = snap.data();
-            // Load saved data into form inputs
-            if (data.formData) {
-                loadUserDataIntoForm(data.formData);
-            }
-
+            if (data.formData) loadUserDataIntoForm(data.formData);
             if (data.sectionSettings) {
                 const ss = data.sectionSettings;
                 if (ss.titles) {
@@ -640,29 +645,20 @@ onAuthStateChanged(auth, async (user) => {
                 if (ss.visible) {
                     document.getElementById('form-certificates-block').style.display = ss.visible.certs ? 'block' : 'none';
                     document.getElementById('form-references-block').style.display = ss.visible.refs ? 'block' : 'none';
-                    
                     document.getElementById('form-certificates-block').parentElement.style.opacity = ss.visible.certs ? '1' : '0.5';
                     document.getElementById('form-references-block').parentElement.style.opacity = ss.visible.refs ? '1' : '0.5';
                 }
             }
-            
             document.body.className = data.template || '';
             if (data.theme) {
                 currentTheme = data.theme;
                 window.applyColor(currentTheme.color);
                 window.applyFont(currentTheme.font);
             }
-            
-            if (data.layout) {
-                applySavedLayout(data.layout);
-            }
-            
-            window.showView('editor-view');
-            generateCVFromForm(false); // Render CV, false = don't save immediately
-            updateStatus('online');
-        } else {
-            window.showView('template-view');
+            if (data.layout) applySavedLayout(data.layout);
         }
+        
+        updateStatus('online');
     } else {
         // Not Logged In - Show Landing Page by default unless manually navigated to Auth
         // If we are already on Auth view (e.g. failed login), stay there.
@@ -679,6 +675,17 @@ window.selectTemplate = (tpl) => {
     document.body.className = tpl;
     window.showView('editor-view');
     generateCVFromForm();
+};
+
+window.handleSignOut = async () => {
+    try {
+        await signOut(auth);
+        currentUser = null;
+        window.showView('landing-view');
+        location.reload(); // Hard reload to clear all states for privacy
+    } catch (e) {
+        alert("Çıkış hatası: " + e.message);
+    }
 };
 
 window.backToTemplates = () => {

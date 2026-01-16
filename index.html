@@ -445,8 +445,8 @@
 
         <!-- NEW MOBILE BOTTOM BAR -->
         <div class="mobile-bottom-bar">
-            <button class="mobile-action-btn secondary" onclick="openThemeModal()">
-                <span class="icon">🎨</span> <span data-i18n="btn_design">Tasarım</span>
+            <button class="mobile-action-btn secondary" onclick="openLayoutModal()">
+                <span class="icon">📏</span> <span data-i18n="btn_layout">Düzen</span>
             </button>
             <button class="mobile-action-btn primary" onclick="window.print()">
                 <span data-i18n="btn_download_pdf">Kaydet (PDF)</span>
@@ -463,6 +463,9 @@
                 <button class="fab-item" onclick="openLayoutModal()">
                     <span class="fab-label">Düzen</span> 📐
                 </button>
+                <button class="fab-item" onclick="openThemeModal()">
+                    <span class="fab-label">Tasarım</span> 🎨
+                </button>
                 <button class="fab-item" onclick="backToTemplates()">
                     <span class="fab-label">Şablonlar</span> 💠
                 </button>
@@ -471,6 +474,9 @@
                 </button>
                 <button class="fab-item danger" onclick="resetAll()">
                     <span class="fab-label">Temizle</span> 🗑️
+                </button>
+                <button class="fab-item danger" onclick="handleSignOut()">
+                    <span class="fab-label">Çıkış Yap</span> 🚪
                 </button>
                  <button class="fab-item" onclick="logout()">
                     <span class="fab-label">Çıkış</span> 🚪
