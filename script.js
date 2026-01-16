@@ -12,6 +12,9 @@ import {
 import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 import { getFunctions, httpsCallable } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-functions.js";
 
+// DEBUG: Add logging to see if module loads
+console.log("Firebase modules loaded successfully");
+
 // --- FIREBASE YAPILANDIRMASI ---
 const firebaseConfig = {
     apiKey: "AIzaSyBbxgCMw5dO5T-kt7Njapo5ST04MRp7JKU",
@@ -653,15 +656,16 @@ function applySavedLayout(layout) {
 // --- AUTH & LANDING LOGIC ---
 
 window.scrollToFeatures = () => {
+    console.log("scrollToFeatures called");
     document.getElementById('features').scrollIntoView({ behavior: 'smooth' });
 };
 
 window.showAuth = (loginMode) => {
-    // DEBUG: Always show auth screen for testing
     console.log("showAuth called with loginMode:", loginMode);
     console.log("Current user:", currentUser);
     
-    // If user is already logged in, don"t show login screen, go to app
+    // DEBUG: Always show auth screen for testing
+    // If user is already logged in, don't show login screen, go to app
     // if (currentUser) {
     //     window.showView('template-view');
     //     return;
