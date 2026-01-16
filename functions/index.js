@@ -1,10 +1,11 @@
 const { onCall, HttpsError } = require("firebase-functions/v2/https");
 const { GoogleGenerativeAI } = require("@google/generative-ai");
+const { defineSecret } = require('firebase-functions/params');
 
-// TODO: Move to Firebase Secrets when upgrading to Blaze plan
-const GEMINI_API_KEY = "AIzaSyBtJOZJZC0DF6-eoPeFO549klp6xeQBzxs";
+// Securely store your API key in Firebase Secrets
+const GEMINI_API_KEY = defineSecret('GEMINI_API_KEY');
 
-exports.parseResumeWithAI = onCall(async (request) => {
+exports.parseResumeWithAI = onCall({ secrets: [GEMINI_API_KEY] }, async (request) => {
     // 1. Authentication Check (Optional but recommended for production)
     if (!request.auth) {
         throw new HttpsError("unauthenticated", "This function must be called by a logged-in user.");
@@ -16,7 +17,7 @@ exports.parseResumeWithAI = onCall(async (request) => {
     }
 
     try {
-        const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
+        const genAI = new GoogleGenerativeAI(GEMINI_API_KEY.value());
         const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
         const prompt = `
