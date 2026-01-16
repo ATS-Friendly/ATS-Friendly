@@ -1264,32 +1264,98 @@ window.generateCVFromForm = (triggerSave = true) => {
             ${customContent}
         </div>`;
     } else if (isModern) {
+        // Modern Two-Column Layout with Sidebar
         html = `
-        <header class="modern-header">
-            <div class="modern-header-content">
-                <div class="modern-text">
-                    <h1>${h(data.fullname) || 'ADINIZ SOYADINIZ'}</h1>
-                    <div class="subtitle">${h(data.title)}</div>
-                    <div class="contact-grid">
-                        <div class="contact-item">✉️ ${h(data.email)}</div>
-                        <div class="contact-item">📞 ${h(data.phone)}</div>
-                        <div class="contact-item">📍 ${h(data.address)}</div>
-                        ${data.linkedin ? `<div class="contact-item">🔗 ${h(data.linkedin)}</div>` : ''}
-                    </div>
+        <div class="modern-layout">
+            <aside class="modern-sidebar">
+                ${data.photo ? `<div class="modern-photo"><img src="${data.photo}" alt="Profile"></div>` : '<div class="modern-photo-placeholder"></div>'}
+                <h1>${h(data.fullname) || 'AD SOYAD'}</h1>
+                <div class="modern-title">${h(data.title)}</div>
+                
+                <div class="sidebar-section">
+                    <h4>${currentLang === 'tr' ? 'İLETİŞİM' : 'CONTACT'}</h4>
+                    <ul class="contact-list">
+                        ${data.email ? `<li><span class="contact-icon">✉</span>${h(data.email)}</li>` : ''}
+                        ${data.phone ? `<li><span class="contact-icon">☎</span>${h(data.phone)}</li>` : ''}
+                        ${data.address ? `<li><span class="contact-icon">⌂</span>${h(data.address)}</li>` : ''}
+                        ${data.linkedin ? `<li><span class="contact-icon">in</span>${h(data.linkedin)}</li>` : ''}
+                    </ul>
                 </div>
-                ${data.photo ? `<div class="modern-photo"><img src="${data.photo}" alt="Profile"></div>` : ''}
-            </div>
-        </header>
-        <div id="main-content">
-             <div class="section">
-                <div class="section-header"><span class="section-title">${labels.prof}</span></div>
-                <div class="entry"><div class="right-col">${h(data.summary, true)}</div></div>
-            </div>
-            ${expContent}
-            ${eduContent}
-            ${certContent}
-            ${refContent}
-            ${customContent}
+                
+                ${data.license ? `
+                <div class="sidebar-section">
+                    <h4>${labels.lic.toUpperCase()}</h4>
+                    <p>${h(data.license)}</p>
+                </div>` : ''}
+            </aside>
+            <main class="modern-main">
+                ${data.summary ? `
+                <div class="modern-section">
+                    <h2 class="modern-section-title">${labels.prof}</h2>
+                    <p class="summary-text">${h(data.summary, true)}</p>
+                </div>` : ''}
+                
+                ${data.experiences.length > 0 ? `
+                <div class="modern-section">
+                    <h2 class="modern-section-title">${labels.exp}</h2>
+                    ${data.experiences.map(exp => `
+                        <div class="modern-entry">
+                            <div class="entry-header">
+                                <strong>${h(exp.title)}</strong>
+                                <span class="entry-date">${h(exp.date)}</span>
+                            </div>
+                            <div class="entry-company">${h(exp.company)}</div>
+                            <p class="entry-desc">${h(exp.desc, true)}</p>
+                        </div>
+                    `).join('')}
+                </div>` : ''}
+                
+                ${data.education.length > 0 ? `
+                <div class="modern-section">
+                    <h2 class="modern-section-title">${labels.edu}</h2>
+                    ${data.education.map(edu => `
+                        <div class="modern-entry">
+                            <div class="entry-header">
+                                <strong>${h(edu.degree)}</strong>
+                                <span class="entry-date">${h(edu.date)}</span>
+                            </div>
+                            <div class="entry-company">${h(edu.school)}</div>
+                        </div>
+                    `).join('')}
+                </div>` : ''}
+                
+                ${visible.certs && data.certificates.length > 0 ? `
+                <div class="modern-section">
+                    <h2 class="modern-section-title">${h(titles.certs)}</h2>
+                    ${data.certificates.map(cert => `
+                        <div class="modern-entry compact">
+                            <div class="entry-header">
+                                <strong>${h(cert.name)}</strong>
+                                <span class="entry-date">${h(cert.date)}</span>
+                            </div>
+                            <div class="entry-company">${h(cert.issuer)}</div>
+                        </div>
+                    `).join('')}
+                </div>` : ''}
+                
+                ${visible.refs && data.references.length > 0 ? `
+                <div class="modern-section">
+                    <h2 class="modern-section-title">${h(titles.refs)}</h2>
+                    ${data.references.map(ref => `
+                        <div class="modern-entry compact">
+                            <strong>${h(ref.name)}</strong> - ${h(ref.title)}<br>
+                            <span class="ref-contact">${h(ref.contact)}</span>
+                        </div>
+                    `).join('')}
+                </div>` : ''}
+                
+                ${data.customSections.length > 0 ? data.customSections.map(sec => `
+                <div class="modern-section">
+                    <h2 class="modern-section-title">${h(sec.title)}</h2>
+                    <p>${h(sec.content, true)}</p>
+                </div>
+                `).join('') : ''}
+            </main>
         </div>`;
     } else {
         html = `
