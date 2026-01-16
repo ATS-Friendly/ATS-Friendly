@@ -23,7 +23,7 @@ exports.parseResumeWithAI = onCall({ secrets: [GEMINI_API_KEY] }, async (request
         const prompt = `
             Extract the following information from the resume text provided below. 
             Return the data STRICTLY as a JSON object with these keys: 
-            fullname, title, email, phone, summary, experiences (array of {title, company, date, desc}), education (array of {school, degree, date}).
+            fullname, title, email, phone, address, linkedin, summary, experiences (array of {title, company, date, desc}), education (array of {school, degree, date}).
             
             If a field is not found, return an empty string or empty array. 
             Translate any non-English headers if necessary to match the keys.

@@ -61,6 +61,10 @@ const auth = getAuth(app);
 const db = getFirestore(app);
 const functions = getFunctions(app); // Initialize Functions
 const googleProvider = new GoogleAuthProvider();
+
+// PDF.js Worker Configuration
+pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
 // --- CV UPLOAD & PARSING ---
 window.handlePhotoUpload = (event) => {
     const file = event.target.files[0];
@@ -116,6 +120,8 @@ window.handleCvUpload = async (event) => {
         if (parsedData.title) document.getElementById('inp-title').value = parsedData.title;
         if (parsedData.email) document.getElementById('inp-email').value = parsedData.email;
         if (parsedData.phone) document.getElementById('inp-phone').value = parsedData.phone;
+        if (parsedData.address) document.getElementById('inp-address').value = parsedData.address;
+        if (parsedData.linkedin) document.getElementById('inp-linkedin').value = parsedData.linkedin;
         if (parsedData.summary) document.getElementById('inp-summary').value = parsedData.summary;
 
         // Populate Dynamic Lists
