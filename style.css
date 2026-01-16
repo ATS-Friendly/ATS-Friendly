@@ -837,7 +837,10 @@ body {
 
 @media screen and (max-width: 1024px) {
     .mobile-editor-tabs { display: flex; }
-    .mobile-bottom-bar { display: flex; }
+    
+    /* Hide bottom bar by default, only show when editor is active */
+    .mobile-bottom-bar { display: none !important; }
+    #editor-view.active .mobile-bottom-bar { display: flex !important; }
     
     .editor-layout {
         flex-direction: column;
@@ -1084,8 +1087,8 @@ textarea.form-input { resize: vertical; }
     }
 }
 
-#layout-modal {
-    display: none;
+.modal-overlay {
+    display: none !important;
     position: fixed;
     top: 0; left: 0;
     right: 0; bottom: 0;
@@ -1093,19 +1096,19 @@ textarea.form-input { resize: vertical; }
     background: rgba(0,0,0,0.4);
     z-index: 5000;
 }
-#layout-modal.active { 
-    display: flex; 
+.modal-overlay.active { 
+    display: flex !important; 
     align-items: center; 
     justify-content: center; 
 }
 
 @media screen and (max-width: 1024px) {
-    #layout-modal.active {
+    .modal-overlay.active {
         align-items: flex-end;
     }
 }
 
-#layout-modal .modal-content {
+.modal-overlay .modal-content {
     background: white;
     width: 320px; 
     position: absolute;
@@ -1118,7 +1121,7 @@ textarea.form-input { resize: vertical; }
 
 /* MOBILE BOTTOM SHEET STYLE WITH TRANSPARENCY */
 @media screen and (max-width: 1024px) {
-    #layout-modal .modal-content {
+    .modal-overlay .modal-content {
         width: 100% !important;
         max-width: 100% !important;
         left: 0 !important;
