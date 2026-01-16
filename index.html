@@ -6,50 +6,48 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ATS-Friendly | Profesyonel Bulut CV Oluşturucu</title>
     
-    <!-- SEO Optimization -->
+    
     <meta name="description" content="Ücretsiz, ATS uyumlu ve profesyonel CV oluşturucu. Dakikalar içinde işe alım sistemlerinden geçen modern özgeçmişler hazırlayın.">
     <meta name="keywords" content="CV hazırlama, özgeçmiş oluşturucu, ATS friendly resume, ücretsiz CV, profesyonel CV, online resume builder">
     <meta name="author" content="ATS-Friendly">
     <meta name="robots" content="index, follow">
     <link rel="canonical" href="https://ats-friendly.github.io/ATS-Friendly/">
 
-    <!-- Open Graph / Facebook / LinkedIn -->
+    
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://ats-friendly.github.io/ATS-Friendly/">
     <meta property="og:title" content="ATS-Friendly | Profesyonel Bulut CV Oluşturucu">
     <meta property="og:description" content="İşe alım robotlarını yenecek profesyonel CV'nizi ücretsiz oluşturun.">
     <meta property="og:image" content="https://ats-friendly.github.io/ATS-Friendly/assets/og-image.png">
 
-    <!-- Twitter -->
+    
     <meta property="twitter:card" content="summary_large_image">
     <meta property="twitter:url" content="https://ats-friendly.github.io/ATS-Friendly/">
     <meta property="twitter:title" content="ATS-Friendly | Profesyonel Bulut CV Oluşturucu">
     <meta property="twitter:description" content="Modern işe alım sistemleri (ATS) ile %100 uyumlu, profesyonel CV'ler hazırlayın.">
     <meta property="twitter:image" content="https://ats-friendly.github.io/ATS-Friendly/assets/og-image.png">
 
-    <!-- Fonts -->
+    
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&family=Lora:ital,wght@0,400;0,700;1,400&family=Merriweather:wght@300;400;700&family=Montserrat:wght@400;600;700&family=Open+Sans:wght@400;600;700&family=PT+Serif:ital,wght@0,400;0,700;1,400&family=Playfair+Display:wght@400;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Raleway:wght@400;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     
-    <!-- CSS Link -->
+    
     <link rel="stylesheet" href="style.css">
     
-    <!-- PWA -->
+    
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#3498db">
     
-    <!-- PDF.js for CV Parsing -->
+    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
-    <script>
-        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-    </script>
+
 </head>
 <body>
 
     <div id="toast">Kaydedildi!</div>
 
-    <!-- SETTINGS MODAL (CONSOLIDATED) -->
+    
     <div id="layout-modal" class="modal-overlay">
         <div class="modal-content">
             <div class="modal-header">
@@ -57,7 +55,7 @@
                 <button class="close-modal" onclick="closeLayoutModal()" aria-label="Close modal">×</button>
             </div>
             <div class="modal-body">
-                <!-- Color Section -->
+                
                 <div class="setting-group">
                     <label data-i18n="lbl_color">Vurgu Rengi</label>
                     <div class="color-options">
@@ -72,7 +70,7 @@
                     </div>
                 </div>
 
-                <!-- Font Section -->
+
                 <div class="setting-group">
                     <label data-i18n="lbl_font">Yazı Tipi</label>
                     <div class="font-options-grid">
@@ -90,7 +88,7 @@
 
                 <hr style="border:0; border-top:1px solid #eee; margin:20px 0;">
 
-                <!-- Layout Section -->
+
                 <div class="setting-group">
                     <div class="range-header">
                         <label data-i18n="lbl_fontsize">Yazı Boyutu</label>
@@ -129,7 +127,7 @@
         </div>
     </div>
 
-    <!-- ACCOUNT MODAL -->
+    
     <div id="account-modal" class="modal-overlay">
         <div class="modal-content">
             <div class="modal-header">
@@ -165,7 +163,7 @@
         </div>
     </div>
 
-    <!-- POLICY MODAL -->
+    
     <div id="policy-modal" class="modal-overlay">
         <div class="modal-content">
             <div class="modal-header">
@@ -173,7 +171,7 @@
                 <button class="close-modal" onclick="closePolicyModal()" aria-label="Close modal">×</button>
             </div>
             <div class="modal-body" id="policy-content" style="font-size: 14px; line-height: 1.6; color: #444;">
-                <!-- Content injected via JS -->
+
             </div>
             <div class="modal-footer">
                 <button class="btn btn-primary" onclick="closePolicyModal()" style="width:100%" data-i18n="btn_save_close">Kapat</button>
@@ -181,7 +179,7 @@
         </div>
     </div>
 
-    <!-- 0. LANDING PAGE (DEFAULT VIEW) -->
+    
     <section id="landing-view" class="view-section active">
         <header class="landing-header">
             <div class="brand-container">
@@ -208,8 +206,6 @@
                 </div>
             </div>
             <div class="hero-image">
-                <!-- Abstract visual representation of ATS filtering -->
-                <div class="mockup-card">
                     <div class="mockup-header">
                         <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
                     </div>
@@ -244,7 +240,96 @@
             </div>
         </section>
 
+        <section class="templates-showcase">
+            <h2 class="section-title" data-i18n="showcase_title">Profesyonel Şablonlar</h2>
+            <p class="section-subtitle" data-i18n="showcase_subtitle">Size en uygun tasarımı seçin ve CV'nizi dakikalar içinde hazırlayın</p>
+            <div class="showcase-grid">
+                <div class="showcase-card">
+                    <div class="showcase-img-wrapper">
+                        <img src="assets/classic-cv.png" alt="Klasik CV Şablonu" loading="lazy">
+                    </div>
+                    <h3 data-i18n="tpl_classic">Klasik</h3>
+                    <p data-i18n="tpl_classic_desc">🏛️ Geleneksel & Akademik</p>
+                </div>
+                <div class="showcase-card">
+                    <div class="showcase-img-wrapper">
+                        <img src="assets/compact-cv.png" alt="Kompakt CV Şablonu" loading="lazy">
+                    </div>
+                    <h3 data-i18n="tpl_compact">Kompakt</h3>
+                    <p data-i18n="tpl_compact_desc">📄 Minimal</p>
+                </div>
+                <div class="showcase-card">
+                    <div class="showcase-img-wrapper">
+                        <img src="assets/elegant-cv.png" alt="Elegant CV Şablonu" loading="lazy">
+                    </div>
+                    <h3>Elegant</h3>
+                    <p>💎 Professional Design</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="faq-section">
+            <h2 class="section-title" data-i18n="faq_title">Sıkça Sorulan Sorular</h2>
+            <div class="faq-container">
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <h3 data-i18n="faq_q1">🔒 Verilerim güvende mi?</h3>
+                    </div>
+                    <div class="faq-answer">
+                        <p data-i18n="faq_a1">Evet! CV verileriniz Google Firebase'in güvenli bulut altyapısında şifrelenmiş olarak saklanır. Verileriniz sadece size aittir ve asla üçüncü taraflarla paylaşılmaz.</p>
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <h3 data-i18n="faq_q2">💰 Gerçekten tamamen ücretsiz mi?</h3>
+                    </div>
+                    <div class="faq-answer">
+                        <p data-i18n="faq_a2">Kesinlikle! Gizli ücret, abonelik veya filigran yok. Sınırsız sayıda CV oluşturabilir, düzenleyebilir ve PDF olarak indirebilirsiniz.</p>
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <h3 data-i18n="faq_q3">🤖 ATS nedir ve neden önemli?</h3>
+                    </div>
+                    <div class="faq-answer">
+                        <p data-i18n="faq_a3">ATS (Applicant Tracking System), şirketlerin başvuruları otomatik olarak taramak için kullandığı yazılımdır. Karmaşık grafikler ve tablolar içeren CV'ler ATS tarafından okunamaz. Bizim şablonlarımız, ATS'nin kolayca anlayabileceği temiz yapıya sahiptir ve CV'nizin insan kaynaklarına ulaşma şansını artırır.</p>
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <h3 data-i18n="faq_q4">📱 Mobil cihazlardan kullanabilir miyim?</h3>
+                    </div>
+                    <div class="faq-answer">
+                        <p data-i18n="faq_a4">Elbette! Platform tamamen responsive tasarıma sahip. Bilgisayar, tablet veya telefon - hangi cihazı kullanırsanız kullanın, CV'nizi rahatlıkla düzenleyebilirsiniz.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
         <footer class="landing-footer">
+            <div class="trust-badges">
+                <div class="badge-item">
+                    <div class="badge-icon">🔐</div>
+                    <div class="badge-text">
+                        <strong data-i18n="badge_secure">Güvenli Depolama</strong>
+                        <span data-i18n="badge_secure_desc">256-bit SSL Şifreleme</span>
+                    </div>
+                </div>
+                <div class="badge-item">
+                    <div class="badge-icon">🚫</div>
+                    <div class="badge-text">
+                        <strong data-i18n="badge_no_sell">Veri Satışı Yok</strong>
+                        <span data-i18n="badge_no_sell_desc">Bilgileriniz Sizinle Kalır</span>
+                    </div>
+                </div>
+                <div class="badge-item">
+                    <div class="badge-icon">✓</div>
+                    <div class="badge-text">
+                        <strong data-i18n="badge_gdpr">GDPR & KVKK Uyumlu</strong>
+                        <span data-i18n="badge_gdpr_desc">Veri Koruma Standartları</span>
+                    </div>
+                </div>
+            </div>
             <p>&copy; 2024 ATS-Friendly CV Maker. Tüm hakları saklıdır.</p>
             <div class="footer-links">
                 <a href="javascript:void(0)" onclick="openPolicyModal('privacy')">Gizlilik Politikası</a>
@@ -254,9 +339,9 @@
         </footer>
     </section>
 
-    <!-- 1. AUTH SCREEN (GİRİŞ/KAYIT) -->
+    
     <section id="auth-view" class="view-section">
-        <!-- Back Button for Mobile -->
+        
         <button class="back-to-home" onclick="showView('landing-view')">← Ana Sayfa</button>
         
         <div class="auth-card professional">
@@ -277,7 +362,7 @@
                     <input type="password" id="auth-password" class="auth-input" placeholder="••••••••" autocomplete="current-password" required>
                 </div>
 
-                <!-- Terms Checkbox (Visible only on Signup) -->
+                
                 <div id="terms-container" style="display:none;" class="terms-check">
                     <label class="checkbox-container">
                         <input type="checkbox" id="auth-terms">
@@ -305,7 +390,7 @@
         </div>
     </section>
 
-    <!-- 2. ŞABLON SEÇİMİ -->
+    
     <section id="template-view" class="view-section">
         <div class="template-header">
             <h1 data-i18n="tpl_select_header">Profesyonel Bir Şablon Seçin</h1>
@@ -343,9 +428,9 @@
         </div>
     </section>
 
-    <!-- 3. SPLIT EDİTÖR (FORM + PREVIEW) -->
+    
     <section id="editor-view" class="view-section">
-        <!-- MOBILE TOP TABS -->
+        
         <div class="mobile-editor-tabs">
             <button class="mobile-tab-btn active" onclick="switchMobileTab('edit')" id="tab-edit">
                 <span data-i18n="tab_edit">Düzenle</span>
@@ -360,7 +445,7 @@
             </div>
         </div>
 
-        <!-- Sidebar Navigation (Desktop Only) -->
+        
         <aside class="sidebar">
             <div class="brand-container">
                 <div class="brand-logo">AF</div>
@@ -406,10 +491,10 @@
             </div>
         </aside>
 
-        <!-- SPLIT CONTAINER -->
+        
         <div class="editor-layout">
             
-            <!-- LEFT PANEL: DATA ENTRY FORM -->
+            
             <div class="editor-panel-form" id="panel-form">
                 <div class="form-header-mini">
                     <h2 data-i18n="form_title">Bilgilerinizi Düzenleyin</h2>
@@ -420,7 +505,7 @@
                 </div>
                 
                 <div class="form-body">
-                    <!-- Kişisel Bilgiler -->
+                    
                     <div class="form-block">
                         <h3 data-i18n="form_personal">Kişisel Bilgiler</h3>
                         <div class="input-grid">
@@ -451,27 +536,27 @@
                         </div>
                     </div>
 
-                    <!-- Profil -->
+                    
                     <div class="form-block">
                         <h3 data-i18n="form_profile">Profil Özeti</h3>
                         <textarea id="inp-summary" class="form-input" rows="4" placeholder="Kısa özet..." oninput="generateCVFromForm()"></textarea>
                     </div>
 
-                    <!-- İş Deneyimi -->
+                    
                     <div class="form-block">
                         <h3 data-i18n="form_experience">İş Deneyimi</h3>
                         <div id="form-experiences-list"></div>
                         <button class="btn-secondary-dashed" onclick="addFormExperience()">+ <span data-i18n="btn_add_job">İş Ekle</span></button>
                     </div>
 
-                    <!-- Eğitim -->
+                    
                     <div class="form-block">
                         <h3 data-i18n="form_education">Eğitim</h3>
                         <div id="form-education-list"></div>
                         <button class="btn-secondary-dashed" onclick="addFormEducation()">+ <span data-i18n="btn_add_edu">Okul Ekle</span></button>
                     </div>
 
-                    <!-- Sertifikalar -->
+                    
                     <div class="form-block">
                         <div class="section-title-edit">
                             <input type="text" id="title-certificates" class="section-header-input" value="Sertifikalar" data-i18n-val="form_certificates" oninput="generateCVFromForm()">
@@ -483,7 +568,7 @@
                         </div>
                     </div>
 
-                    <!-- Referanslar -->
+                    
                     <div class="form-block">
                         <div class="section-title-edit">
                             <input type="text" id="title-references" class="section-header-input" value="Referanslar" data-i18n-val="form_references" oninput="generateCVFromForm()">
@@ -495,7 +580,7 @@
                         </div>
                     </div>
 
-                    <!-- Özel Bölümler -->
+                    
                     <div class="form-block">
                         <h3 data-i18n="form_custom">Özel Bölümler</h3>
                         <div id="form-custom-list"></div>
@@ -504,17 +589,17 @@
                 </div>
             </div>
 
-            <!-- RIGHT PANEL: PREVIEW -->
+            
             <div class="editor-panel-preview" id="panel-preview">
                 <div id="cv-scale-container">
                     <div class="page cv-content" id="cv-root">
-                        <!-- CV Content generated here -->
+
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- NEW MOBILE BOTTOM BAR -->
+        
         <div class="mobile-bottom-bar">
             <button class="mobile-action-btn secondary" onclick="openLayoutModal()">
                 <span class="icon">📏</span> <span data-i18n="btn_layout">Düzen</span>
@@ -527,7 +612,7 @@
             </button>
         </div>
 
-        <!-- NEW MOBILE FLOATING ACTION MENU -->
+        
         <div id="fab-overlay" class="fab-overlay" onclick="toggleFabMenu()"></div>
         <div class="mobile-fab-container">
             <div class="fab-menu-items" id="fab-items">
