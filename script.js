@@ -54,6 +54,89 @@ let currentLayout = {
     sectionGap: 15
 };
 
+// --- CV UPLOAD & PARSING ---
+window.handleCvUpload = async (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const toast = document.getElementById('toast');
+    const t = translations[currentLang];
+    
+    toast.innerText = t.msg_importing;
+    toast.classList.add('show');
+
+    try {
+        const arrayBuffer = await file.arrayBuffer();
+        const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+        let fullText = "";
+
+        for (let i = 1; i <= pdf.numPages; i++) {
+            const page = await pdf.getPage(i);
+            const content = await page.getTextContent();
+            const pageText = content.items.map(item => item.str).join(" ");
+            fullText += pageText + "\n";
+        }
+
+        // Basic Parsing Logic
+        const parsedData = parseCvText(fullText);
+        
+        // Fill form fields
+        if (parsedData.name) document.getElementById('inp-fullname').value = parsedData.name;
+        if (parsedData.email) document.getElementById('inp-email').value = parsedData.email;
+        if (parsedData.phone) document.getElementById('inp-phone').value = parsedData.phone;
+        if (parsedData.summary) document.getElementById('inp-summary').value = parsedData.summary;
+
+        // Trigger updates
+        window.generateCVFromForm();
+        triggerDebounceSave();
+
+        toast.innerText = t.msg_import_success;
+        setTimeout(() => toast.classList.remove('show'), 3000);
+        
+    } catch (error) {
+        console.error("CV Parsing Error:", error);
+        toast.innerText = t.msg_import_error;
+        setTimeout(() => toast.classList.remove('show'), 3000);
+    }
+
+    // Reset input
+    event.target.value = '';
+};
+
+function parseCvText(text) {
+    const data = {
+        name: "",
+        email: "",
+        phone: "",
+        summary: ""
+    };
+
+    // 1. Email Regex
+    const emailMatch = text.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/);
+    if (emailMatch) data.email = emailMatch[0];
+
+    // 2. Phone Regex (Simple)
+    const phoneMatch = text.match(/(\+?\d{1,3}[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}/);
+    if (phoneMatch) data.phone = phoneMatch[0];
+
+    // 3. Name (Assuming it's at the beginning of the file)
+    const lines = text.split('\n').map(l => l.trim()).filter(l => l.length > 2);
+    if (lines.length > 0) {
+        // Simple heuristic: Usually the first non-empty line is the name
+        data.name = lines[0].substring(0, 50); 
+    }
+
+    // 4. Summary (Basic heuristic)
+    const lowerText = text.toLowerCase();
+    const summaryStart = lowerText.indexOf("profile") !== -1 ? lowerText.indexOf("profile") : lowerText.indexOf("summary");
+    if (summaryStart !== -1) {
+        const afterSummary = text.substring(summaryStart + 7).trim();
+        data.summary = afterSummary.split('\n')[0].substring(0, 250);
+    }
+
+    return data;
+}
+
 // --- DİL YÖNETİMİ (LOCALIZATION) ---
 const translations = {
     tr: {
@@ -145,6 +228,10 @@ const translations = {
         form_references: "Referanslar",
         btn_add_cert: "Sertifika Ekle",
         btn_add_ref: "Referans Ekle",
+        btn_import_cv: "CV'den Aktar",
+        msg_importing: "CV analiz ediliyor...",
+        msg_import_success: "Bilgiler başarıyla aktarıldı!",
+        msg_import_error: "CV okuma hatası. Lütfen manuel doldurun.",
         btn_account: "Hesabım",
         modal_account_title: "Hesabım",
         menu_profile: "Profil Bilgilerim",
@@ -247,6 +334,10 @@ const translations = {
         form_references: "References",
         btn_add_cert: "Add Certificate",
         btn_add_ref: "Add Reference",
+        btn_import_cv: "Import from CV",
+        msg_importing: "Analyzing CV...",
+        msg_import_success: "Info imported successfully!",
+        msg_import_error: "Error reading CV. Please fill manually.",
         btn_account: "Account",
         modal_account_title: "My Account",
         menu_profile: "My Profile",

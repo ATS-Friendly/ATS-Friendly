@@ -904,8 +904,50 @@ body {
     }
 }
 
-.form-header-mini { margin-bottom: 20px; }
+.form-header-mini { 
+    margin-bottom: 20px; 
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
 .form-header-mini h2 { font-size: 20px; margin: 0; color: #2d3436; }
+
+.btn-import-cv {
+    background: #f0f7ff;
+    color: #0984e3;
+    border: 1px solid #d1e9ff;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s;
+}
+
+.btn-import-cv:hover {
+    background: #e1f0ff;
+    border-color: #74b9ff;
+    transform: translateY(-1px);
+}
+
+.btn-import-cv:active {
+    transform: translateY(0);
+}
+
+@media screen and (max-width: 1024px) {
+    .form-header-mini {
+        flex-direction: column;
+        gap: 12px;
+        align-items: flex-start;
+    }
+    .btn-import-cv {
+        width: 100%;
+        justify-content: center;
+    }
+}
 
     .editor-panel-preview {
         flex-grow: 1;

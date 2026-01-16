@@ -38,6 +38,12 @@
     <!-- PWA -->
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#3498db">
+    
+    <!-- PDF.js for CV Parsing -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script>
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+    </script>
 </head>
 <body>
 
@@ -407,6 +413,10 @@
             <div class="editor-panel-form" id="panel-form">
                 <div class="form-header-mini">
                     <h2 data-i18n="form_title">Bilgilerinizi Düzenleyin</h2>
+                    <button class="btn-import-cv" onclick="document.getElementById('cv-upload-input').click()">
+                        <span class="icon">📄</span> <span data-i18n="btn_import_cv">CV'den Aktar</span>
+                    </button>
+                    <input type="file" id="cv-upload-input" style="display:none" accept=".pdf" onchange="handleCvUpload(event)">
                 </div>
                 
                 <div class="form-body">
