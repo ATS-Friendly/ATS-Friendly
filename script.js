@@ -1587,3 +1587,14 @@ window.createNewSection = () => {
 // Initial setup
 setLanguage('tr');
 window.resizePreview();
+
+// Print Event Listeners for cleaner PDF generation
+window.addEventListener('beforeprint', () => {
+    // Force a final render without saving
+    if (window.generateCVFromForm) window.generateCVFromForm(false);
+});
+
+window.addEventListener('afterprint', () => {
+    // Re-scale preview for mobile if needed after print
+    if (window.resizePreview) window.resizePreview();
+});

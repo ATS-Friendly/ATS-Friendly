@@ -777,6 +777,7 @@ body {
     margin: 0;
     font-size: 13px;
     color: #636e72;
+
 }
 
 .sidebar {
@@ -1508,6 +1509,8 @@ input[type=range] {
     color: #2d3436; 
     line-height: var(--cv-line-height);
     font-size: var(--cv-font-size);
+    user-select: text !important;
+    -webkit-user-select: text !important;
 }
 
 /* GENERAL TEXT WRAPPING FIXES */
@@ -1853,88 +1856,108 @@ body.tpl-elegant .section-title {
         size: A4;
     }
 
-    /* 1. Tüm Arayüz Elemanlarını ve Diğer Sayfaları Gizle */
-    body > *:not(#editor-view),
-    .sidebar, 
-    .editor-panel-form, 
-    .fab-container, 
-    .mobile-editor-tabs, 
+    /* 1. Hide EVERYTHING except the CV container */
+    body > *,
+    #landing-view,
+    #template-view,
+    #editor-view > *:not(.editor-layout),
+    .editor-layout > *:not(.editor-panel-preview),
+    .editor-panel-preview > *:not(#cv-scale-container),
+    .sidebar,
+    .fab-container,
+    .mobile-editor-tabs,
     .mobile-bottom-bar,
-    .nav-buttons,
-    .landing-header,
-    .landing-hero,
-    .features-section,
+    .mobile-fab-container,
+    .mobile-zoom-btn,
+    .modal-overlay,
+    .modal-content,
     #toast,
     button,
-    .lang-switcher,
-    .mobile-view-toggle,
-    .mobile-fab-container,
-    .mobile-zoom-btn {
+    input,
+    textarea,
+    select {
         display: none !important;
+        opacity: 0 !important;
+        visibility: hidden !important;
+        pointer-events: none !important;
     }
 
-    /* 2. Sadece Editor View içindeki Preview kısmını göster */
-    #editor-view {
-        display: block !important;
-        position: absolute !important;
-        left: 0 !important;
-        top: 0 !important;
-        width: 100% !important;
-        height: auto !important;
-        background: white !important;
-        overflow: visible !important;
-    }
-
-    /* 3. Kapsayıcıların kilidini aç */
-    html, body, .view-section, .editor-layout, .editor-panel-preview {
+    /* 2. Reset containers to be simple blocks without fixed positioning or transformations */
+    html, body {
         height: auto !important;
         width: 100% !important;
         margin: 0 !important;
         padding: 0 !important;
         overflow: visible !important;
+        background: white !important;
+    }
+
+    #editor-view, 
+    .view-section, 
+    .editor-layout, 
+    .editor-panel-preview {
+        display: block !important;
         position: static !important;
-        display: block !important;
+        width: 100% !important;
+        height: auto !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        overflow: visible !important;
         background: white !important;
+        box-shadow: none !important;
+        transform: none !important;
     }
 
-    /* 4. CV Kağıdını Sayfaya Yerleştir (A4 Standard: 210mm x 297mm) */
+    /* 3. The CV Paper Container - The ONLY thing visible */
     #cv-scale-container {
+        display: block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
         position: absolute !important;
         left: 0 !important;
         top: 0 !important;
         width: 210mm !important;
+        height: auto !important;
+        min-height: 297mm !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        transform: none !important;
+        transform-origin: top left !important;
+        z-index: 1 !important;
+        background: white !important;
+        box-shadow: none !important;
+        overflow: visible !important;
+    }
+
+    #cv-root, .page {
+        display: block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        width: 210mm !important;
         margin: 0 !important;
         padding: 0 !important;
         height: auto !important;
-        overflow: visible !important;
-        z-index: 9999;
-        transform: none !important;
+        min-height: 297mm !important;
         background: white !important;
-    }
-
-    #cv-root {
-        width: 210mm !important;
-        margin: 0 !important;
-        background: white !important;
-        height: auto !important;
-        min-height: auto !important;
-        overflow: visible !important;
-    }
-
-    .page {
-        width: 210mm !important;
-        max-width: 210mm !important;
-        height: auto !important;
-        min-height: 296mm !important; 
         overflow: visible !important;
         box-shadow: none !important;
-        border: none !important;
-        margin: 0 !important;
-        padding: 11mm 20mm 11mm 20mm !important; /* Ideal 20mm Margin */
-        background: white !important;
-        box-sizing: border-box !important;
     }
-    
+
+    /* Apply the actual margins to the inner page */
+    .page {
+        padding: 15mm 20mm !important;
+        box-sizing: border-box !important;
+        page-break-after: always;
+    }
+
+    /* Ensure backgrounds and colors are preserved */
+    * {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+        color-adjust: exact !important;
+    }
+
+    /* Avoid breaking sections across pages where possible */
     .section, .entry {
         page-break-inside: avoid;
     }
