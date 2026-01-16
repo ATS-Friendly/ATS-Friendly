@@ -550,22 +550,7 @@ window.resizePreview = () => {
 window.addEventListener('resize', window.resizePreview);
 
 // --- PRINT SCALING RESET ---
-window.onbeforeprint = () => {
-    const cvRoot = document.getElementById('cv-root');
-    const scaleContainer = document.getElementById('cv-scale-container');
-    if (cvRoot && scaleContainer) {
-        cvRoot.style.transform = '';
-        cvRoot.style.width = '';
-        cvRoot.style.margin = '';
-        scaleContainer.style.transform = '';
-        scaleContainer.style.width = '';
-        scaleContainer.style.height = '';
-    }
-};
-
-window.onafterprint = () => {
-    window.resizePreview();
-};
+// Consolidated listeners at the bottom of the file
 
 // --- MOBILE FAB MENU ---
 window.toggleFabMenu = () => {
@@ -1591,8 +1576,20 @@ window.resizePreview();
 
 // Print Event Listeners for cleaner PDF generation
 window.addEventListener('beforeprint', () => {
-    // Force a final render without saving
+    // 1. Force a final render without saving to ensure latest data
     if (window.generateCVFromForm) window.generateCVFromForm(false);
+
+    // 2. Reset scaling and inline styles that might interfere with print
+    const cvRoot = document.getElementById('cv-root');
+    const scaleContainer = document.getElementById('cv-scale-container');
+    if (cvRoot && scaleContainer) {
+        cvRoot.style.transform = '';
+        cvRoot.style.width = '';
+        cvRoot.style.margin = '';
+        scaleContainer.style.transform = '';
+        scaleContainer.style.width = '';
+        scaleContainer.style.height = '';
+    }
 });
 
 window.addEventListener('afterprint', () => {
