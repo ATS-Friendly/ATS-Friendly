@@ -227,12 +227,12 @@ body {
 
 .features-section {
     padding: 60px 20px;
-    background: #f8f9fa;
+    background: #f1f2f6;
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
     gap: 30px;
-    max-width: 1200px;
-    margin: 0 auto;
+    max-width: 100%;
+    margin: 0;
     width: 100%;
     box-sizing: border-box;
 }
@@ -259,10 +259,10 @@ body {
 .footer-links a { color: #636e72; text-decoration: none; margin: 0 10px; font-size: 13px; font-weight: 600; }
 
 .templates-showcase {
-    max-width: 1200px;
-    margin: 0 auto;
+    max-width: 100%;
+    margin: 0;
     padding: 80px 40px;
-    background: #f8f9fa;
+    background: #f1f2f6;
     text-align: center;
 }
 .section-title {
@@ -277,10 +277,14 @@ body {
     margin-bottom: 50px;
 }
 .showcase-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
     gap: 30px;
     margin-top: 40px;
+    max-width: 1200px;
+    margin-left: auto;
+    margin-right: auto;
 }
 .showcase-card {
     background: white;
@@ -289,6 +293,8 @@ body {
     box-shadow: 0 5px 20px rgba(0,0,0,0.08);
     transition: 0.3s;
     border: 1px solid #eee;
+    width: 280px;
+    flex-shrink: 0;
 }
 .showcase-card:hover {
     transform: translateY(-8px);
@@ -327,10 +333,10 @@ body {
 }
 
 .faq-section {
-    max-width: 900px;
-    margin: 0 auto;
+    max-width: 100%;
+    margin: 0;
     padding: 80px 40px;
-    background: white;
+    background: #f1f2f6;
 }
 .faq-container {
     margin-top: 40px;
@@ -365,7 +371,7 @@ body {
     flex-wrap: wrap;
     margin-bottom: 30px;
     padding: 30px 20px;
-    background: #f8f9fa;
+    background: #f1f2f6;
     border-radius: 12px;
     max-width: 900px;
     margin: 0 auto 30px auto;
@@ -432,6 +438,10 @@ body {
 
 @media screen and (max-width: 768px) {
     .landing-hero { padding: 40px 20px; text-align: center; flex-direction: column-reverse; gap: 30px; }
+    .showcase-grid {
+        flex-direction: column;
+        align-items: center;
+    }
     .hero-content h1 { font-size: 2.2rem; line-height: 1.2; }
     .hero-subtitle { font-size: 1rem; margin-bottom: 25px; }
     .hero-buttons { justify-content: center; flex-direction: column; width: 100%; gap: 12px; }
@@ -1936,12 +1946,13 @@ body.tpl-elegant .section-title {
     }
 
     /* Standard Padding for non-modern templates */
-    body:not(.tpl-modern) .page {
-        padding: 15mm 20mm !important;
+    body:not(.tpl-modern) #cv-root {
+        padding: 20mm 25mm !important;
+        box-sizing: border-box !important;
     }
 
     /* Modern Template Full Bleed */
-    body.tpl-modern .page {
+    body.tpl-modern #cv-root {
         padding: 0 !important;
     }
 
