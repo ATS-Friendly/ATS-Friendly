@@ -25,9 +25,9 @@
     --font-cv: 'PT Serif', serif;
     
     --cv-font-size: 11pt;
-    --cv-line-height: 1.4;
-    --cv-padding: 20mm;
-    --cv-section-gap: 15px;
+    --cv-line-height: 1.35;
+    --cv-padding: 15mm;
+    --cv-section-gap: 12px;
 }
 
 body {
@@ -1765,7 +1765,7 @@ h1 {
 }
 .section-header { 
     border-bottom: 1.5px solid var(--cv-accent-color); 
-    margin-bottom: 18px; 
+    margin-bottom: 12px; 
     padding-bottom: 6px; 
 }
 .section-title { 
@@ -1775,7 +1775,7 @@ h1 {
     font-family: var(--font-cv);
     color: var(--cv-accent-color);
 }
-.entry { display: flex; margin-bottom: 15px; }
+.entry { display: flex; margin-bottom: 8px; }
 .left-col { width: 170px; flex-shrink: 0; font-size: 0.9em; font-weight: 700; color: #636e72; padding-right: 15px; }
 .right-col { width: 100%; word-break: break-word; }
 .entry h3 { margin: 0 0 4px 0; font-size: 1.05em; font-weight: 700; }
@@ -1806,7 +1806,7 @@ body.tpl-compact .section-header {
     border-top: 1px solid #ccc; border-bottom: 1px solid #ccc; padding: 6px 0;
 }
 body.tpl-compact .section-title { font-size: 1.0em; font-weight: 700; letter-spacing: 2px; color: var(--cv-accent-color); }
-body.tpl-compact .entry { display: block; position: relative; margin-bottom: 15px; }
+body.tpl-compact .entry { display: block; position: relative; margin-bottom: 8px; }
 body.tpl-compact .entry .left-col { position: absolute; top: 0; right: 0; width: auto; text-align: right; font-weight: 600; font-size: 0.9em; color: var(--cv-accent-color); }
 body.tpl-compact .entry .right-col { padding-right: 180px; }
 
@@ -1947,7 +1947,7 @@ body.tpl-modern .modern-main {
 }
 
 body.tpl-modern .modern-section {
-    margin-bottom: 25px;
+    margin-bottom: 12px;
 }
 
 body.tpl-modern .modern-section-title {
@@ -1970,9 +1970,45 @@ body.tpl-modern .summary-text {
 }
 
 body.tpl-modern .modern-entry {
-    margin-bottom: 18px;
+    margin-bottom: 12px;
     padding-left: 15px;
     border-left: 3px solid #eee;
+}
+
+/* 2-Column References Grid */
+.references-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px 30px;
+}
+
+.references-grid.modern {
+    gap: 10px 20px;
+}
+
+.references-grid .entry {
+    margin-bottom: 0;
+}
+
+.entry.no-left-col .right-col {
+    padding-left: 0;
+}
+
+.inline-date {
+    font-weight: 400;
+    font-size: 0.9em;
+    color: #636e72;
+    margin-left: 5px;
+}
+
+/* Page Break Optimization */
+.entry, .modern-entry, .section {
+    page-break-inside: avoid;
+}
+
+/* Prevent very long summaries from eating up space */
+.cv-content .right-col p {
+    margin-top: 4px;
 }
 
 body.tpl-modern .modern-entry.compact {
@@ -2007,7 +2043,7 @@ body.tpl-modern .entry-company {
 body.tpl-modern .entry-desc {
     font-size: 0.85rem;
     color: #555;
-    margin: 8px 0 0 0;
+    margin: 4px 0 0 0;
     line-height: 1.5;
 }
 
@@ -2042,7 +2078,7 @@ body.tpl-elegant #cv-root {
 body.tpl-elegant header {
     border-bottom: 1px solid #eee;
     padding-bottom: 20px;
-    margin-bottom: 40px;
+    margin-bottom: 20px;
 }
 
 body.tpl-elegant .section-title {
