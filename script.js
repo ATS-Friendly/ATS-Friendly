@@ -45,6 +45,26 @@ const escapeHTML = (str) => {
     }[m]));
 };
 
+const formatCvDate = (val) => {
+    if (!val) return "";
+    if (val === 'present') return currentLang === 'tr' ? 'Devam Ediyor' : 'Present';
+    if (val.includes('-')) {
+        const [year, month] = val.split('-');
+        const months = currentLang === 'tr' 
+            ? ["Ocak", "Şubat", "Mart", "Nisan", "Mayıs", "Haziran", "Temmuz", "Ağustos", "Eylül", "Ekim", "Kasım", "Aralık"]
+            : ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+        return `${months[parseInt(month) - 1]} ${year}`;
+    }
+    return val;
+};
+
+window.toggleDateEnd = (checkbox) => {
+    const input = checkbox.closest('.date-end-wrapper').querySelector('input[type="month"]');
+    input.disabled = checkbox.checked;
+    if (checkbox.checked) input.value = '';
+    generateCVFromForm();
+};
+
 const firebaseConfig = {
     apiKey: "AIzaSyBbxgCMw5dO5T-kt7Njapo5ST04MRp7JKU",
     authDomain: "ats-friendly-93377.firebaseapp.com",
@@ -268,6 +288,9 @@ const translations = {
         btn_add_cert: "Sertifika Ekle",
         btn_add_ref: "Referans Ekle",
         btn_import_cv: "CV'den Aktar",
+        lbl_date_start: "Başlangıç",
+        lbl_date_end: "Bitiş",
+        lbl_present: "Devam Ediyor",
         msg_importing: "CV analiz ediliyor...",
         msg_import_success: "Bilgiler başarıyla aktarıldı!",
         msg_import_error: "CV okuma hatası. Lütfen manuel doldurun.",
@@ -411,6 +434,9 @@ const translations = {
         btn_add_cert: "Add Certificate",
         btn_add_ref: "Add Reference",
         btn_import_cv: "Import from CV",
+        lbl_date_start: "Start Date",
+        lbl_date_end: "End Date",
+        lbl_present: "Present",
         msg_importing: "Analyzing CV...",
         msg_import_success: "Info imported successfully!",
         msg_import_error: "Error reading CV. Please fill manually.",
@@ -943,9 +969,18 @@ window.addFormExperience = (data = null) => {
                 <label>${t.lbl_company}</label>
                 <input type="text" class="form-input job-company" placeholder="Ex: Google" value="${data ? data.company : ''}" oninput="generateCVFromForm()">
             </div>
-            <div class="input-group full-width">
-                <label>${t.lbl_date}</label>
-                <input type="text" class="form-input job-date" placeholder="Ex: Jan 2020 - Present" value="${data ? data.date : ''}" oninput="generateCVFromForm()">
+            <div class="input-group">
+                <label>${t.lbl_date_start}</label>
+                <input type="month" class="form-input job-date-start" value="${data ? data.startDate : ''}" oninput="generateCVFromForm()">
+            </div>
+            <div class="input-group">
+                <label>${t.lbl_date_end}</label>
+                <div class="date-end-wrapper">
+                    <input type="month" class="form-input job-date-end" value="${data ? data.endDate : ''}" oninput="generateCVFromForm()" ${data && data.present ? 'disabled' : ''}>
+                    <label class="present-label">
+                        <input type="checkbox" class="job-present" onchange="toggleDateEnd(this)" ${data && data.present ? 'checked' : ''}> ${t.lbl_present}
+                    </label>
+                </div>
             </div>
             <div class="input-group full-width">
                 <label>${t.lbl_desc}</label>
@@ -974,9 +1009,13 @@ window.addFormEducation = (data = null) => {
                 <label>${t.lbl_degree}</label>
                 <input type="text" class="form-input edu-degree" placeholder="Ex: CS" value="${data ? data.degree : ''}" oninput="generateCVFromForm()">
             </div>
-            <div class="input-group full-width">
-                <label>${t.lbl_date}</label>
-                <input type="text" class="form-input edu-date" placeholder="Ex: 2015 - 2019" value="${data ? data.date : ''}" oninput="generateCVFromForm()">
+            <div class="input-group">
+                <label>${t.lbl_date_start}</label>
+                <input type="month" class="form-input edu-date-start" value="${data ? data.startDate : ''}" oninput="generateCVFromForm()">
+            </div>
+            <div class="input-group">
+                <label>${t.lbl_date_end}</label>
+                <input type="month" class="form-input edu-date-end" value="${data ? data.endDate : ''}" oninput="generateCVFromForm()">
             </div>
         </div>
     `;
@@ -1102,7 +1141,9 @@ window.generateCVFromForm = (triggerSave = true) => {
         data.experiences.push({
             title: item.querySelector('.job-title').value,
             company: item.querySelector('.job-company').value,
-            date: item.querySelector('.job-date').value,
+            startDate: item.querySelector('.job-date-start').value,
+            endDate: item.querySelector('.job-date-end').value,
+            present: item.querySelector('.job-present').checked,
             desc: item.querySelector('.job-desc').value
         });
     });
@@ -1111,7 +1152,8 @@ window.generateCVFromForm = (triggerSave = true) => {
         data.education.push({
             school: item.querySelector('.edu-school').value,
             degree: item.querySelector('.edu-degree').value,
-            date: item.querySelector('.edu-date').value
+            startDate: item.querySelector('.edu-date-start').value,
+            endDate: item.querySelector('.edu-date-end').value
         });
     });
 
@@ -1173,11 +1215,14 @@ window.generateCVFromForm = (triggerSave = true) => {
     // -- EXPERIENCES --
     let expContent = "";
     if (data.experiences.length > 0) {
-        let entries = data.experiences.map(exp => `
+        let entries = data.experiences.map(exp => {
+            const dateStr = `${formatCvDate(exp.startDate)} — ${exp.present ? formatCvDate('present') : formatCvDate(exp.endDate)}`;
+            return `
             <div class="entry">
-                <div class="left-col">${h(exp.date)}</div>
+                <div class="left-col">${h(dateStr)}</div>
                 <div class="right-col"><h3>${h(exp.title)}, ${h(exp.company)}</h3><p>${h(exp.desc, true)}</p></div>
-            </div>`).join('');
+            </div>`;
+        }).join('');
         
         expContent = `
             <div class="section">
@@ -1189,11 +1234,14 @@ window.generateCVFromForm = (triggerSave = true) => {
     // -- EDUCATION --
     let eduContent = "";
     if (data.education.length > 0) {
-        let entries = data.education.map(edu => `
+        let entries = data.education.map(edu => {
+            const dateStr = `${formatCvDate(edu.startDate)} — ${formatCvDate(edu.endDate)}`;
+            return `
             <div class="entry">
-                <div class="left-col">${h(edu.date)}</div>
+                <div class="left-col">${h(dateStr)}</div>
                 <div class="right-col"><h3>${h(edu.degree)}</h3><p>${h(edu.school)}</p></div>
-            </div>`).join('');
+            </div>`;
+        }).join('');
 
         eduContent = `
             <div class="section">
@@ -1321,30 +1369,34 @@ window.generateCVFromForm = (triggerSave = true) => {
                 ${data.experiences.length > 0 ? `
                 <div class="modern-section">
                     <h2 class="modern-section-title">${labels.exp}</h2>
-                    ${data.experiences.map(exp => `
+                    ${data.experiences.map(exp => {
+                        const dateStr = `${formatCvDate(exp.startDate)} — ${exp.present ? formatCvDate('present') : formatCvDate(exp.endDate)}`;
+                        return `
                         <div class="modern-entry">
                             <div class="entry-header">
                                 <strong>${h(exp.title)}</strong>
-                                <span class="entry-date">${h(exp.date)}</span>
+                                <span class="entry-date">${h(dateStr)}</span>
                             </div>
                             <div class="entry-company">${h(exp.company)}</div>
                             <p class="entry-desc">${h(exp.desc, true)}</p>
                         </div>
-                    `).join('')}
+                    `;}).join('')}
                 </div>` : ''}
                 
                 ${data.education.length > 0 ? `
                 <div class="modern-section">
                     <h2 class="modern-section-title">${labels.edu}</h2>
-                    ${data.education.map(edu => `
+                    ${data.education.map(edu => {
+                        const dateStr = `${formatCvDate(edu.startDate)} — ${formatCvDate(edu.endDate)}`;
+                        return `
                         <div class="modern-entry">
                             <div class="entry-header">
                                 <strong>${h(edu.degree)}</strong>
-                                <span class="entry-date">${h(edu.date)}</span>
+                                <span class="entry-date">${h(dateStr)}</span>
                             </div>
                             <div class="entry-company">${h(edu.school)}</div>
                         </div>
-                    `).join('')}
+                    `;}).join('')}
                 </div>` : ''}
                 
                 ${visible.certs && data.certificates.length > 0 ? `
@@ -1601,11 +1653,26 @@ window.createNewSection = () => {
     alert("Yeni sistemde 'Özel Bölümler' alanını kullanarak ekleme yapabilirsiniz.");
 };
 
+// LinkedIn URL Tip & Focus Logic
+const setupLinkedInTip = () => {
+    const inp = document.getElementById('inp-linkedin');
+    if (!inp) return;
+    
+    inp.addEventListener('focus', () => {
+        if (!localStorage.getItem('linkedin_tip_shown')) {
+            const tip = currentLang === 'tr' 
+                ? "İpucu: LinkedIn profil linkinizi 'Genel profil ve URL' kısmından kopyalarsanız CV'nizde daha şık (temiz) görünecektir." 
+                : "Tip: For a cleaner look on your CV, copy your LinkedIn URL from the 'Public profile & URL' section of your profile.";
+            alert(tip);
+            localStorage.setItem('linkedin_tip_shown', 'true');
+        }
+    });
+};
+
 // Initial setup
 setLanguage('tr');
 window.resizePreview();
-
-// Print Event Listeners for cleaner PDF generation
+setupLinkedInTip();
 window.addEventListener('beforeprint', () => {
     // 1. Force a final render without saving to ensure latest data
     if (window.generateCVFromForm) window.generateCVFromForm(false);
@@ -1628,15 +1695,3 @@ window.addEventListener('afterprint', () => {
     if (window.resizePreview) window.resizePreview();
 });
 
-// LinkedIn URL Tip
-window.addEventListener('load', () => {
-    if (!localStorage.getItem('linkedin_tip_shown')) {
-        setTimeout(() => {
-            const tip = currentLang === 'tr' 
-                ? "İpucu: LinkedIn profil linkinizi 'Genel profil ve URL' kısmından kopyalarsanız CV'nizde daha şık (temiz) görünecektir." 
-                : "Tip: For a cleaner look on your CV, copy your LinkedIn URL from the 'Public profile & URL' section of your profile.";
-            alert(tip);
-            localStorage.setItem('linkedin_tip_shown', 'true');
-        }, 1500);
-    }
-});

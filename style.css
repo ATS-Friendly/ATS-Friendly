@@ -225,9 +225,15 @@ body {
     box-shadow: 0 5px 15px rgba(46, 204, 113, 0.3);
 }
 
+.features-section, .templates-showcase, .faq-section, .trust-badges {
+    background: #f1f2f6 !important;
+}
+.feature-card, .showcase-card {
+    background: white !important;
+}
+
 .features-section {
     padding: 60px 20px;
-    background: #f1f2f6;
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
     gap: 30px;
@@ -1022,6 +1028,27 @@ body {
 
 .mobile-action-btn:active {
     transform: scale(0.96);
+}
+
+.date-end-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+.present-label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    color: #0984e3;
+    font-weight: 700;
+    cursor: pointer;
+    user-select: none;
+}
+.present-label input[type="checkbox"] {
+    width: 14px;
+    height: 14px;
+    cursor: pointer;
 }
 
 @media screen and (max-width: 1024px) {
@@ -1981,6 +2008,9 @@ body.tpl-elegant .section-title {
     }
 
     /* Avoid breaking individual entries across pages, but allow sections to break */
+    .section, .modern-section {
+        page-break-inside: auto !important;
+    }
     .entry, .modern-entry {
         page-break-inside: avoid !important;
     }
