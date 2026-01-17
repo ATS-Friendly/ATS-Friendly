@@ -184,21 +184,6 @@ body {
     justify-content: center;
 }
 
-.mockup-card {
-    width: 300px;
-    height: 380px;
-    background: white;
-    border-radius: 20px;
-    box-shadow: 0 20px 60px rgba(0,0,0,0.1);
-    border: 1px solid #f1f2f6;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-    position: relative;
-    transform: rotate(-3deg);
-    transition: 0.5s;
-}
-.mockup-card:hover { transform: rotate(0deg) scale(1.02); }
 .mockup-header {
     height: 30px;
     background: #f8f9fa;
@@ -229,7 +214,7 @@ body {
     box-shadow: 0 5px 15px rgba(46, 204, 113, 0.3);
 }
 
-.features-section, .templates-showcase, .faq-section, .trust-badges {
+.features-section, .templates-showcase, .trust-badges {
     background: #f1f2f6 !important;
 }
 .feature-card, .showcase-card {
@@ -361,38 +346,6 @@ body {
     line-height: 1.4;
 }
 
-.faq-section {
-    max-width: 100%;
-    margin: 0;
-    padding: 80px 40px;
-    background: #f1f2f6;
-}
-.faq-container {
-    margin-top: 40px;
-}
-.faq-item {
-    border-bottom: 1px solid #eee;
-    padding: 25px 0;
-}
-.faq-item:last-child {
-    border-bottom: none;
-}
-.faq-question h3 {
-    font-size: 1.1rem;
-    color: #2d3436;
-    margin: 0 0 12px 0;
-    font-weight: 700;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
-.faq-answer p {
-    margin: 0;
-    color: #636e72;
-    font-size: 0.95rem;
-    line-height: 1.7;
-}
-
 .trust-badges {
     display: flex;
     justify-content: center;
@@ -431,7 +384,7 @@ body {
 }
 
 @media screen and (max-width: 768px) {
-    .templates-showcase, .faq-section {
+    .templates-showcase {
         padding: 50px 20px;
     }
     .section-title {
@@ -1072,7 +1025,6 @@ body {
 @media screen and (max-width: 1024px) {
     .mobile-editor-tabs { display: flex; }
     
-    /* Hide bottom bar by default, only show when editor is active */
     .mobile-bottom-bar { display: none !important; }
     #editor-view.active .mobile-bottom-bar { display: flex !important; }
     
@@ -1113,12 +1065,10 @@ body {
         overflow-y: auto;
     }
     
-    /* Show both panels vertically stacked */
     .editor-panel-form { display: block; width: 100%; }
     .editor-panel-preview { display: block; width: 100%; }
 }
 
-/* Flatpickr Modern Overrides */
 .flatpickr-calendar {
     box-shadow: 0 10px 30px rgba(0,0,0,0.1) !important;
     border: none !important;
@@ -1543,7 +1493,6 @@ textarea.form-input { resize: vertical; }
     animation: fadeInScale 0.2s ease-out;
 }
 
-/* MOBILE BOTTOM SHEET STYLE WITH TRANSPARENCY */
 @media screen and (max-width: 1024px) {
     .modal-overlay .modal-content {
         width: 100% !important;
@@ -1581,7 +1530,6 @@ textarea.form-input { resize: vertical; }
     cursor: move; 
     user-select: none;
 }
-/* Disable drag cursor on mobile */
 @media screen and (max-width: 1024px) {
     .modal-header { 
         cursor: default; 
@@ -1649,7 +1597,6 @@ textarea.form-input { resize: vertical; }
     .modal-footer { background: rgba(255, 255, 255, 0.8); }
 }
 
-/* Range Sliders */
 .range-header {
     display: flex;
     justify-content: space-between;
@@ -1685,20 +1632,19 @@ input[type=range] {
     transition: transform 0.2s;
     margin: 0; 
     box-shadow: 0 5px 20px rgba(0,0,0,0.1);
-    /* Make overflow visible so scaled content shows */
     overflow: visible;
 }
 
 @media screen and (min-width: 1025px) {
     #cv-scale-container {
-        margin: 0 auto; /* Keep centered on desktop */
+        margin: 0 auto;
         transform-origin: top center;
     }
 }
 @media screen and (max-width: 1024px) {
     #cv-scale-container {
         display: block;
-        margin: 0 !important; /* Flex handles centering now */
+        margin: 0 !important;
     }
 }
 
@@ -1721,7 +1667,6 @@ input[type=range] {
     -webkit-user-select: text !important;
 }
 
-/* GENERAL TEXT WRAPPING FIXES */
 .cv-content p, 
 .cv-content h1, 
 .cv-content h2, 
@@ -1752,11 +1697,9 @@ h1 {
     font-size: 1.1em;
 }
 
-/* Template 1: Classic */
 .contact-info { margin-top: 10px; font-size: 0.9em; }
 .address-line, .contact-row, .compact-separator, .personal-details { display: none; }
 
-/* Sections */
 .section {
     position: relative; 
     border: 1px solid transparent;
@@ -1781,7 +1724,6 @@ h1 {
 .entry h3 { margin: 0 0 4px 0; font-size: 1.05em; font-weight: 700; }
 .entry p { margin: 0; font-size: 1em; color: #444; }
 
-/* Template 2: Compact */
 body.tpl-compact .contact-info { display: none; }
 body.tpl-compact .address-line,
 body.tpl-compact .contact-row,
@@ -1810,7 +1752,6 @@ body.tpl-compact .entry { display: block; position: relative; margin-bottom: 15p
 body.tpl-compact .entry .left-col { position: absolute; top: 0; right: 0; width: auto; text-align: right; font-weight: 600; font-size: 0.9em; color: var(--cv-accent-color); }
 body.tpl-compact .entry .right-col { padding-right: 180px; }
 
-/* Elegant Template License */
 .elegant-license {
     margin-top: 8px;
     font-size: 0.9em;
@@ -1822,7 +1763,6 @@ body.tpl-compact .entry .right-col { padding-right: 180px; }
     font-weight: 700;
 }
 
-/* Template 3: Modern (Photo Friendly - Two Column Layout) */
 body.tpl-modern #cv-root {
     background: white;
     padding: 0 !important;
@@ -2016,7 +1956,6 @@ body.tpl-modern .ref-contact {
     color: #888;
 }
 
-/* Print adjustments for Modern template */
 @media print {
     body.tpl-modern .modern-layout {
         display: grid !important;
@@ -2033,7 +1972,6 @@ body.tpl-modern .ref-contact {
     }
 }
 
-/* Template 4: Elegant */
 body.tpl-elegant #cv-root {
     padding: 40px 50px;
     border-top: 15px solid var(--cv-accent-color);
@@ -2052,15 +1990,12 @@ body.tpl-elegant .section-title {
     display: inline-block;
 }
 
-
-/* --- KESİN ÇÖZÜM PRINT AYARLARI --- */
 @media print {
     @page {
         margin: 0;
         size: A4;
     }
 
-    /* 1. Hide ALL UI elements */
     body > *:not(#editor-view),
     #landing-view,
     #template-view,
@@ -2083,7 +2018,6 @@ body.tpl-elegant .section-title {
         visibility: hidden !important;
     }
 
-    /* 2. Reset Layout for Print */
     html, body {
         height: auto !important;
         width: 100% !important;
@@ -2109,7 +2043,6 @@ body.tpl-elegant .section-title {
         transform: none !important;
     }
 
-    /* 3. CV Container - A4 Standard */
     #cv-scale-container {
         display: block !important;
         visibility: visible !important;
@@ -2144,37 +2077,31 @@ body.tpl-elegant .section-title {
         position: relative !important;
     }
 
-    /* Standard Padding for non-modern templates */
     body:not(.tpl-modern) #cv-root {
         padding: 20mm 25mm !important;
         box-sizing: border-box !important;
     }
 
-    /* Modern Template Full Bleed */
     body.tpl-modern #cv-root {
         padding: 0 !important;
     }
 
-    /* Ensure backgrounds and colors are preserved */
     * {
         -webkit-print-color-adjust: exact !important;
         print-color-adjust: exact !important;
         color-adjust: exact !important;
     }
 
-    /* Sidebar background specifically for Modern */
     body.tpl-modern .modern-sidebar {
         -webkit-print-color-adjust: exact !important;
         background: linear-gradient(180deg, #1a1a2e 0%, #16213e 100%) !important;
     }
 
-    /* Layout specific fixes for print stacking */
     body.tpl-modern .modern-layout {
         display: grid !important;
         grid-template-columns: 220px 1fr !important;
     }
 
-    /* Avoid breaking individual entries across pages, but allow sections to break */
     .section, .modern-section {
         page-break-inside: auto !important;
     }
@@ -2260,7 +2187,6 @@ body.tpl-elegant .section-title {
     position: fixed;
     bottom: 30px;
     left: 20px;
-    /* Z-index below modal (3000) but high enough above content */
     z-index: 2800;
     flex-direction: column-reverse;
     align-items: flex-start;
@@ -2308,9 +2234,7 @@ body.tpl-elegant .section-title {
     transform: translateY(0);
 }
 
-/* TRANSPARENT MENU ITEM STYLE */
 .fab-item {
-    /* Glassmorphism background */
     background: rgba(255, 255, 255, 0.85);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);

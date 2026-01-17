@@ -12,18 +12,15 @@ import {
 import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 import { getFunctions, httpsCallable } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-functions.js";
 
-// --- GLOBAL VARIABLES (DEFINE EARLY) ---
 let isLoginMode = true;
 let currentUser = null;
 let isSyncing = false;
-let saveTimeout = null; // For debouncing save
+let saveTimeout = null; 
 let currentLang = 'tr';
-// Theme Defaults
 let currentTheme = {
     color: '#2c3e50',
     font: 'ptserif' 
 };
-// Layout Defaults
 let currentLayout = {
     fontSize: 11,
     lineHeight: 1.4,
@@ -33,7 +30,6 @@ let currentLayout = {
 let profilePhotoBase64 = null;
 const appId = "mono-cv-app";
 
-// --- UTILS ---
 const escapeHTML = (str) => {
     if (!str) return "";
     return str.toString().replace(/[&<>"']/g, (m) => ({
@@ -46,14 +42,15 @@ const escapeHTML = (str) => {
 };
 
 const formatCvDate = (val) => {
-    if (!val) return "";
+    if (!val || val === 'undefined') return "";
     if (val === 'present') return currentLang === 'tr' ? 'Devam Ediyor' : 'Present';
-    if (val.includes('-')) {
+    if (typeof val === 'string' && val.includes('-')) {
         const [year, month] = val.split('-');
         const months = currentLang === 'tr' 
             ? ["Ocak", "Şubat", "Mart", "Nisan", "Mayıs", "Haziran", "Temmuz", "Ağustos", "Eylül", "Ekim", "Kasım", "Aralık"]
             : ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-        return `${months[parseInt(month) - 1]} ${year}`;
+        const mIdx = parseInt(month) - 1;
+        if (months[mIdx]) return `${months[mIdx]} ${year}`;
     }
     return val;
 };
@@ -71,21 +68,17 @@ const firebaseConfig = {
     projectId: "ats-friendly-93377",
     storageBucket: "ats-friendly-93377.firebasestorage.app",
     messagingSenderId: "542738169697",
-    appId: "1:542738169697:web:a999680a273fdd90ab4f20",
-    measurementId: "G-MCW4JWYYN4"
+    appId: "1:542738169697:web:a999680a273fdd90ab4f20"
 };
 
-// Uygulamayı Başlat
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
-const functions = getFunctions(app); // Initialize Functions
+const functions = getFunctions(app); 
 const googleProvider = new GoogleAuthProvider();
 
-// PDF.js Worker Configuration
 pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
-// --- CV UPLOAD & PARSING ---
 window.handlePhotoUpload = (event) => {
     const file = event.target.files[0];
     if (!file) return;
@@ -130,12 +123,10 @@ window.handleCvUpload = async (event) => {
             fullText += pageText + "\n";
         }
 
-        // --- NEW: AI POWERED PARSING VIA FIREBASE FUNCTION ---
         const parseResume = httpsCallable(functions, 'parseResumeWithAI');
         const result = await parseResume({ text: fullText });
         const parsedData = result.data;
         
-        // Fill static fields
         if (parsedData.fullname) document.getElementById('inp-fullname').value = parsedData.fullname;
         if (parsedData.title) document.getElementById('inp-title').value = parsedData.title;
         if (parsedData.email) document.getElementById('inp-email').value = parsedData.email;
@@ -144,7 +135,6 @@ window.handleCvUpload = async (event) => {
         if (parsedData.linkedin) document.getElementById('inp-linkedin').value = parsedData.linkedin;
         if (parsedData.summary) document.getElementById('inp-summary').value = parsedData.summary;
 
-        // Populate Dynamic Lists
         if (parsedData.experiences && parsedData.experiences.length > 0) {
             document.getElementById('form-experiences-list').innerHTML = '';
             parsedData.experiences.forEach(exp => window.addFormExperience(exp));
@@ -156,7 +146,6 @@ window.handleCvUpload = async (event) => {
             window.initDatePicker();
         }
 
-        // Trigger updates
         window.generateCVFromForm();
         triggerDebounceSave();
 
@@ -169,13 +158,11 @@ window.handleCvUpload = async (event) => {
         setTimeout(() => toast.classList.remove('show'), 3000);
     }
 
-    // Reset input
     event.target.value = '';
 };
 
 
 
-// --- DİL YÖNETİMİ (LOCALIZATION) ---
 const translations = {
     tr: {
         auth_title: "Hesabınıza Giriş Yapın",
@@ -196,7 +183,6 @@ const translations = {
         tpl_compact: "Kompakt",
         tpl_compact_desc: "📄 Minimal",
         tpl_modern: "Modern",
-        tpl_modern_desc: "✨ Fotoğraflı & Şık",
         btn_design: "Tasarım Ayarları",
         btn_layout: "Sayfa Düzeni",
         btn_change_tpl: "Şablonu Değiştir",
@@ -210,7 +196,6 @@ const translations = {
         status_syncing: "Kaydediliyor...",
         status_saved: "Kaydedildi!",
         status_offline: "Çevrimdışı",
-        cv_label_birth: "Doğum Yeri",
         cv_label_license: "Ehliyet",
         confirm_reset: "DİKKAT: CV içeriğiniz tamamen silinecek ve başlangıç haline dönecektir. Devam etmek istiyor musunuz?",
         toast_reset: "CV başarıyla sıfırlandı.",
@@ -223,7 +208,6 @@ const translations = {
         lbl_margin: "Kenar Boşluğu",
         lbl_sectiongap: "Bölüm Aralığı",
         btn_save_close: "Kapat",
-        btn_design: "Özelleştir",
         tab_edit: "Düzenle",
         tab_preview: "Önizle",
         landing_h1: "İşe Alım Robotlarını<br><span class='highlight-text'>Yenecek CV'nizi Oluşturun</span>",
@@ -238,22 +222,12 @@ const translations = {
         feat_3_desc: "CV'niz bulutta güvende. İstediğiniz cihazdan (PC veya Mobil) kaldığınız yerden devam edin.",
         showcase_title: "Profesyonel Şablonlar",
         showcase_subtitle: "Size en uygun tasarımı seçin ve CV'nizi dakikalar içinde hazırlayın",
-        faq_title: "Sıkça Sorulan Sorular",
-        faq_q1: "🔒 Verilerim güvende mi?",
-        faq_a1: "Evet! CV verileriniz Google Firebase'in güvenli bulut altyapısında şifrelenmiş olarak saklanır. Verileriniz sadece size aittir ve asla üçüncü taraflarla paylaşılmaz.",
-        faq_q2: "💰 Gerçekten tamamen ücretsiz mi?",
-        faq_a2: "Kesinlikle! Gizli ücret, abonelik veya filigran yok. Sınırsız sayıda CV oluşturabilir, düzenleyebilir ve PDF olarak indirebilirsiniz.",
-        faq_q3: "🤖 ATS nedir ve neden önemli?",
-        faq_a3: "ATS (Applicant Tracking System), şirketlerin başvuruları otomatik olarak taramak için kullandığı yazılımdır. Karmaşık grafikler ve tablolar içeren CV'ler ATS tarafından okunamaz. Bizim şablonlarımız, ATS'nin kolayca anlayabileceği temiz yapıya sahiptir ve CV'nizin insan kaynaklarına ulaşma şansını artırır.",
-        faq_q4: "📱 Mobil cihazlardan kullanabilir miyim?",
-        faq_a4: "Elbette! Platform tamamen responsive tasarıma sahip. Bilgisayar, tablet veya telefon - hangi cihazı kullanırsanız kullanın, CV'nizi rahatlıkla düzenleyebilirsiniz.",
         badge_secure: "Güvenli Depolama",
         badge_secure_desc: "256-bit SSL Şifreleme",
         badge_no_sell: "Veri Satışı Yok",
         badge_no_sell_desc: "Bilgileriniz Sizinle Kalır",
         badge_gdpr: "GDPR & KVKK Uyumlu",
         badge_gdpr_desc: "Veri Koruma Standartları",
-        // Form Translations
         form_title: "Bilgilerinizi Düzenleyin",
         form_personal: "Kişisel Bilgiler",
         form_profile: "Profil Özeti",
@@ -357,7 +331,6 @@ const translations = {
         status_syncing: "Saving...",
         status_saved: "Saved!",
         status_offline: "Offline",
-        cv_label_birth: "Place of birth",
         cv_label_license: "Driving license",
         confirm_reset: "WARNING: Your CV content will be erased and reset to default. Do you want to continue?",
         toast_reset: "CV successfully reset.",
@@ -370,7 +343,6 @@ const translations = {
         lbl_margin: "Margin",
         lbl_sectiongap: "Section Gap",
         btn_save_close: "Close",
-        btn_design: "Customize",
         tab_edit: "Edit",
         tab_preview: "Preview",
         landing_h1: "Build Your CV to<br><span class='highlight-text'>Beat Recruitment Robots</span>",
@@ -385,22 +357,12 @@ const translations = {
         feat_3_desc: "Your CV is safe in the cloud. Continue where you left off from any device (PC or Mobile).",
         showcase_title: "Professional Templates",
         showcase_subtitle: "Choose the design that suits you best and create your CV in minutes",
-        faq_title: "Frequently Asked Questions",
-        faq_q1: "🔒 Is my data safe?",
-        faq_a1: "Yes! Your CV data is stored encrypted in Google Firebase's secure cloud infrastructure. Your data belongs only to you and is never shared with third parties.",
-        faq_q2: "💰 Is it really completely free?",
-        faq_a2: "Absolutely! No hidden fees, subscriptions or watermarks. Unlimited CV creation, editing and PDF download.",
-        faq_q3: "🤖 What is ATS and why is it important?",
-        faq_a3: "ATS (Applicant Tracking System) is software companies use to automatically scan applications. CVs with complex graphics and tables cannot be read by ATS. Our templates have a clean structure that ATS can easily understand and increase the chances of your CV reaching human resources.",
-        faq_q4: "📱 Can I use it from mobile devices?",
-        faq_a4: "Of course! The platform has a fully responsive design. Computer, tablet or phone - whatever device you use, you can easily edit your CV.",
         badge_secure: "Secure Storage",
         badge_secure_desc: "256-bit SSL Encryption",
         badge_no_sell: "No Data Selling",
         badge_no_sell_desc: "Your Info Stays With You",
         badge_gdpr: "GDPR & KVKK Compliant",
         badge_gdpr_desc: "Data Protection Standards",
-        // Form Translations
         form_title: "Edit Your Details",
         form_personal: "Personal Details",
         form_profile: "Professional Summary",
@@ -479,7 +441,6 @@ window.setLanguage = (lang) => {
     
     const t = translations[lang];
 
-    // UI Güncelle
     document.querySelectorAll('[data-i18n]').forEach(el => {
         const key = el.getAttribute('data-i18n');
         const translation = t[key];
@@ -492,27 +453,22 @@ window.setLanguage = (lang) => {
         }
     });
 
-    // Update placeholders
     document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
         const key = el.getAttribute('data-i18n-placeholder');
         if (t[key]) el.placeholder = t[key];
     });
 
-    // Update dynamic values (like section titles)
     document.querySelectorAll('[data-i18n-val]').forEach(el => {
         const key = el.getAttribute('data-i18n-val');
         if (t[key]) el.value = t[key];
     });
 
-    // Toggle Button Style
     document.querySelectorAll('[data-lang]').forEach(btn => {
         btn.classList.toggle('active', btn.getAttribute('data-lang') === lang);
     });
 
-    // Update Auth Labels Manually
     updateAuthUI();
     
-    // Refresh CV Preview to apply language changes (e.g. section headers)
     generateCVFromForm();
 };
 
@@ -530,17 +486,14 @@ function updateAuthUI() {
     document.getElementById('auth-toggle-msg').innerText = toggleMsg;
     document.getElementById('auth-toggle-link').innerText = toggleLink;
     
-    // Toggle Terms Checkbox visibility
     document.getElementById('terms-container').style.display = isLoginMode ? 'none' : 'block';
 }
 
-// --- EKRAN YÖNETİMİ ---
 window.showView = (viewId) => {
     document.querySelectorAll('.view-section').forEach(v => v.classList.remove('active'));
     const target = document.getElementById(viewId);
     if (target) {
         target.classList.add('active');
-        // Default mobile tab
         if (viewId === 'editor-view' && window.innerWidth <= 1024) {
             window.switchMobileTab('edit');
         }
@@ -557,20 +510,16 @@ window.switchMobileTab = (tab) => {
         editorView.classList.remove('show-preview');
         tabEdit.classList.add('active');
         tabPreview.classList.remove('active');
-        // Scroll to top of form
         document.getElementById('panel-form').scrollTop = 0;
     } else {
         editorView.classList.add('show-preview');
         editorView.classList.remove('show-edit');
         tabPreview.classList.add('active');
         tabEdit.classList.remove('active');
-        // Recalculate preview scale when switching to preview
         setTimeout(window.resizePreview, 50);
     }
 };
 
-
-// --- AUTO SCALE PREVIEW FOR MOBILE ---
 window.resizePreview = () => {
     const previewPanel = document.getElementById('panel-preview');
     const scaleContainer = document.getElementById('cv-scale-container');
@@ -579,7 +528,6 @@ window.resizePreview = () => {
     if (!previewPanel || !scaleContainer || !cvRoot) return;
 
     if (window.innerWidth > 1024) {
-        // Desktop Reset
         cvRoot.style.transform = 'none';
         scaleContainer.style.width = 'auto';
         scaleContainer.style.height = 'auto';
@@ -588,43 +536,30 @@ window.resizePreview = () => {
         return;
     }
 
-    // --- NEW MOBILE LOGIC ---
-    // 210mm @ 96dpi approx 794px wide.
     const originalWidth = 794; 
-    
-    // Calculate available width with padding
     const horizontalPadding = 30; 
     const availableWidth = window.innerWidth - horizontalPadding;
 
-    // Calculate Scale Factor
     const scale = Math.min(1, availableWidth / originalWidth);
     
-    // 1. Transform the INNER content (#cv-root)
     cvRoot.style.transformOrigin = 'top left'; 
     cvRoot.style.transform = `scale(${scale})`;
-    cvRoot.style.width = originalWidth + 'px'; // Explicit width to prevent any flex/block shrinking
+    cvRoot.style.width = originalWidth + 'px'; 
     
-    // 2. Resize the OUTER wrapper (#cv-scale-container) to match the SCALED dimensions
     const scaledWidth = originalWidth * scale;
     const scaledHeight = cvRoot.getBoundingClientRect().height;
 
     scaleContainer.style.width = `${scaledWidth}px`;
     scaleContainer.style.height = `${scaledHeight}px`;
     
-    // 3. Spacing
     scaleContainer.style.marginTop = '10px';
     scaleContainer.style.marginBottom = '100px'; 
     scaleContainer.style.marginLeft = '0';
     scaleContainer.style.marginRight = '0';
 };
 
-// Listen for window resize
 window.addEventListener('resize', window.resizePreview);
 
-// --- PRINT SCALING RESET ---
-// Consolidated listeners at the bottom of the file
-
-// --- MOBILE FAB MENU ---
 window.toggleFabMenu = () => {
     const items = document.getElementById('fab-items');
     const btn = document.getElementById('fab-trigger');
@@ -634,21 +569,17 @@ window.toggleFabMenu = () => {
     overlay.classList.toggle('active');
 };
 
-
-// --- MODAL YÖNETİMİ (TEMA & LAYOUT) ---
 function openModal(modalId) {
     const modal = document.getElementById(modalId);
     const content = modal.querySelector('.modal-content');
     modal.classList.add('active');
     
-    // Close FAB when opening modal
     if (document.getElementById('fab-items')) {
         document.getElementById('fab-items').classList.remove('show');
         document.getElementById('fab-trigger').classList.remove('active');
         document.getElementById('fab-overlay').classList.remove('active');
     }
 
-    // Center modal or simple fixed positioning for mobile stability
     if(window.innerWidth > 1024) {
         if (!content.style.top || !content.style.left) {
             content.style.top = "100px";
@@ -657,7 +588,6 @@ function openModal(modalId) {
         }
         initDragElement(content);
     } else {
-        // Mobile positioning handled by CSS (bottom sheet)
         content.style.top = '';
         content.style.left = '';
         content.style.transform = '';
@@ -665,12 +595,10 @@ function openModal(modalId) {
 }
 
 window.openLayoutModal = () => {
-    // If we are in the editor view, we should ensure the CV is rendered first
     if(document.getElementById('editor-view').classList.contains('active')) {
         generateCVFromForm(false);
     }
     
-    // Sync slider values with current state
     document.getElementById('rng-fontsize').value = currentLayout.fontSize;
     document.getElementById('val-fontsize').innerText = currentLayout.fontSize + 'pt';
 
@@ -757,11 +685,10 @@ function initDragElement(elmnt) {
     }
 }
 
-// --- TEMA VE STİL UYGULAMALARI ---
 window.applyColor = (color) => {
     currentTheme.color = color;
     document.documentElement.style.setProperty('--cv-accent-color', color);
-    triggerDebounceSave(); // Save when color changes
+    triggerDebounceSave();
 };
 
 window.applyFont = (fontType) => {
@@ -779,7 +706,7 @@ window.applyFont = (fontType) => {
         case 'ptserif': default: fontVal = "'PT Serif', serif"; break;
     }
     document.documentElement.style.setProperty('--font-cv', fontVal);
-    triggerDebounceSave(); // Save when font changes
+    triggerDebounceSave();
 };
 
 window.updateLayout = () => {
@@ -790,40 +717,31 @@ window.updateLayout = () => {
 
     currentLayout = { fontSize: fs, lineHeight: lh, margin: mg, sectionGap: sg };
 
-    // Update UI Labels
     document.getElementById('val-fontsize').innerText = fs + 'pt';
     document.getElementById('val-lineheight').innerText = lh;
     document.getElementById('val-margin').innerText = mg + 'mm';
     document.getElementById('val-sectiongap').innerText = sg + 'px';
 
-    // Apply CSS Variables
     document.documentElement.style.setProperty('--cv-font-size', fs + 'pt');
     document.documentElement.style.setProperty('--cv-line-height', lh);
     document.documentElement.style.setProperty('--cv-padding', mg + 'mm');
     document.documentElement.style.setProperty('--cv-section-gap', sg + 'px');
-    
-    // Note: Layout changes are usually saved when modal closes, but we can debounce here too if desired
-    // For performance, we wait for modal close or manual save
 };
 
-function applySavedLayout(layout) {
+window.applySavedLayout = (layout) => {
     if(!layout) return;
     currentLayout = layout;
     document.documentElement.style.setProperty('--cv-font-size', layout.fontSize + 'pt');
     document.documentElement.style.setProperty('--cv-line-height', layout.lineHeight);
     document.documentElement.style.setProperty('--cv-padding', layout.margin + 'mm');
     document.documentElement.style.setProperty('--cv-section-gap', layout.sectionGap + 'px');
-}
-
-// --- AUTH & LANDING LOGIC ---
+};
 
 window.scrollToFeatures = () => {
-    console.log("scrollToFeatures called");
     document.getElementById('features').scrollIntoView({ behavior: 'smooth' });
 };
 
 window.showAuth = (loginMode) => {
-    // If user is already logged in, don't show login screen, go to app
     if (currentUser) {
         window.showView('template-view');
         return;
@@ -837,7 +755,6 @@ window.loginWithGoogle = async () => {
     try {
         updateStatus('syncing'); 
         await signInWithPopup(auth, googleProvider);
-        // Successful login is handled by onAuthStateChanged, which will now redirect from auth-view
     } catch (e) {
         let msg = "Google Giriş Hatası: " + e.message;
         if(e.code === 'auth/popup-blocked') {
@@ -864,7 +781,6 @@ window.handleAuth = async () => {
     
     if (!email || !password) return alert("Lütfen tüm alanları doldurun.");
     
-    // Validate Terms on Signup
     if (!isLoginMode && !terms) {
         return alert("Kayıt olmak için Kullanım Koşulları ve Gizlilik Politikasını kabul etmelisiniz.");
     }
@@ -879,7 +795,6 @@ window.handleAuth = async () => {
         } else {
             await createUserWithEmailAndPassword(auth, email, password);
         }
-        // Success is handled by onAuthStateChanged
     } catch (e) { 
         alert("Hata: " + e.message);
         btnTextSpan.innerText = originalText;
@@ -892,7 +807,6 @@ window.logout = async () => {
         await signOut(auth);
         currentUser = null;
         window.showView('landing-view');
-        location.reload(); 
     } catch (e) {
         alert("Çıkış hatası: " + e.message);
     }
@@ -902,7 +816,6 @@ onAuthStateChanged(auth, async (user) => {
     if (user) {
         currentUser = user;
         
-        // 1. Background Data Fetch
         const docRef = doc(db, 'artifacts', appId, 'users', user.uid, 'data', 'cvContent');
         const snap = await getDoc(docRef);
         
@@ -933,9 +846,6 @@ onAuthStateChanged(auth, async (user) => {
         
         updateStatus('online');
 
-        // 2. Navigation Logic:
-        // ONLY redirect to the app if the user is currently looking at the login/signup screen (auth-view).
-        // If they are on the landing page, stay on the landing page (logged in state).
         const currentView = document.querySelector('.view-section.active');
         if (currentView && currentView.id === 'auth-view') {
             if (snap.exists()) {
@@ -946,9 +856,6 @@ onAuthStateChanged(auth, async (user) => {
             }
         }
     } else {
-        // Not Logged In - Show Landing Page by default unless manually navigated to Auth
-        // If we are already on Auth view (e.g. failed login), stay there.
-        // Otherwise, show Landing.
         const currentView = document.querySelector('.view-section.active');
         if (!currentView || currentView.id === 'editor-view' || currentView.id === 'template-view') {
             window.showView('landing-view');
@@ -956,7 +863,6 @@ onAuthStateChanged(auth, async (user) => {
     }
 });
 
-// Logout handled by consolidated window.logout
 window.selectTemplate = (tpl) => {
     document.body.className = tpl;
     window.showView('editor-view');
@@ -968,8 +874,6 @@ window.backToTemplates = () => {
     window.showView('template-view');
 };
 
-// --- DYNAMIC FORM HANDLERS ---
-// All dynamic handlers now call generateCVFromForm() which will Debounce save
 window.addFormExperience = (data = null) => {
     const container = document.getElementById('form-experiences-list');
     const div = document.createElement('div');
@@ -981,28 +885,28 @@ window.addFormExperience = (data = null) => {
         <div class="input-grid">
             <div class="input-group">
                 <label data-i18n="lbl_job_title">${t.lbl_job_title}</label>
-                <input type="text" class="form-input job-title" data-i18n-placeholder="lbl_job_title" placeholder="Ex: Manager" value="${data ? data.title : ''}" oninput="generateCVFromForm()">
+                <input type="text" class="form-input job-title" data-i18n-placeholder="lbl_job_title" placeholder="Ex: Manager" value="${(data?.title && data.title !== 'undefined') ? data.title : ''}" oninput="generateCVFromForm()">
             </div>
             <div class="input-group">
                 <label data-i18n="lbl_company">${t.lbl_company}</label>
-                <input type="text" class="form-input job-company" data-i18n-placeholder="lbl_company" placeholder="Ex: Google" value="${data ? data.company : ''}" oninput="generateCVFromForm()">
+                <input type="text" class="form-input job-company" data-i18n-placeholder="lbl_company" placeholder="Ex: Google" value="${(data?.company && data.company !== 'undefined') ? data.company : ''}" oninput="generateCVFromForm()">
             </div>
             <div class="input-group">
                 <label data-i18n="lbl_date_start">${t.lbl_date_start}</label>
-                <input type="text" class="form-input job-date-start date-picker-month" value="${data ? data.startDate : ''}" oninput="generateCVFromForm()">
+                <input type="text" class="form-input job-date-start date-picker-month" value="${(data?.startDate && data.startDate !== 'undefined') ? data.startDate : ''}" oninput="generateCVFromForm()">
             </div>
             <div class="input-group">
                 <label data-i18n="lbl_date_end">${t.lbl_date_end}</label>
                 <div class="date-end-wrapper">
-                    <input type="text" class="form-input job-date-end date-picker-month" value="${data ? data.endDate : ''}" oninput="generateCVFromForm()" ${data && data.present ? 'disabled' : ''}>
+                    <input type="text" class="form-input job-date-end date-picker-month" value="${(data?.endDate && data.endDate !== 'undefined') ? data.endDate : ''}" oninput="generateCVFromForm()" ${data?.present ? 'disabled' : ''}>
                     <label class="present-label">
-                        <input type="checkbox" class="job-present" onchange="toggleDateEnd(this)" ${data && data.present ? 'checked' : ''}> <span data-i18n="lbl_present">${t.lbl_present}</span>
+                        <input type="checkbox" class="job-present" onchange="toggleDateEnd(this)" ${data?.present ? 'checked' : ''}> <span data-i18n="lbl_present">${t.lbl_present}</span>
                     </label>
                 </div>
             </div>
             <div class="input-group full-width">
                 <label data-i18n="lbl_desc">${t.lbl_desc}</label>
-                <textarea class="form-input job-desc" rows="3" oninput="generateCVFromForm()">${data ? data.desc : ''}</textarea>
+                <textarea class="form-input job-desc" rows="3" oninput="generateCVFromForm()">${(data?.desc && data.desc !== 'undefined') ? data.desc : ''}</textarea>
             </div>
         </div>
     `;
@@ -1024,19 +928,19 @@ window.addFormEducation = (data = null) => {
         <div class="input-grid">
             <div class="input-group">
                 <label data-i18n="lbl_school">${t.lbl_school}</label>
-                <input type="text" class="form-input edu-school" data-i18n-placeholder="lbl_school" placeholder="Ex: MIT" value="${data ? data.school : ''}" oninput="generateCVFromForm()">
+                <input type="text" class="form-input edu-school" data-i18n-placeholder="lbl_school" placeholder="Ex: MIT" value="${(data?.school && data.school !== 'undefined') ? data.school : ''}" oninput="generateCVFromForm()">
             </div>
             <div class="input-group">
                 <label data-i18n="lbl_degree">${t.lbl_degree}</label>
-                <input type="text" class="form-input edu-degree" data-i18n-placeholder="lbl_degree" placeholder="Ex: CS" value="${data ? data.degree : ''}" oninput="generateCVFromForm()">
+                <input type="text" class="form-input edu-degree" data-i18n-placeholder="lbl_degree" placeholder="Ex: CS" value="${(data?.degree && data.degree !== 'undefined') ? data.degree : ''}" oninput="generateCVFromForm()">
             </div>
             <div class="input-group">
                 <label data-i18n="lbl_date_start">${t.lbl_date_start}</label>
-                <input type="text" class="form-input edu-date-start date-picker-month" value="${data ? data.startDate : ''}" oninput="generateCVFromForm()">
+                <input type="text" class="form-input edu-date-start date-picker-month" value="${(data?.startDate && data.startDate !== 'undefined') ? data.startDate : ''}" oninput="generateCVFromForm()">
             </div>
             <div class="input-group">
                 <label data-i18n="lbl_date_end">${t.lbl_date_end}</label>
-                <input type="text" class="form-input edu-date-end date-picker-month" value="${data ? data.endDate : ''}" oninput="generateCVFromForm()">
+                <input type="text" class="form-input edu-date-end date-picker-month" value="${(data?.endDate && data.endDate !== 'undefined') ? data.endDate : ''}" oninput="generateCVFromForm()">
             </div>
         </div>
     `;
@@ -1057,11 +961,11 @@ window.addFormCustomSection = (data = null) => {
         <button class="remove-dynamic-btn" onclick="removeItemAndRefresh(this)" aria-label="Remove item">×</button>
         <div class="input-group" style="margin-bottom:10px;">
             <label data-i18n="lbl_section_title">${t.lbl_section_title}</label>
-            <input type="text" class="form-input custom-title" placeholder="Ex: Certificates" value="${data ? data.title : ''}" oninput="generateCVFromForm()">
+            <input type="text" class="form-input custom-title" placeholder="Ex: Certificates" value="${data?.title || ''}" oninput="generateCVFromForm()">
         </div>
         <div class="input-group full-width">
             <label data-i18n="lbl_section_content">${t.lbl_section_content}</label>
-            <textarea class="form-input custom-content" rows="3" placeholder="Details..." oninput="generateCVFromForm()">${data ? data.content : ''}</textarea>
+            <textarea class="form-input custom-content" rows="3" placeholder="Details..." oninput="generateCVFromForm()">${data?.content || ''}</textarea>
         </div>
     `;
     container.appendChild(div);
@@ -1079,15 +983,15 @@ window.addFormReference = (data = null) => {
         <div class="input-grid">
             <div class="input-group">
                 <label data-i18n="lbl_reference_name">${t.lbl_reference_name}</label>
-                <input type="text" class="form-input ref-name" placeholder="Ex: John Doe" value="${data ? data.name : ''}" oninput="generateCVFromForm()">
+                <input type="text" class="form-input ref-name" placeholder="Ex: John Doe" value="${data?.name || ''}" oninput="generateCVFromForm()">
             </div>
             <div class="input-group">
                 <label data-i18n="lbl_reference_title">${t.lbl_reference_title}</label>
-                <input type="text" class="form-input ref-title" placeholder="Ex: HR Manager" value="${data ? data.title : ''}" oninput="generateCVFromForm()">
+                <input type="text" class="form-input ref-title" placeholder="Ex: HR Manager" value="${data?.title || ''}" oninput="generateCVFromForm()">
             </div>
             <div class="input-group full-width">
                 <label data-i18n="lbl_reference_contact">${t.lbl_reference_contact}</label>
-                <input type="text" class="form-input ref-contact" placeholder="Ex: john@company.com" value="${data ? data.contact : ''}" oninput="generateCVFromForm()">
+                <input type="text" class="form-input ref-contact" placeholder="Ex: john@company.com" value="${data?.contact || ''}" oninput="generateCVFromForm()">
             </div>
         </div>
     `;
@@ -1106,15 +1010,15 @@ window.addFormCertificate = (data = null) => {
         <div class="input-grid">
             <div class="input-group">
                 <label data-i18n="lbl_certificate_name">${t.lbl_certificate_name}</label>
-                <input type="text" class="form-input cert-name" placeholder="Ex: PMP" value="${data ? data.name : ''}" oninput="generateCVFromForm()">
+                <input type="text" class="form-input cert-name" placeholder="Ex: PMP" value="${data?.name || ''}" oninput="generateCVFromForm()">
             </div>
             <div class="input-group">
                 <label data-i18n="lbl_issuer">${t.lbl_issuer}</label>
-                <input type="text" class="form-input cert-issuer" placeholder="Ex: PMI" value="${data ? data.issuer : ''}" oninput="generateCVFromForm()">
+                <input type="text" class="form-input cert-issuer" placeholder="Ex: PMI" value="${data?.issuer || ''}" oninput="generateCVFromForm()">
             </div>
             <div class="input-group full-width">
                 <label data-i18n="lbl_date">${t.lbl_date}</label>
-                <input type="text" class="form-input cert-date" placeholder="Ex: 2023" value="${data ? data.date : ''}" oninput="generateCVFromForm()">
+                <input type="text" class="form-input cert-date" placeholder="Ex: 2023" value="${data?.date || ''}" oninput="generateCVFromForm()">
             </div>
         </div>
     `;
@@ -1140,9 +1044,7 @@ window.removeItemAndRefresh = (btn) => {
     generateCVFromForm();
 };
 
-// --- DATA BINDING ---
 window.generateCVFromForm = (triggerSave = true) => {
-    // 1. Gather Data from DOM Inputs
     const data = {
         fullname: document.getElementById('inp-fullname').value,
         title: document.getElementById('inp-title').value,
@@ -1160,7 +1062,6 @@ window.generateCVFromForm = (triggerSave = true) => {
         customSections: []
     };
 
-    // Collect Dynamic Lists
     document.querySelectorAll('#form-experiences-list .dynamic-item').forEach(item => {
         data.experiences.push({
             title: item.querySelector('.job-title').value,
@@ -1204,30 +1105,25 @@ window.generateCVFromForm = (triggerSave = true) => {
         });
     });
 
-    // Section Titles (Editable)
     const titles = {
         certs: document.getElementById('title-certificates').value,
         refs: document.getElementById('title-references').value
     };
 
-    // Visible Status
     const visible = {
         certs: document.getElementById('form-certificates-block').style.display !== 'none',
         refs: document.getElementById('form-references-block').style.display !== 'none'
     };
 
-    // 2. Generate HTML
     const isCompact = document.body.classList.contains('tpl-compact');
     const isModern = document.body.classList.contains('tpl-modern');
     let html = "";
     
-    // Helper to escape and optionally handle newlines
     const h = (str, allowNewlines = false) => {
         let escaped = escapeHTML(str);
         return allowNewlines ? escaped.replace(/\n/g, '<br>') : escaped;
     };
 
-    // Labels based on Lang
     const labels = {
         exp: currentLang === 'tr' ? 'İŞ DENEYİMİ' : 'EMPLOYMENT HISTORY',
         edu: currentLang === 'tr' ? 'EĞİTİM' : 'EDUCATION',
@@ -1235,8 +1131,6 @@ window.generateCVFromForm = (triggerSave = true) => {
         lic: translations[currentLang].cv_label_license
     };
 
-    // GENERATE SECTION CONTENT (Grouped)
-    // -- EXPERIENCES --
     let expContent = "";
     if (data.experiences.length > 0) {
         let entries = data.experiences.map(exp => {
@@ -1255,7 +1149,6 @@ window.generateCVFromForm = (triggerSave = true) => {
             </div>`;
     }
 
-    // -- EDUCATION --
     let eduContent = "";
     if (data.education.length > 0) {
         let entries = data.education.map(edu => {
@@ -1274,7 +1167,6 @@ window.generateCVFromForm = (triggerSave = true) => {
             </div>`;
     }
 
-    // -- CUSTOM SECTIONS --
     let customContent = "";
     if (data.customSections.length > 0) {
         customContent = data.customSections.map(sec => `
@@ -1287,7 +1179,6 @@ window.generateCVFromForm = (triggerSave = true) => {
         `).join('');
     }
 
-    // -- CERTIFICATES (Restored / Optimized) --
     let certContent = "";
     if (visible.certs && data.certificates.length > 0) {
         let entries = data.certificates.map(cert => `
@@ -1298,7 +1189,6 @@ window.generateCVFromForm = (triggerSave = true) => {
         certContent = `<div class="section"><div class="section-header"><span class="section-title">${h(titles.certs)}</span></div>${entries}</div>`;
     }
 
-    // -- REFERENCES (Restored / Optimized) --
     let refContent = "";
     if (visible.refs && data.references.length > 0) {
         let entries = data.references.map(ref => `
@@ -1359,7 +1249,6 @@ window.generateCVFromForm = (triggerSave = true) => {
             ${customContent}
         </div>`;
     } else if (isModern) {
-        // Modern Two-Column Layout with Sidebar
         html = `
         <div class="modern-layout">
             <aside class="modern-sidebar">
@@ -1465,7 +1354,6 @@ window.generateCVFromForm = (triggerSave = true) => {
                 <span>📍 ${h(data.address)}</span> | <span>📞 ${h(data.phone)}</span> | <span>✉️ ${h(data.email)}</span>
                 ${data.linkedin ? ` | <span>🔗 ${h(data.linkedin)}</span>` : ''}
             </div>
-            <!-- Hidden Fields for switch compatibility -->
             <div class="address-line" style="display:none">${h(data.address)}</div>
             <div class="contact-row" style="display:none">
                 <span>${h(data.phone)}</span>
@@ -1491,12 +1379,10 @@ window.generateCVFromForm = (triggerSave = true) => {
 
     document.getElementById('cv-root').innerHTML = html;
     
-    // Trigger scale update if on mobile preview
     if(window.innerWidth <= 1024) {
         setTimeout(window.resizePreview, 10);
     }
 
-    // Trigger Debounce Save
     if (triggerSave) {
         triggerDebounceSave(data);
     }
@@ -1512,7 +1398,6 @@ function loadUserDataIntoForm(data) {
     document.getElementById('inp-license').value = data.license || '';
     document.getElementById('inp-summary').value = data.summary || '';
 
-    // Handle Photo
     if (data.photo) {
         profilePhotoBase64 = data.photo;
         document.getElementById('btn-remove-photo').style.display = 'inline-block';
@@ -1553,34 +1438,18 @@ function loadUserDataIntoForm(data) {
     }
 }
 
-
-// --- DEBOUNCE SAVE ---
 function triggerDebounceSave(data = null) {
-    // Clear existing timer
     if (saveTimeout) clearTimeout(saveTimeout);
-    
     updateStatus('syncing');
-
-    // Set new timer for 2 seconds
     saveTimeout = setTimeout(() => {
         saveToCloud(data);
     }, 2000);
 }
 
-
-// --- SAVE / LOAD ---
 async function saveToCloud(formData = null) {
     if (!currentUser) return;
-    
-    // If saving explicitly without formData (e.g. template change), assume it's a direct state save
-    // But better to grab current form data if null to be safe, 
-    // though `generateCVFromForm` usually passes it.
-    
     isSyncing = true;
-    
     const docRef = doc(db, 'artifacts', appId, 'users', currentUser.uid, 'data', 'cvContent');
-    
-    // Gather Section Settings
     const sectionSettings = {
         titles: {
             certs: document.getElementById('title-certificates').value,
@@ -1604,7 +1473,6 @@ async function saveToCloud(formData = null) {
         
         updateStatus('online');
         
-        // Only show toast IF the user is actually in the editor
         if (document.getElementById('editor-view').classList.contains('active')) {
             const t = document.getElementById('toast');
             t.innerText = translations[currentLang].status_saved;
@@ -1639,15 +1507,12 @@ function updateStatus(state) {
     }
 }
 
-// --- RESET ---
 window.resetAll = async (skipConfirm = false) => {
     if(!skipConfirm && !confirm(translations[currentLang].confirm_reset)) return;
     
-    // Clear Form Inputs
     const inputs = document.querySelectorAll('.form-input');
     inputs.forEach(i => i.value = '');
     
-    // Clear Photo
     profilePhotoBase64 = null;
     document.getElementById('btn-remove-photo').style.display = 'none';
     
@@ -1674,10 +1539,6 @@ window.resetAll = async (skipConfirm = false) => {
     }
 };
 
-window.createNewSection = () => {
-    alert("Yeni sistemde 'Özel Bölümler' alanını kullanarak ekleme yapabilirsiniz.");
-};
-
 window.initDatePicker = () => {
     if (typeof flatpickr !== 'undefined') {
         flatpickr(".date-picker-month", {
@@ -1690,9 +1551,8 @@ window.initDatePicker = () => {
                 })
             ],
             locale: currentLang === 'tr' ? 'tr' : 'en',
-            maxDate: "today", // Restrict future dates
+            maxDate: "today", 
             onChange: function(selectedDates, dateStr, instance) {
-                // Manually update the input value so generateCVFromForm picks it up
                 instance.element.value = dateStr;
                 generateCVFromForm();
             }
@@ -1700,16 +1560,13 @@ window.initDatePicker = () => {
     }
 };
 
-// Initial setup
 setLanguage('tr');
 window.resizePreview();
 window.initDatePicker();
 
 window.addEventListener('beforeprint', () => {
-    // 1. Force a final render without saving to ensure latest data
     if (window.generateCVFromForm) window.generateCVFromForm(false);
 
-    // 2. Reset scaling and inline styles that might interfere with print
     const cvRoot = document.getElementById('cv-root');
     const scaleContainer = document.getElementById('cv-scale-container');
     if (cvRoot && scaleContainer) {
@@ -1723,7 +1580,6 @@ window.addEventListener('beforeprint', () => {
 });
 
 window.addEventListener('afterprint', () => {
-    // Re-scale preview for mobile if needed after print
     if (window.resizePreview) window.resizePreview();
 });
 

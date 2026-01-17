@@ -6,7 +6,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ATS-Friendly | Profesyonel Bulut CV Oluşturucu</title>
 
-    <!-- Google Analytics -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-MCW4JWYYN4"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
@@ -15,7 +14,6 @@
       gtag('config', 'G-MCW4JWYYN4');
     </script>
 
-    <!-- Favicon -->
     <link rel="icon" type="image/png" href="assets/favicon.png">
     <link rel="apple-touch-icon" href="assets/favicon.png">
 
@@ -25,7 +23,6 @@
     <meta name="robots" content="index, follow">
     <link rel="canonical" href="https://ats-friendly.github.io/ATS-Friendly/">
 
-    
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://ats-friendly.github.io/ATS-Friendly/">
     <meta property="og:site_name" content="ATS-Friendly">
@@ -44,31 +41,24 @@
     <meta name="twitter:description" content="Modern işe alım sistemleri (ATS) ile %100 uyumlu, profesyonel CV'ler hazırlayın.">
     <meta name="twitter:image" content="https://ats-friendly.github.io/ATS-Friendly/assets/og-image.png">
 
-    
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&family=Lora:ital,wght@0,400;0,700;1,400&family=Merriweather:wght@300;400;700&family=Montserrat:wght@400;600;700&family=Open+Sans:wght@400;600;700&family=PT+Serif:ital,wght@0,400;0,700;1,400&family=Playfair+Display:wght@400;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Raleway:wght@400;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     
-    
     <link rel="stylesheet" href="style.css">
-    
-    <!-- Flatpickr for Modern Date Pickers -->
+
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <link rel="stylesheet" type="text/css" href="https://npmcdn.com/flatpickr/dist/themes/material_blue.css">
-    
-    
+
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#3498db">
-    
-    
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 </head>
 <body>
 
     <div id="toast">Kaydedildi!</div>
 
-    
     <div id="layout-modal" class="modal-overlay">
         <div class="modal-content">
             <div class="modal-header">
@@ -76,7 +66,6 @@
                 <button class="close-modal" onclick="closeLayoutModal()" aria-label="Close modal">×</button>
             </div>
             <div class="modal-body">
-                
                 <div class="setting-group">
                     <label data-i18n="lbl_color">Vurgu Rengi</label>
                     <div class="color-options">
@@ -90,7 +79,6 @@
                         <button class="color-btn" style="background-color: #7f8c8d;" onclick="applyColor('#7f8c8d')" title="Concrete Grey"></button>
                     </div>
                 </div>
-
 
                 <div class="setting-group">
                     <label data-i18n="lbl_font">Yazı Tipi</label>
@@ -107,9 +95,6 @@
                     </div>
                 </div>
 
-                <hr style="border:0; border-top:1px solid #eee; margin:20px 0;">
-
-
                 <div class="setting-group">
                     <div class="range-header">
                         <label data-i18n="lbl_fontsize">Yazı Boyutu</label>
@@ -117,7 +102,6 @@
                     </div>
                     <input type="range" id="rng-fontsize" min="9" max="14" step="0.5" value="11" oninput="updateLayout()">
                 </div>
-                
                 <div class="setting-group">
                     <div class="range-header">
                         <label data-i18n="lbl_lineheight">Satır Aralığı</label>
@@ -148,7 +132,6 @@
         </div>
     </div>
 
-    
     <div id="account-modal" class="modal-overlay">
         <div class="modal-content">
             <div class="modal-header">
@@ -184,7 +167,6 @@
         </div>
     </div>
 
-    
     <div id="policy-modal" class="modal-overlay">
         <div class="modal-content">
             <div class="modal-header">
@@ -200,7 +182,6 @@
         </div>
     </div>
 
-    
     <section id="landing-view" class="view-section active">
         <header class="landing-header">
             <div class="brand-container">
@@ -332,7 +313,6 @@
 
     
     <section id="auth-view" class="view-section">
-        
         <button class="back-to-home" onclick="showView('landing-view')">← Ana Sayfa</button>
         
         <div class="auth-card professional">
@@ -353,7 +333,6 @@
                     <input type="password" id="auth-password" class="auth-input" placeholder="••••••••" autocomplete="current-password" required>
                 </div>
 
-                
                 <div id="terms-container" style="display:none;" class="terms-check">
                     <label class="checkbox-container">
                         <input type="checkbox" id="auth-terms">
@@ -381,7 +360,6 @@
         </div>
     </section>
 
-    
     <section id="template-view" class="view-section">
         <div class="template-header">
             <h1 data-i18n="tpl_select_header">Profesyonel Bir Şablon Seçin</h1>
@@ -429,9 +407,7 @@
         </div>
     </section>
 
-    
     <section id="editor-view" class="view-section">
-        
         <div class="mobile-editor-tabs">
             <button class="mobile-tab-btn active" onclick="switchMobileTab('edit')" id="tab-edit">
                 <span data-i18n="tab_edit">Düzenle</span>
@@ -446,7 +422,6 @@
             </div>
         </div>
 
-        
         <aside class="sidebar">
             <div class="brand-container">
                 <div class="brand-logo">AF</div>
@@ -492,10 +467,7 @@
             </div>
         </aside>
 
-        
         <div class="editor-layout">
-            
-            
             <div class="editor-panel-form" id="panel-form">
                 <div class="form-header-mini">
                     <h2 data-i18n="form_title">Bilgilerinizi Düzenleyin</h2>
@@ -506,7 +478,6 @@
                 </div>
                 
                 <div class="form-body">
-                    
                     <div class="form-block">
                         <h3 data-i18n="form_personal">Kişisel Bilgiler</h3>
                         <div class="input-grid">
@@ -562,21 +533,17 @@
                         <textarea id="inp-summary" class="form-input" rows="4" data-i18n-placeholder="lbl_desc" placeholder="Kısa özet..." oninput="generateCVFromForm()"></textarea>
                     </div>
 
-                    
                     <div class="form-block">
                         <h3 data-i18n="form_experience">İş Deneyimi</h3>
                         <div id="form-experiences-list"></div>
                         <button class="btn-secondary-dashed" onclick="addFormExperience()">+ <span data-i18n="btn_add_job">İş Ekle</span></button>
                     </div>
 
-                    
                     <div class="form-block">
                         <h3 data-i18n="form_education">Eğitim</h3>
                         <div id="form-education-list"></div>
                         <button class="btn-secondary-dashed" onclick="addFormEducation()">+ <span data-i18n="btn_add_edu">Okul Ekle</span></button>
                     </div>
-
-                    
                     <div class="form-block">
                         <div class="section-title-edit">
                             <input type="text" id="title-certificates" class="section-header-input" value="Sertifikalar" data-i18n-val="form_certificates" oninput="generateCVFromForm()">
@@ -587,8 +554,6 @@
                             <button class="btn-secondary-dashed" onclick="addFormCertificate()">+ <span data-i18n="btn_add_cert">Sertifika Ekle</span></button>
                         </div>
                     </div>
-
-                    
                     <div class="form-block">
                         <div class="section-title-edit">
                             <input type="text" id="title-references" class="section-header-input" value="Referanslar" data-i18n-val="form_references" oninput="generateCVFromForm()">
@@ -600,7 +565,6 @@
                         </div>
                     </div>
 
-                    
                     <div class="form-block">
                         <h3 data-i18n="form_custom">Özel Bölümler</h3>
                         <div id="form-custom-list"></div>
@@ -609,7 +573,6 @@
                 </div>
             </div>
 
-            
             <div class="editor-panel-preview" id="panel-preview">
                 <div id="cv-scale-container">
                     <div class="page cv-content" id="cv-root">
@@ -619,7 +582,6 @@
             </div>
         </div>
 
-        
         <div class="mobile-bottom-bar">
             <button class="mobile-action-btn secondary" onclick="openLayoutModal()">
                 <span class="icon">📏</span> <span data-i18n="btn_layout">Düzen</span>
@@ -632,7 +594,6 @@
             </button>
         </div>
 
-        
         <div id="fab-overlay" class="fab-overlay" onclick="toggleFabMenu()"></div>
         <div class="mobile-fab-container">
             <div class="fab-menu-items" id="fab-items">
@@ -654,7 +615,6 @@
     </section>
 
     <script type="module" src="script.js"></script>
-    <!-- Flatpickr JS -->
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script src="https://npmcdn.com/flatpickr/dist/l10n/tr.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/plugins/monthSelect/index.js"></script>
