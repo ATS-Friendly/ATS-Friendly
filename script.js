@@ -1595,9 +1595,8 @@ window.addEventListener('beforeprint', () => {
     document.body.classList.add('printing');
 
     const viewport = document.querySelector('meta[name="viewport"]');
-    if (viewport) {
-        originalViewport = viewport.content;
-        viewport.content = "width=1024";
+    if (metaViewport) {
+        metaViewport.content = 'width=800'; 
     }
 
     const cvRoot = document.getElementById('cv-root');

@@ -1643,7 +1643,7 @@ input[type=range] {
 
 #cv-scale-container {
     width: 210mm;
-    min-height: 297mm;
+    min-height: auto;
     transform-origin: top left;
     transition: transform 0.2s;
     margin: 0; 
