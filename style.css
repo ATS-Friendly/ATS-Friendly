@@ -1674,6 +1674,12 @@ input[type=range] {
     box-shadow: 0 10px 30px rgba(0,0,0,0.1);
 }
 
+@media screen and (max-width: 1024px) {
+    .page {
+        min-height: auto;
+    }
+}
+
 .cv-content { 
     font-family: var(--font-cv); 
     color: #2d3436; 
@@ -1793,6 +1799,16 @@ body.tpl-modern .modern-layout {
     display: grid;
     grid-template-columns: 220px 1fr;
     min-height: 297mm;
+}
+
+@media screen and (max-width: 1024px) {
+    body.tpl-modern .modern-layout {
+        min-height: auto;
+    }
+    
+    body.tpl-modern .modern-sidebar {
+        min-height: auto;
+    }
 }
 
 body.tpl-modern .modern-sidebar {
