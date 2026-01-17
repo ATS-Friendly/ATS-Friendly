@@ -2072,7 +2072,8 @@ body.tpl-elegant .section-title {
         position: relative !important;
         width: 210mm !important;
         min-width: 210mm !important;
-        min-height: 297mm !important;
+        height: auto !important;
+        min-height: auto !important;
         margin: 0 auto !important;
         padding: 0 !important;
         transform: none !important;
@@ -2087,7 +2088,8 @@ body.tpl-elegant .section-title {
         visibility: visible !important;
         width: 210mm !important;
         min-width: 210mm !important;
-        min-height: 297mm !important;
+        height: auto !important;
+        min-height: auto !important;
         margin: 0 !important;
         padding: 0 !important;
         background: white !important;
@@ -2098,11 +2100,13 @@ body.tpl-elegant .section-title {
 
     .page {
         width: 210mm !important;
-        min-height: 297mm !important;
+        min-height: 296mm !important; 
+        height: auto !important;
         background: white !important;
         box-sizing: border-box !important;
-        overflow: visible !important;
+        overflow: hidden !important;
         position: relative !important;
+        margin: 0 !important;
     }
 
     body:not(.tpl-modern) #cv-root {
@@ -2123,11 +2127,16 @@ body.tpl-elegant .section-title {
         -webkit-print-color-adjust: exact !important;
         print-color-adjust: exact !important;
         background: linear-gradient(180deg, #1a1a2e 0%, #16213e 100%) !important;
+        height: 100% !important;
+        min-height: 296mm !important;
     }
 
     body.tpl-modern .modern-layout {
         display: grid !important;
         grid-template-columns: 220px 1fr !important;
+        min-height: 296mm !important;
+        height: auto !important;
+        overflow: hidden !important;
     }
 
     .section, .modern-section {
