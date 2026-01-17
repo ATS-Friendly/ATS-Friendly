@@ -2395,3 +2395,38 @@ body.tpl-elegant .section-title {
         border: none !important;
     }
 }
+
+@media print {
+    @page {
+        margin: 0;
+        size: A4;
+    }
+
+    /* En dıştaki tüm kapları A4 sınırına zorla */
+    html, body, .editor-panel-preview {
+        width: 210mm !important;
+        overflow: hidden !important;
+    }
+
+    /* İŞTE ASIL SORUNLU KUTU BURASIYDI: */
+    #cv-scale-container {
+        display: block !important;
+        /* Genişliği 210mm değil, %100 yapıyoruz ki dışarı taşmasın */
+        width: 100% !important;
+        min-width: 0 !important; 
+        max-width: 210mm !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        overflow: hidden !important; /* İçindeki kağıt taşarsa bile gösterme */
+        transform: none !important;
+    }
+
+    /* Asıl kağıt burada 210mm kalabilir */
+    #cv-root {
+        width: 210mm !important;
+        min-width: 210mm !important;
+        margin: 0 auto !important;
+        box-shadow: none !important;
+        border: none !important;
+    }
+}
