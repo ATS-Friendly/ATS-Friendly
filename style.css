@@ -2068,9 +2068,9 @@ body.tpl-elegant .section-title {
 
     html, body {
         height: auto !important;
-        width: 210mm !important;
-        min-width: 210mm !important;
-        max-width: 210mm !important;
+        width: 209mm !important;
+        min-width: 209mm !important;
+        max-width: 209mm !important;
         margin: 0 !important;
         padding: 0 !important;
         overflow: visible !important;
@@ -2086,7 +2086,7 @@ body.tpl-elegant .section-title {
     .editor-panel-preview {
         display: block !important;
         position: static !important;
-        width: 100% !important;
+        width: 99.5% !important;
         height: auto !important;
         margin: 0 !important;
         padding: 0 !important;
@@ -2100,8 +2100,8 @@ body.tpl-elegant .section-title {
         display: block !important;
         visibility: visible !important;
         position: relative !important;
-        width: 210mm !important;
-        min-width: 210mm !important;
+        width: 209mm !important;
+        min-width: 209mm !important;
         height: auto !important;
         min-height: 295mm !important;
         margin: 0 auto !important;
@@ -2343,3 +2343,32 @@ body.tpl-elegant .section-title {
     border-color: rgba(255, 0, 0, 0.1);
 }
 
+@media print {
+    #cv-root {
+        display: block !important;
+        visibility: visible !important;
+        width: 210mm !important;      /* Yazıcıda A4 olsun */
+        min-width: 210mm !important;
+        height: auto !important;
+        min-height: 295mm !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        background: white !important;
+        overflow: visible !important; /* Yazıcıda scrollbar çıkmasın */
+        transform: none !important;   /* Yazıcıda küçültme yapmasın */
+        scale: 1 !important;
+    }
+}
+
+/* --- MOBİLDE İSE SERBEST BIRAKALIM --- */
+@media screen and (max-width: 768px) {
+    #cv-root {
+        /* Genişliği serbest bırak ki ekrana sığsın veya scale edilebilsin */
+        width: 210mm; /* Buradaki !important'ı kaldırdık */
+        min-width: auto;
+        
+        /* Ölçeklendirmeye izin ver */
+        transform-origin: top left;
+        transform: scale(1); /* Ekranına göre bu sayıyı değiştirebilirsin */
+    }
+}
