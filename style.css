@@ -1665,8 +1665,8 @@ input[type=range] {
 }
 
     .page { 
-    width: 210mm;
-    min-height: 297mm; 
+    width: 209mm;
+    min-height: 295mm; 
     padding: var(--cv-padding); 
     position: relative; 
     margin: 0;
@@ -1788,8 +1788,8 @@ body.tpl-modern .page {
 
 body.tpl-modern .modern-layout {
     display: grid;
-    grid-template-columns: 220px 1fr;
-    min-height: 297mm;
+    grid-template-columns: 218px 1fr;
+    min-height: 295mm;
 }
 
 @media screen and (max-width: 1024px) {
