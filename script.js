@@ -103,11 +103,18 @@ window.removePhoto = () => {
 };
 
 window.handleCvUpload = async (event) => {
+    const t = translations[currentLang];
+    
+    if (isGuest) {
+        alert(t.msg_guest_import_warning);
+        event.target.value = '';
+        return;
+    }
+
     const file = event.target.files[0];
     if (!file) return;
 
     const toast = document.getElementById('toast');
-    const t = translations[currentLang];
     
     toast.innerText = t.msg_importing;
     toast.classList.add('show');
@@ -195,6 +202,7 @@ const translations = {
         nav_actions: "İŞLEMLER",
         status_connecting: "Bağlanıyor...",
         status_online: "Senkronize",
+        msg_guest_import_warning: "CV yükleme özelliğini kullanmak için lütfen giriş yapın veya kayıt olun.",
         status_syncing: "Kaydediliyor...",
         status_saved: "Kaydedildi!",
         status_offline: "Çevrimdışı",
@@ -331,6 +339,7 @@ const translations = {
         nav_actions: "ACTIONS",
         status_connecting: "Connecting...",
         status_online: "Synced",
+        msg_guest_import_warning: "Please log in or sign up to use the CV upload feature.",
         status_syncing: "Saving...",
         status_saved: "Saved!",
         status_offline: "Offline",
@@ -1581,20 +1590,24 @@ window.initDatePicker();
 
 window.addEventListener('beforeprint', () => {
     if (window.generateCVFromForm) window.generateCVFromForm(false);
+    document.body.classList.add('printing');
 
     const cvRoot = document.getElementById('cv-root');
     const scaleContainer = document.getElementById('cv-scale-container');
     if (cvRoot && scaleContainer) {
         cvRoot.style.transform = '';
-        cvRoot.style.width = '';
-        cvRoot.style.margin = '';
+        cvRoot.style.width = '210mm';
+        cvRoot.style.minWidth = '210mm';
+        cvRoot.style.margin = '0 auto';
         scaleContainer.style.transform = '';
-        scaleContainer.style.width = '';
-        scaleContainer.style.height = '';
+        scaleContainer.style.width = '210mm';
+        scaleContainer.style.minWidth = '210mm';
+        scaleContainer.style.height = 'auto';
     }
 });
 
 window.addEventListener('afterprint', () => {
+    document.body.classList.remove('printing');
     if (window.resizePreview) window.resizePreview();
 });
 
