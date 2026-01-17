@@ -2124,7 +2124,7 @@ body.tpl-elegant .section-title {
         padding: 0 !important;
         background: white !important;
         overflow: auto !important;
-        transform: scale(1) !important;
+        transform: none !important;
         scale: 1 !important;
     }
 
@@ -2343,3 +2343,40 @@ body.tpl-elegant .section-title {
     border-color: rgba(255, 0, 0, 0.1);
 }
 
+/* --- MOBİL İÇİN KESİN ÇÖZÜM --- */
+@media screen and (max-width: 768px) {
+    /* 1. Ekranın sağa sola oynamasını engelle */
+    body, html {
+        overflow-x: hidden;
+    }
+
+    /* 2. CV'nin içinde durduğu kutuyu düzenle */
+    .editor-panel-preview {
+        padding: 10px !important;
+        display: block !important;
+        width: 100% !important;
+        overflow: hidden !important; /* Taşmaları gizle */
+    }
+
+    /* 3. CV Kağıdının Kendisi */
+    #cv-root {
+        /* Kağıdı fiziksel olarak A4 boyutunda tut (Bozulmaması için) */
+        width: 210mm !important;
+        min-width: 210mm !important;
+        height: auto !important;
+        min-height: 297mm !important;
+        
+        /* SİHİRLİ DOKUNUŞ: Kağıdı olduğu gibi küçült (Zoom Out) */
+        transform: scale(0.42) !important; /* Ekrana sığacak kadar küçült */
+        transform-origin: top left !important; /* Sol üst köşeden hizala */
+        
+        /* Küçülünce oluşan boşlukları kapat */
+        margin-left: 0 !important;
+        margin-top: 0 !important;
+        margin-bottom: -150% !important; /* Alt taraftaki devasa boşluğu siler */
+        
+        /* Gölgeyi ve kenarlıkları kaldır */
+        box-shadow: none !important;
+        border: none !important;
+    }
+}
