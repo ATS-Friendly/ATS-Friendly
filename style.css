@@ -1671,7 +1671,6 @@ input[type=range] {
     position: relative; 
     margin: 0;
     background: white;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
 }
 
 .cv-content { 
@@ -1849,7 +1848,6 @@ body.tpl-modern .modern-photo {
     overflow: hidden;
     margin: 0 auto 20px auto;
     border: 4px solid rgba(255,255,255,0.2);
-    box-shadow: 0 8px 25px rgba(0,0,0,0.3);
 }
 
 body.tpl-modern .modern-photo img {
