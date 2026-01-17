@@ -14,6 +14,7 @@ import { getFunctions, httpsCallable } from "https://www.gstatic.com/firebasejs/
 
 let isLoginMode = true;
 let currentUser = null;
+let isGuest = false;
 let isSyncing = false;
 let saveTimeout = null; 
 let currentLang = 'tr';
@@ -189,6 +190,7 @@ const translations = {
         btn_download_pdf: "PDF İndir",
         btn_reset: "Sıfırla / Temizle",
         btn_logout: "Çıkış Yap",
+        btn_guest: "Misafir Olarak Devam Et",
         nav_design: "TASARIM",
         nav_actions: "İŞLEMLER",
         status_connecting: "Bağlanıyor...",
@@ -324,6 +326,7 @@ const translations = {
         btn_download_pdf: "Download PDF",
         btn_reset: "Reset / Clear",
         btn_logout: "Logout",
+        btn_guest: "Continue as Guest",
         nav_design: "DESIGN",
         nav_actions: "ACTIONS",
         status_connecting: "Connecting...",
@@ -806,15 +809,22 @@ window.logout = async () => {
     try {
         await signOut(auth);
         currentUser = null;
+        isGuest = false;
         window.showView('landing-view');
     } catch (e) {
         alert("Çıkış hatası: " + e.message);
     }
 };
 
+window.continueAsGuest = () => {
+    isGuest = true;
+    window.showView('template-view');
+};
+
 onAuthStateChanged(auth, async (user) => {
     if (user) {
         currentUser = user;
+        isGuest = false;
         
         const docRef = doc(db, 'artifacts', appId, 'users', user.uid, 'data', 'cvContent');
         const snap = await getDoc(docRef);
@@ -857,7 +867,7 @@ onAuthStateChanged(auth, async (user) => {
         }
     } else {
         const currentView = document.querySelector('.view-section.active');
-        if (!currentView || currentView.id === 'editor-view' || currentView.id === 'template-view') {
+        if (!isGuest && (!currentView || currentView.id === 'editor-view' || currentView.id === 'template-view')) {
             window.showView('landing-view');
         }
     }
@@ -1447,7 +1457,12 @@ function triggerDebounceSave(data = null) {
 }
 
 async function saveToCloud(formData = null) {
-    if (!currentUser) return;
+    if (!currentUser) {
+        if (isGuest && document.getElementById('editor-view').classList.contains('active')) {
+            updateStatus('online'); 
+        }
+        return;
+    }
     isSyncing = true;
     const docRef = doc(db, 'artifacts', appId, 'users', currentUser.uid, 'data', 'cvContent');
     const sectionSettings = {
