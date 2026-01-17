@@ -1594,11 +1594,11 @@ window.addEventListener('beforeprint', () => {
     if (window.generateCVFromForm) window.generateCVFromForm(false);
     document.body.classList.add('printing');
 
-    // const viewport = document.querySelector('meta[name="viewport"]');
-// if (viewport) {
-//     originalViewport = viewport.content;
-//     viewport.content = "width=1024";  <-- İŞTE MOBİLİ BOZAN SATIR BU
-// }
+    const viewport = document.querySelector('meta[name="viewport"]');
+    if (viewport) {
+        originalViewport = viewport.content;
+        viewport.content = "width=1024";
+    }
 
     const cvRoot = document.getElementById('cv-root');
     const scaleContainer = document.getElementById('cv-scale-container');
