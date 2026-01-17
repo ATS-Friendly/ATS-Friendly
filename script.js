@@ -26,9 +26,9 @@ let currentTheme = {
 // Layout Defaults
 let currentLayout = {
     fontSize: 11,
-    lineHeight: 1.35,
-    margin: 15,
-    sectionGap: 12
+    lineHeight: 1.4,
+    margin: 20,
+    sectionGap: 15
 };
 let profilePhotoBase64 = null;
 const appId = "mono-cv-app";
@@ -1291,11 +1291,9 @@ window.generateCVFromForm = (triggerSave = true) => {
     let certContent = "";
     if (visible.certs && data.certificates.length > 0) {
         let entries = data.certificates.map(cert => `
-            <div class="entry no-left-col">
-                <div class="right-col">
-                    <h3>${h(cert.name)} <span class="inline-date">(${h(cert.date)})</span></h3>
-                    <p>${h(cert.issuer)}</p>
-                </div>
+            <div class="entry">
+                <div class="left-col">${h(cert.date)}</div>
+                <div class="right-col"><h3>${h(cert.name)}</h3><p>${h(cert.issuer)}</p></div>
             </div>`).join('');
         certContent = `<div class="section"><div class="section-header"><span class="section-title">${h(titles.certs)}</span></div>${entries}</div>`;
     }
@@ -1304,10 +1302,10 @@ window.generateCVFromForm = (triggerSave = true) => {
     let refContent = "";
     if (visible.refs && data.references.length > 0) {
         let entries = data.references.map(ref => `
-            <div class="entry no-left-col">
+            <div class="entry">
                 <div class="right-col"><h3>${h(ref.name)}</h3><p>${h(ref.title)} | ${h(ref.contact)}</p></div>
             </div>`).join('');
-        refContent = `<div class="section"><div class="section-header"><span class="section-title">${h(titles.refs)}</span></div><div class="references-grid">${entries}</div></div>`;
+        refContent = `<div class="section"><div class="section-header"><span class="section-title">${h(titles.refs)}</span></div>${entries}</div>`;
     }
 
 
@@ -1442,14 +1440,12 @@ window.generateCVFromForm = (triggerSave = true) => {
                 ${visible.refs && data.references.length > 0 ? `
                 <div class="modern-section">
                     <h2 class="modern-section-title">${h(titles.refs)}</h2>
-                    <div class="references-grid modern">
-                        ${data.references.map(ref => `
-                            <div class="modern-entry compact">
-                                <strong>${h(ref.name)}</strong> - ${h(ref.title)}<br>
-                                <span class="ref-contact">${h(ref.contact)}</span>
-                            </div>
-                        `).join('')}
-                    </div>
+                    ${data.references.map(ref => `
+                        <div class="modern-entry compact">
+                            <strong>${h(ref.name)}</strong> - ${h(ref.title)}<br>
+                            <span class="ref-contact">${h(ref.contact)}</span>
+                        </div>
+                    `).join('')}
                 </div>` : ''}
                 
                 ${data.customSections.length > 0 ? data.customSections.map(sec => `
