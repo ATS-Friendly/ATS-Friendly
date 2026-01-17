@@ -2343,3 +2343,64 @@ body.tpl-elegant .section-title {
     border-color: rgba(255, 0, 0, 0.1);
 }
 
+/* 1. TEMEL AYARLAR (Tüm cihazlar için) */
+* {
+    box-sizing: border-box; /* Padding'lerin taşma yapmasını engeller (Çok Önemli!) */
+    -webkit-print-color-adjust: exact; /* Renklerin çıktıda doğru görünmesini sağlar */
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Times New Roman', Times, serif; /* Senin fontun neyse o kalabilir */
+    background-color: rgb(82, 86, 89); /* Masaüstünde arkası gri olsun (PDF okuyucu gibi) */
+}
+
+/* 2. EKRAN GÖRÜNÜMÜ (Web & Mobil) */
+.page {
+    background: white;
+    display: block;
+    margin: 10px auto; /* Üstten boşluk bırak ve ortala */
+    padding: 15px;     /* İçerik kenara yapışmasın */
+    
+    /* İŞTE SİHİRLİ KISIM BURASI: */
+    width: 100%;       /* Mobilde ekranı doldur */
+    max-width: 210mm;  /* Ama masaüstünde A4 boyutunu geçme */
+    
+    min-height: 297mm; /* Boyu en az A4 kadar olsun */
+}
+
+/* 3. MOBİL İÇİN ÖZEL DÜZELTME (Ekran daraldığında) */
+@media screen and (max-width: 768px) {
+    body {
+        background-color: white; /* Mobilde arka plan beyaz olsun, bütünleşsin */
+    }
+    .page {
+        margin: 0;       /* Kenar boşluklarını sıfırla */
+        box-shadow: none;/* Gölgeyi kaldır */
+        width: 100%;     /* Tam genişlik */
+        max-width: none; /* Sınırlamayı kaldır */
+        border: none;
+    }
+}
+
+/* 4. YAZDIRMA AYARLARI (Ctrl+P yapıldığında devreye girer) */
+@media print {
+    @page {
+        margin: 0; /* Tarayıcının kendi boşluklarını sıfırla */
+        size: A4;  /* Kağıt boyutu */
+    }
+    
+    body {
+        background-color: white; /* Arka planı beyaz yap */
+    }
+    
+    .page {
+        margin: 0;
+        border: initial;
+        width: 210mm;      /* Yazıcıda kesinlikle 210mm olsun */
+        min-height: 297mm; /* Tam sayfa boyu */
+        box-shadow: none;  /* Gölge olmasın */
+        page-break-after: always; /* Her .page sınıfından sonra yeni sayfa */
+    }
+}
