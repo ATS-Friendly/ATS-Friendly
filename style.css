@@ -901,6 +901,26 @@ body {
     text-transform: uppercase;
 }
 
+.mobile-back-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border: none;
+    background: #f1f2f6;
+    color: #747d8c;
+    border-radius: 12px;
+    cursor: pointer;
+    font-size: 18px;
+    margin-right: 5px;
+}
+
+.mobile-back-btn:active {
+    background: #e1e2e6;
+    transform: scale(0.95);
+}
+
 .mobile-editor-tabs {
     display: none;
     position: fixed;
@@ -2020,11 +2040,14 @@ body.tpl-elegant .section-title {
 
     html, body {
         height: auto !important;
-        width: 100% !important;
+        width: 210mm !important;
+        min-width: 210mm !important;
         margin: 0 !important;
         padding: 0 !important;
         overflow: visible !important;
         background: white !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
     }
 
     #editor-view, 
@@ -2056,6 +2079,7 @@ body.tpl-elegant .section-title {
         background: white !important;
         overflow: visible !important;
         box-shadow: none !important;
+        scale: 1 !important;
     }
 
     #cv-root {
@@ -2068,6 +2092,8 @@ body.tpl-elegant .section-title {
         padding: 0 !important;
         background: white !important;
         overflow: visible !important;
+        transform: none !important;
+        scale: 1 !important;
     }
 
     .page {
@@ -2091,11 +2117,11 @@ body.tpl-elegant .section-title {
     * {
         -webkit-print-color-adjust: exact !important;
         print-color-adjust: exact !important;
-        color-adjust: exact !important;
     }
 
     body.tpl-modern .modern-sidebar {
         -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
         background: linear-gradient(180deg, #1a1a2e 0%, #16213e 100%) !important;
     }
 

@@ -1588,18 +1588,26 @@ setLanguage('tr');
 window.resizePreview();
 window.initDatePicker();
 
+let originalViewport = null;
+
 window.addEventListener('beforeprint', () => {
     if (window.generateCVFromForm) window.generateCVFromForm(false);
     document.body.classList.add('printing');
 
+    const viewport = document.querySelector('meta[name="viewport"]');
+    if (viewport) {
+        originalViewport = viewport.content;
+        viewport.content = "width=1024";
+    }
+
     const cvRoot = document.getElementById('cv-root');
     const scaleContainer = document.getElementById('cv-scale-container');
     if (cvRoot && scaleContainer) {
-        cvRoot.style.transform = '';
+        cvRoot.style.transform = 'none';
         cvRoot.style.width = '210mm';
         cvRoot.style.minWidth = '210mm';
         cvRoot.style.margin = '0 auto';
-        scaleContainer.style.transform = '';
+        scaleContainer.style.transform = 'none';
         scaleContainer.style.width = '210mm';
         scaleContainer.style.minWidth = '210mm';
         scaleContainer.style.height = 'auto';
@@ -1608,6 +1616,12 @@ window.addEventListener('beforeprint', () => {
 
 window.addEventListener('afterprint', () => {
     document.body.classList.remove('printing');
+    
+    const viewport = document.querySelector('meta[name="viewport"]');
+    if (viewport && originalViewport) {
+        viewport.content = originalViewport;
+    }
+
     if (window.resizePreview) window.resizePreview();
 });
 
