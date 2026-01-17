@@ -2108,7 +2108,7 @@ body.tpl-elegant .section-title {
         padding: 0 !important;
         transform: none !important;
         background: white !important;
-        overflow: visible !important;
+        overflow: auto !important;
         box-shadow: none !important;
         scale: 1 !important;
     }
@@ -2123,7 +2123,7 @@ body.tpl-elegant .section-title {
         margin: 0 !important;
         padding: 0 !important;
         background: white !important;
-        overflow: visible !important;
+        overflow: auto !important;
         transform: none !important;
         scale: 1 !important;
     }
@@ -2135,7 +2135,7 @@ body.tpl-elegant .section-title {
         height: 295mm !important;
         background: white !important;
         box-sizing: border-box !important;
-        overflow: hidden !important;
+        overflow: auto !important;
         position: relative !important;
         margin: 0 !important;
         page-break-after: always !important;
@@ -2171,7 +2171,7 @@ body.tpl-elegant .section-title {
         min-height: 295mm !important;
         max-height: 295mm !important;
         height: 295mm !important;
-        overflow: hidden !important;
+        overflow: auto !important;
     }
 
     .section, .modern-section {
