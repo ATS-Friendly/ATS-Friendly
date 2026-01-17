@@ -2343,3 +2343,55 @@ body.tpl-elegant .section-title {
     border-color: rgba(255, 0, 0, 0.1);
 }
 
+/* --- MOBİL İÇİN KESİN VE NİHAİ ÇÖZÜM --- */
+@media screen and (max-width: 768px) {
+    
+    /* 1. Tüm Arka Planı Beyazlat ve Kaymayı Önle */
+    body, html {
+        width: 100% !important;
+        overflow-x: hidden !important; /* Sağa taşmayı engelle */
+        background-color: white !important;
+        margin: 0 !important;
+    }
+
+    /* 2. Ana Taşıyıcıyı Ekrana Sığdır */
+    .editor-panel-preview {
+        width: 100% !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        overflow: hidden !important;
+        background: white !important;
+        display: block !important;
+    }
+
+    /* 3. GİZLİ SUÇLUYDU: Ara Katmanı (Scale Container) Düzenle */
+    #cv-scale-container {
+        width: 100% !important; /* Genişliği 210mm değil, %100 yap */
+        min-width: 0 !important; /* Sabit genişliği kır */
+        margin: 0 !important;
+        padding: 0 !important;
+        transform: none !important; /* JS buraya scale veriyorsa iptal et */
+        display: flex !important;
+        justify-content: center !important; /* Kağıdı ortala */
+        background: white !important;
+    }
+
+    /* 4. A4 Kağıdının Kendisini Küçült (Zoom Out) */
+    #cv-root {
+        /* Fiziksel boyutunu koru (Yazılar bozulmasın) */
+        width: 210mm !important;
+        min-width: 210mm !important;
+        height: auto !important;
+        min-height: 297mm !important;
+        
+        /* Küçültme İşlemi: */
+        transform: scale(0.45) !important; /* Ekrana sığacak kadar küçült */
+        transform-origin: top center !important; /* Yukarıdan ve ortadan hizala */
+        
+        /* Kenar boşluklarını temizle */
+        margin-top: 10px !important;
+        margin-bottom: -140% !important; /* Alt boşluğu kapat */
+        box-shadow: none !important;
+        border: none !important;
+    }
+}
