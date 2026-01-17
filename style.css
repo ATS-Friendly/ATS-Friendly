@@ -2343,31 +2343,3 @@ body.tpl-elegant .section-title {
     border-color: rgba(255, 0, 0, 0.1);
 }
 
-/* --- MOBİL UYUMLULUK DÜZELTMESİ --- */
-@media screen and (max-width: 768px) {
-    body {
-        /* Mobilde arka planı tamamen beyaz yapalım ki "kutu" gibi durmasın */
-        background-color: white; 
-        margin: 0;
-    }
-
-    .page {
-        /* Sabit 21cm genişliği iptal et, ekranı doldur */
-        width: 100%; 
-        min-height: auto; 
-        
-        /* Kenarlardaki boşlukları mobilde biraz azaltalım */
-        padding: 15px; 
-        margin: 0; 
-        
-        /* Gölgeyi kaldıralım, böylece kağıt havada duruyor gibi görünmez */
-        box-shadow: none; 
-        border: none;
-    }
-    
-    /* Eğer taşmaya sebep olan uzun linkler varsa onları kır */
-    p, a, span {
-        word-wrap: break-word;
-        overflow-wrap: break-word;
-    }
-}
