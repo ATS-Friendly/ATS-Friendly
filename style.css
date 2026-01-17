@@ -2124,7 +2124,7 @@ body.tpl-elegant .section-title {
         padding: 0 !important;
         background: white !important;
         overflow: auto !important;
-        transform: none !important;
+        transform: scale(1) !important;
         scale: 1 !important;
     }
 
@@ -2343,43 +2343,3 @@ body.tpl-elegant .section-title {
     border-color: rgba(255, 0, 0, 0.1);
 }
 
-/* --- MOBİL UYUMLULUK (Güçlendirilmiş Versiyon) --- */
-@media screen and (max-width: 768px) {
-    /* 1. Dış Çerçeveyi Düzenle */
-    .editor-panel-preview {
-        padding: 10px !important;
-        display: block !important; /* Flex yapısını mobilde iptal et */
-        overflow-x: hidden !important;
-    }
-
-    /* 2. CV Kağıdını Zorla Küçült (JS müdahale edemesin diye !important ekledik) */
-    #cv-root {
-        /* Genişliği sabit A4 tut */
-        width: 210mm !important; 
-        min-width: 210mm !important;
-        
-        /* Ölçeklendirmeyi CSS ile zorla yap */
-        transform: scale(0.45) !important; /* %45 Küçült */
-        transform-origin: top left !important; /* Sol üstten hizala */
-        
-        /* Konumlandırma */
-        margin-left: 0 !important;
-        margin-top: 0 !important;
-        margin-bottom: -140% !important; /* Alt boşluğu kapat */
-        
-        /* Gölgeyi kaldır */
-        box-shadow: none !important;
-    }
-}
-
-/* --- YAZDIRMA AYARLARI (Dokunulmazlık Alanı) --- */
-@media print {
-    #cv-root {
-        transform: none !important; /* Yazıcıda küçültme yapma! */
-        width: 210mm !important;
-        height: auto !important;
-        box-shadow: none !important;
-        margin: 0 !important;
-        page-break-after: always;
-    }
-}
