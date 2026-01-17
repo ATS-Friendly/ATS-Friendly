@@ -1674,12 +1674,6 @@ input[type=range] {
     box-shadow: 0 10px 30px rgba(0,0,0,0.1);
 }
 
-@media screen and (max-width: 1024px) {
-    .page {
-        min-height: auto;
-    }
-}
-
 .cv-content { 
     font-family: var(--font-cv); 
     color: #2d3436; 
@@ -1803,11 +1797,41 @@ body.tpl-modern .modern-layout {
 
 @media screen and (max-width: 1024px) {
     body.tpl-modern .modern-layout {
-        min-height: auto;
+        grid-template-columns: 180px 1fr;
     }
     
     body.tpl-modern .modern-sidebar {
-        min-height: auto;
+        padding: 25px 15px;
+    }
+    
+    body.tpl-modern .modern-main {
+        padding: 25px 20px;
+    }
+    
+    body.tpl-modern .modern-photo {
+        width: 100px;
+        height: 100px;
+    }
+    
+    body.tpl-modern .modern-photo-placeholder {
+        width: 100px;
+        height: 100px;
+    }
+    
+    body.tpl-modern .modern-sidebar h1 {
+        font-size: 1.2rem;
+    }
+    
+    body.tpl-modern .modern-title {
+        font-size: 0.75rem;
+    }
+    
+    body.tpl-modern .sidebar-section h4 {
+        font-size: 0.65rem;
+    }
+    
+    body.tpl-modern .contact-list li {
+        font-size: 0.7rem;
     }
 }
 
@@ -2115,12 +2139,14 @@ body.tpl-elegant .section-title {
     .page {
         width: 210mm !important;
         min-height: 296mm !important; 
-        height: auto !important;
+        max-height: 296mm !important;
+        height: 296mm !important;
         background: white !important;
         box-sizing: border-box !important;
         overflow: hidden !important;
         position: relative !important;
         margin: 0 !important;
+        page-break-after: always !important;
     }
 
     body:not(.tpl-modern) #cv-root {
@@ -2141,15 +2167,18 @@ body.tpl-elegant .section-title {
         -webkit-print-color-adjust: exact !important;
         print-color-adjust: exact !important;
         background: linear-gradient(180deg, #1a1a2e 0%, #16213e 100%) !important;
-        height: 100% !important;
+        height: 296mm !important;
+        max-height: 296mm !important;
         min-height: 296mm !important;
+        overflow: hidden !important;
     }
 
     body.tpl-modern .modern-layout {
         display: grid !important;
         grid-template-columns: 220px 1fr !important;
         min-height: 296mm !important;
-        height: auto !important;
+        max-height: 296mm !important;
+        height: 296mm !important;
         overflow: hidden !important;
     }
 
