@@ -721,7 +721,7 @@ body {
 .template-card { 
     background: white; 
     border-radius: 20px; 
-    overflow: visible; 
+    overflow: hidden; 
     cursor: pointer; 
     transition: 0.3s; 
     border: 3px solid transparent; 
@@ -741,7 +741,7 @@ body {
     display: flex; 
     align-items: center; 
     justify-content: center; 
-    overflow: visible;
+    overflow: hidden;
     position: relative;
     
 }
@@ -1648,7 +1648,7 @@ input[type=range] {
     transition: transform 0.2s;
     margin: 0; 
     box-shadow: 0 5px 20px rgba(0,0,0,0.1);
-    overflow: visible;
+    overflow: hidden;
 }
 
 @media screen and (min-width: 1025px) {
@@ -1843,7 +1843,7 @@ body.tpl-modern .modern-photo {
     width: 130px;
     height: 130px;
     border-radius: 50%;
-    overflow: visible;
+    overflow: hidden;
     margin: 0 auto 20px auto;
     border: 4px solid rgba(255,255,255,0.2);
 }
@@ -2073,7 +2073,7 @@ body.tpl-elegant .section-title {
         max-width: 209mm !important;
         margin: 0 !important;
         padding: 0 !important;
-        overflow: visible !important;
+        overflow: hidden !important;
         background: white !important;
         -webkit-print-color-adjust: exact !important;
         print-color-adjust: exact !important;
@@ -2090,7 +2090,7 @@ body.tpl-elegant .section-title {
         height: auto !important;
         margin: 0 !important;
         padding: 0 !important;
-        overflow: visible !important;
+        overflow: hidden !important;
         background: white !important;
         box-shadow: none !important;
         transform: none !important;
@@ -2108,7 +2108,7 @@ body.tpl-elegant .section-title {
         padding: 0 !important;
         transform: none !important;
         background: white !important;
-        overflow: visible !important;
+        overflow: hidden !important;
         box-shadow: none !important;
         scale: 1 !important;
     }
@@ -2123,7 +2123,7 @@ body.tpl-elegant .section-title {
         margin: 0 !important;
         padding: 0 !important;
         background: white !important;
-        overflow: visible !important;
+        overflow: hidden !important;
         transform: none !important;
         scale: 1 !important;
     }
@@ -2135,7 +2135,7 @@ body.tpl-elegant .section-title {
         height: 295mm !important;
         background: white !important;
         box-sizing: border-box !important;
-        overflow: visible !important;
+        overflow: hidden !important;
         position: relative !important;
         margin: 0 !important;
         page-break-after: always !important;
@@ -2162,7 +2162,7 @@ body.tpl-elegant .section-title {
         height: 295mm !important;
         max-height: 295mm !important;
         min-height: 295mm !important;
-        overflow: visible !important;
+        overflow: hidden !important;
     }
 
     body.tpl-modern .modern-layout {
@@ -2171,7 +2171,7 @@ body.tpl-elegant .section-title {
         min-height: 295mm !important;
         max-height: 295mm !important;
         height: 295mm !important;
-        overflow: visible !important;
+        overflow: hidden !important;
     }
 
     .section, .modern-section {
