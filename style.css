@@ -2306,3 +2306,32 @@ body.tpl-elegant .section-title {
     border-color: rgba(255, 0, 0, 0.1);
 }
 
+/* --- EN ALTA EKLE: Mobil Baskı ve 2. Sayfa Düzeltmesi --- */
+@media print {
+    /* Mevcut yükseklik sınırlarını eziyoruz (override) */
+    .page, #cv-scale-container, #cv-root {
+        min-height: auto !important; 
+        height: auto !important;    
+        padding-bottom: 0 !important;
+        margin-bottom: 0 !important;
+        border: none !important;
+    }
+
+    /* Sayfayı biraz küçült ki kenarlara çarpıp taşmasın */
+    body {
+        transform: scale(0.99);
+        transform-origin: top left;
+        width: 100% !important;
+    }
+}
+
+@media print and (max-width: 768px) {
+    html, body {
+        zoom: 100% !important;
+        min-width: 0 !important;
+    }
+    #cv-scale-container {
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+}
