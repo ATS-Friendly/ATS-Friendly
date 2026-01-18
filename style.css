@@ -2171,7 +2171,7 @@ body.tpl-elegant .section-title {
         width: 790px !important;         /* A4 width */
         min-width: 790px !important;
         max-width: 794px !important;
-        height: 1115px !important;         /* Natural content height */
+        height: 1000px !important;         /* Natural content height */
         margin: 0 !important;
         padding: 0 !important;
         background: white !important;
@@ -2185,7 +2185,7 @@ body.tpl-elegant .section-title {
     /* Page wrapper - let content determine height naturally */
     .page {
         width: 790px !important;         /* A4 width */
-        height: 1115px !important;         /* Natural content height */
+        height: 1000px !important;         /* Natural content height */
         background: white !important;
         box-sizing: border-box !important;
         overflow: visible !important;
