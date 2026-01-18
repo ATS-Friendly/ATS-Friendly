@@ -564,7 +564,7 @@ window.resizePreview = () => {
 
     const scale = Math.min(1, availableWidth / originalWidth);
     
-    cvRoot.style.transformOrigin = 'top center'; 
+    cvRoot.style.transformOrigin = 'top left'; 
     cvRoot.style.transform = `scale(${scale})`;
     cvRoot.style.width = originalWidth + 'px'; 
     
