@@ -2181,7 +2181,7 @@ body.tpl-elegant .section-title {
         box-sizing: border-box !important;
     }
 
-    /* Page wrapper - enforce A4 dimensions */
+    /* Page wrapper - enforce A4 dimensions with proper page breaks */
     .page {
         width: 794px !important;         /* A4 width */
         height: auto !important;
@@ -2193,8 +2193,13 @@ body.tpl-elegant .section-title {
         position: relative !important;
         margin: 0 !important;
         padding: 0 !important;
-        page-break-after: always !important;
         transform: none !important;
+        break-after: auto !important;    /* Modern standard - only break when needed */
+    }
+    
+    /* Only force page break between actual multiple pages */
+    .page:not(:last-child) {
+        break-after: page !important;    /* iOS Safari safe: only non-last pages */
     }
 
     /* Template-specific padding (except modern) */
@@ -2231,17 +2236,18 @@ body.tpl-elegant .section-title {
         overflow: visible !important;     /* Allow multi-page content */
     }
 
-    /* Prevent orphaned headers and unwanted breaks */
+    /* Prevent orphaned headers and control section breaks */
     .section, .modern-section {
-        page-break-inside: auto !important;
+        break-inside: auto !important;        /* Allow breaks within sections if needed */
+        page-break-inside: auto !important;   /* Fallback for older browsers */
     }
     .section-header, .modern-section-title {
-        page-break-after: avoid !important;
-        break-after: avoid !important;
+        break-after: avoid !important;        /* Never break after headers */
+        page-break-after: avoid !important;   /* Fallback for older browsers */
     }
     .entry, .modern-entry {
-        page-break-inside: avoid !important;
-        break-inside: avoid !important;
+        break-inside: avoid !important;       /* Keep entries together */
+        page-break-inside: avoid !important;  /* Fallback for older browsers */
     }
 }
 
