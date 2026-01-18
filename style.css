@@ -2168,10 +2168,10 @@ body.tpl-elegant .section-title {
     #cv-root {
         display: block !important;
         visibility: visible !important;
-        width: 794px !important;         /* A4 width */
-        min-width: 794px !important;
+        width: 790px !important;         /* A4 width */
+        min-width: 790px !important;
         max-width: 794px !important;
-        height: 1118px !important;         /* Natural content height */
+        height: 1115px !important;         /* Natural content height */
         margin: 0 !important;
         padding: 0 !important;
         background: white !important;
@@ -2184,8 +2184,8 @@ body.tpl-elegant .section-title {
 
     /* Page wrapper - let content determine height naturally */
     .page {
-        width: 794px !important;         /* A4 width */
-        height: 1118px !important;         /* Natural content height */
+        width: 790px !important;         /* A4 width */
+        height: 1115px !important;         /* Natural content height */
         background: white !important;
         box-sizing: border-box !important;
         overflow: visible !important;
