@@ -736,7 +736,7 @@ body {
 }
 .template-preview { 
     width: 100%;
-    height: 350px; 
+    height: 1024px; 
     background: #eee; 
     display: flex; 
     align-items: center; 
@@ -2153,7 +2153,7 @@ body.tpl-elegant .section-title {
         width: 794px !important;         /* A4 width */
         min-width: 794px !important;
         max-width: 794px !important;
-        height: 1124px !important;
+        height: auto !important;
         margin: 0 !important;
         padding: 0 !important;
         transform: none !important;
@@ -2168,8 +2168,8 @@ body.tpl-elegant .section-title {
     #cv-root {
         display: block !important;
         visibility: visible !important;
-        width: 790px !important;         /* A4 width */
-        min-width: 790px !important;
+        width: auto !important;         /* A4 width */
+        min-width: auto !important;
         max-width: 794px !important;
         height: 1100px !important;         /* Natural content height */
         margin: 0 !important;
@@ -2184,7 +2184,7 @@ body.tpl-elegant .section-title {
 
     /* Page wrapper - let content determine height naturally */
     .page {
-        width: 790px !important;         /* A4 width */
+        width: auto !important;         /* A4 width */
         height: 1100px !important;         /* Natural content height */
         background: white !important;
         box-sizing: border-box !important;
