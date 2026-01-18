@@ -2153,7 +2153,7 @@ body.tpl-elegant .section-title {
         width: 794px !important;         /* A4 width */
         min-width: 794px !important;
         max-width: 794px !important;
-        height: auto !important;
+        height: 1124px !important;
         margin: 0 !important;
         padding: 0 !important;
         transform: none !important;
@@ -2171,7 +2171,7 @@ body.tpl-elegant .section-title {
         width: 790px !important;         /* A4 width */
         min-width: 790px !important;
         max-width: 794px !important;
-        height: 1000px !important;         /* Natural content height */
+        height: 1100px !important;         /* Natural content height */
         margin: 0 !important;
         padding: 0 !important;
         background: white !important;
@@ -2185,7 +2185,7 @@ body.tpl-elegant .section-title {
     /* Page wrapper - let content determine height naturally */
     .page {
         width: 790px !important;         /* A4 width */
-        height: 1000px !important;         /* Natural content height */
+        height: 1100px !important;         /* Natural content height */
         background: white !important;
         box-sizing: border-box !important;
         overflow: visible !important;
@@ -2223,7 +2223,7 @@ body.tpl-elegant .section-title {
         -webkit-print-color-adjust: exact !important;
         print-color-adjust: exact !important;
         background: linear-gradient(180deg, #1a1a2e 0%, #16213e 100%) !important;
-        height: 1110px !important;          /* Natural content height */
+        height: 1100px !important;          /* Natural content height */
         overflow: visible !important;     /* Allow multi-page content */
     }
 
@@ -2231,7 +2231,7 @@ body.tpl-elegant .section-title {
     body.tpl-modern .modern-layout {
         display: grid !important;
         grid-template-columns: 220px 1fr !important;
-        height: 1110px !important;          /* Natural content height */
+        height: 1100px !important;          /* Natural content height */
         overflow: visible !important;     /* Allow multi-page content */
     }
 
