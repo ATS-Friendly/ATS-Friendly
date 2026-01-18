@@ -1688,9 +1688,10 @@ input[type=range] {
     }
 }
 
-    .page { 
-    width: 209mm;
-    min-height: 295mm; 
+/* Screen preview: A4 dimensions in pixels for consistency */
+.page { 
+    width: 794px;          /* A4 width = 210mm */
+    min-height: 1123px;    /* A4 height = 297mm */
     padding: var(--cv-padding); 
     position: relative; 
     margin: 0;
@@ -1820,7 +1821,7 @@ body.tpl-modern .page {
 body.tpl-modern .modern-layout {
     display: grid;
     grid-template-columns: 218px 1fr;
-    min-height: 295mm;
+    min-height: 1123px;    /* A4 height in pixels */
 }
 
 @media screen and (max-width: 1024px) {
@@ -2069,12 +2070,24 @@ body.tpl-elegant .section-title {
     display: inline-block;
 }
 
+/* ============================================
+   PRINT STYLES - A4 OUTPUT
+   ============================================
+   CRITICAL ARCHITECTURAL RULES:
+   1. Print output is 100% CSS-driven, no JavaScript
+   2. Exact A4 dimensions: 794px × 1123px (210mm × 297mm)
+   3. All transforms and scales are reset
+   4. Browser-agnostic, deterministic layout
+   ============================================ */
+
 @media print {
+    /* Define A4 page with zero margins */
     @page {
-        margin: 0;
         size: A4;
+        margin: 0;
     }
 
+    /* Hide all UI elements */
     body > *:not(#editor-view),
     #landing-view,
     #template-view,
@@ -2097,114 +2110,132 @@ body.tpl-elegant .section-title {
         visibility: hidden !important;
     }
 
+    /* Reset body to A4 dimensions */
     html, body {
+        width: 794px !important;        /* A4 width = 210mm */
+        min-width: 794px !important;
+        max-width: 794px !important;
         height: auto !important;
-        width: 209mm !important;
-        min-width: 209mm !important;
-        max-width: 209mm !important;
         margin: 0 !important;
         padding: 0 !important;
-        overflow: hidden !important;
+        overflow: visible !important;
         background: white !important;
         -webkit-print-color-adjust: exact !important;
         print-color-adjust: exact !important;
         -webkit-text-size-adjust: 100%;
     }
 
+    /* Reset all container wrappers */
     #editor-view, 
     .view-section, 
     .editor-layout, 
     .editor-panel-preview {
         display: block !important;
         position: static !important;
-        width: 99.5% !important;
+        width: 100% !important;
         height: auto !important;
         margin: 0 !important;
         padding: 0 !important;
-        overflow: hidden !important;
+        overflow: visible !important;
         background: white !important;
         box-shadow: none !important;
         transform: none !important;
+        scale: none !important;
     }
 
+    /* CV Scale Container - remove all transforms */
     #cv-scale-container {
         display: block !important;
         visibility: visible !important;
         position: relative !important;
-        width: 209mm !important;
-        min-width: 209mm !important;
+        width: 794px !important;         /* A4 width */
+        min-width: 794px !important;
+        max-width: 794px !important;
         height: auto !important;
-        min-height: 295mm !important;
-        margin: 0 auto !important;
+        margin: 0 !important;
         padding: 0 !important;
         transform: none !important;
+        transform-origin: initial !important;
         background: white !important;
-        overflow: hidden !important;
+        overflow: visible !important;
         box-shadow: none !important;
-        scale: 1 !important;
+        scale: none !important;
     }
 
+    /* CV Root - the actual content container */
     #cv-root {
         display: block !important;
         visibility: visible !important;
-        width: 210mm !important;
-        min-width: 210mm !important;
+        width: 794px !important;         /* A4 width */
+        min-width: 794px !important;
+        max-width: 794px !important;
         height: auto !important;
-        min-height: 295mm !important;
+        min-height: 1123px !important;   /* A4 height = 297mm */
         margin: 0 !important;
         padding: 0 !important;
         background: white !important;
-        overflow: hidden !important;
+        overflow: visible !important;
         transform: none !important;
-        scale: 1 !important;
+        transform-origin: initial !important;
+        scale: none !important;
+        box-sizing: border-box !important;
     }
 
+    /* Page wrapper - enforce A4 dimensions */
     .page {
-        width: 210mm !important;
-        min-height: 295mm !important; 
-        max-height: 296mm !important;
-        height: 295mm !important;
+        width: 794px !important;         /* A4 width */
+        height: auto !important;
+        min-height: 1123px !important;   /* A4 height */
+        max-height: none !important;
         background: white !important;
         box-sizing: border-box !important;
-        overflow: hidden !important;
+        overflow: visible !important;
         position: relative !important;
         margin: 0 !important;
+        padding: 0 !important;
         page-break-after: always !important;
+        transform: none !important;
     }
 
+    /* Template-specific padding (except modern) */
     body:not(.tpl-modern) #cv-root {
-        padding: 20mm 25mm !important;
+        padding: 75px 95px !important;   /* 20mm top/bottom, 25mm left/right */
         box-sizing: border-box !important;
     }
 
+    /* Modern template: no padding (uses grid layout) */
     body.tpl-modern #cv-root {
         padding: 0 !important;
     }
 
+    /* Preserve colors in print */
     * {
         -webkit-print-color-adjust: exact !important;
         print-color-adjust: exact !important;
     }
 
+    /* Modern template sidebar - exact A4 height */
     body.tpl-modern .modern-sidebar {
         -webkit-print-color-adjust: exact !important;
         print-color-adjust: exact !important;
         background: linear-gradient(180deg, #1a1a2e 0%, #16213e 100%) !important;
-        height: 295mm !important;
-        max-height: 295mm !important;
-        min-height: 295mm !important;
+        height: 1123px !important;       /* A4 height */
+        max-height: 1123px !important;
+        min-height: 1123px !important;
         overflow: hidden !important;
     }
 
+    /* Modern template layout - exact A4 height */
     body.tpl-modern .modern-layout {
         display: grid !important;
         grid-template-columns: 220px 1fr !important;
-        min-height: 295mm !important;
-        max-height: 295mm !important;
-        height: 295mm !important;
+        height: 1123px !important;       /* A4 height */
+        min-height: 1123px !important;
+        max-height: 1123px !important;
         overflow: hidden !important;
     }
 
+    /* Prevent orphaned headers and unwanted breaks */
     .section, .modern-section {
         page-break-inside: auto !important;
     }

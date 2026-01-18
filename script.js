@@ -533,14 +533,23 @@ window.switchMobileTab = (tab) => {
 };
 
 window.resizePreview = () => {
+    // CRITICAL: This function is ONLY for screen preview, never for print
+    // Print layout is handled 100% by CSS @media print rules
+    
     const previewPanel = document.getElementById('panel-preview');
     const scaleContainer = document.getElementById('cv-scale-container');
     const cvRoot = document.getElementById('cv-root');
 
     if (!previewPanel || !scaleContainer || !cvRoot) return;
+    
+    // Check if we're in print mode - if so, do nothing
+    if (document.body.classList.contains('printing')) return;
 
+    // Desktop: no scaling needed
     if (window.innerWidth > 1024) {
         cvRoot.style.transform = 'none';
+        cvRoot.style.transformOrigin = '';
+        cvRoot.style.width = '794px'; // A4 width in pixels
         scaleContainer.style.width = 'auto';
         scaleContainer.style.height = 'auto';
         scaleContainer.style.marginTop = '0';
@@ -548,7 +557,8 @@ window.resizePreview = () => {
         return;
     }
 
-    const originalWidth = 794; 
+    // Mobile: apply scale transform for preview only
+    const originalWidth = 794; // A4 width = 210mm = 794px
     const horizontalPadding = 30; 
     const availableWidth = window.innerWidth - horizontalPadding;
 
@@ -1588,42 +1598,33 @@ setLanguage('tr');
 window.resizePreview();
 window.initDatePicker();
 
+// ============================================
+// PRINT EVENT HANDLERS
+// ============================================
+// CRITICAL ARCHITECTURAL RULE:
+// Print output must be 100% CSS-driven, zero JavaScript manipulation
+// All transforms, scales, and sizing are handled by @media print in CSS
+// These events are ONLY for state management, not layout changes
+
 let originalViewport = null;
 
 window.addEventListener('beforeprint', () => {
+    // Regenerate CV with latest form data
     if (window.generateCVFromForm) window.generateCVFromForm(false);
+    
+    // Add print class for CSS targeting
     document.body.classList.add('printing');
-
-    // Viewport değişikliğini kaldırdık - modern tarayıcılar print CSS'i zaten doğru handle ediyor
-    // const viewport = document.querySelector('meta[name="viewport"]');
-    // if (viewport) {
-    //     originalViewport = viewport.content;
-    //     viewport.content = "width=1024";
-    // }
-
-    const cvRoot = document.getElementById('cv-root');
-    const scaleContainer = document.getElementById('cv-scale-container');
-    if (cvRoot && scaleContainer) {
-        cvRoot.style.transform = 'none';
-        cvRoot.style.width = '210mm';
-        cvRoot.style.minWidth = '210mm';
-        cvRoot.style.margin = '0 auto';
-        scaleContainer.style.transform = 'none';
-        scaleContainer.style.width = '210mm';
-        scaleContainer.style.minWidth = '210mm';
-        scaleContainer.style.height = 'auto';
-    }
+    
+    // DO NOT manipulate DOM styles here!
+    // All print layout is handled by @media print CSS rules
+    // This ensures consistent A4 output across all browsers
 });
 
 window.addEventListener('afterprint', () => {
+    // Remove print class
     document.body.classList.remove('printing');
     
-    // Viewport restore artık gerekli değil
-    // const viewport = document.querySelector('meta[name="viewport"]');
-    // if (viewport && originalViewport) {
-    //     viewport.content = originalViewport;
-    // }
-
+    // Restore preview scaling for screen
     if (window.resizePreview) window.resizePreview();
 });
 
