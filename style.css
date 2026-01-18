@@ -1670,7 +1670,7 @@ input[type=range] {
     transform-origin: top center;
     transition: transform 0.2s;
     margin: 0; 
-    box-shadow: none rgba(0,0,0,0.1);
+    box-shadow: 0 5px 20px rgba(0,0,0,0.1);
     overflow: visible;
 }
 
@@ -1682,9 +1682,9 @@ input[type=range] {
 }
 @media screen and (max-width: 1024px) {
     #cv-scale-container {
-        display: flex;
-        margin: 0 !important;
-        overflow: none;
+        display: block;
+        margin: 0 auto !important;
+        overflow: visible;
     }
 }
 

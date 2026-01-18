@@ -554,7 +554,7 @@ window.resizePreview = () => {
 
     const scale = Math.min(1, availableWidth / originalWidth);
     
-    cvRoot.style.transformOrigin = 'top left'; 
+    cvRoot.style.transformOrigin = 'top center'; 
     cvRoot.style.transform = `scale(${scale})`;
     cvRoot.style.width = originalWidth + 'px'; 
     
@@ -1594,11 +1594,12 @@ window.addEventListener('beforeprint', () => {
     if (window.generateCVFromForm) window.generateCVFromForm(false);
     document.body.classList.add('printing');
 
-      const viewport = document.querySelector('meta[name="viewport"]');
-      if (viewport) {
-          originalViewport = viewport.content;
-          viewport.content = "width=1024";
-      }
+    // Viewport değişikliğini kaldırdık - modern tarayıcılar print CSS'i zaten doğru handle ediyor
+    // const viewport = document.querySelector('meta[name="viewport"]');
+    // if (viewport) {
+    //     originalViewport = viewport.content;
+    //     viewport.content = "width=1024";
+    // }
 
     const cvRoot = document.getElementById('cv-root');
     const scaleContainer = document.getElementById('cv-scale-container');
@@ -1617,10 +1618,11 @@ window.addEventListener('beforeprint', () => {
 window.addEventListener('afterprint', () => {
     document.body.classList.remove('printing');
     
-    const viewport = document.querySelector('meta[name="viewport"]');
-    if (viewport && originalViewport) {
-        viewport.content = originalViewport;
-    }
+    // Viewport restore artık gerekli değil
+    // const viewport = document.querySelector('meta[name="viewport"]');
+    // if (viewport && originalViewport) {
+    //     viewport.content = originalViewport;
+    // }
 
     if (window.resizePreview) window.resizePreview();
 });
