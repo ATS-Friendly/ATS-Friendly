@@ -190,7 +190,6 @@ const translations = {
         tpl_classic_desc: "🏛️ Geleneksel",
         tpl_compact: "Kompakt",
         tpl_compact_desc: "📄 Minimal",
-        tpl_modern: "Modern",
         btn_design: "Tasarım Ayarları",
         btn_layout: "Sayfa Düzeni",
         btn_change_tpl: "Şablonu Değiştir",
@@ -326,8 +325,6 @@ const translations = {
         tpl_classic_desc: "🏛️ Traditional",
         tpl_compact: "Compact",
         tpl_compact_desc: "📄 Minimal",
-        tpl_modern: "Modern",
-        tpl_modern_desc: "✨ Photo & Stylish",
         btn_design: "Design Settings",
         btn_layout: "Page Layout",
         btn_change_tpl: "Change Template",
@@ -829,6 +826,7 @@ window.logout = async () => {
         await signOut(auth);
         currentUser = null;
         isGuest = false;
+        window.closeAccountModal();
         window.showView('landing-view');
     } catch (e) {
         alert("Çıkış hatası: " + e.message);
@@ -1145,7 +1143,6 @@ window.generateCVFromForm = (triggerSave = true) => {
     };
 
     const isCompact = document.body.classList.contains('tpl-compact');
-    const isModern = document.body.classList.contains('tpl-modern');
     let html = "";
     
     const h = (str, allowNewlines = false) => {
@@ -1231,6 +1228,7 @@ window.generateCVFromForm = (triggerSave = true) => {
     if (isCompact) {
         html = `
         <header>
+            ${data.photo ? `<div class="cv-photo"><img src="${data.photo}" alt="Profile Photo"></div>` : ''}
             <h1>${h(data.fullname) || 'ADINIZ SOYADINIZ'}</h1>
             <div class="subtitle">${h(data.title)}</div>
             <div class="address-line">${h(data.address)}</div>
@@ -1258,6 +1256,7 @@ window.generateCVFromForm = (triggerSave = true) => {
     } else if (document.body.classList.contains('tpl-elegant')) {
         html = `
         <header>
+            ${data.photo ? `<div class="cv-photo"><img src="${data.photo}" alt="Profile Photo"></div>` : ''}
             <h1>${h(data.fullname) || 'ADINIZ SOYADINIZ'}</h1>
             <div class="subtitle">${h(data.title)}</div>
             <div class="contact-info">
@@ -1277,106 +1276,10 @@ window.generateCVFromForm = (triggerSave = true) => {
             ${refContent}
             ${customContent}
         </div>`;
-    } else if (isModern) {
-        html = `
-        <div class="modern-layout">
-            <aside class="modern-sidebar">
-                ${data.photo ? `<div class="modern-photo"><img src="${data.photo}" alt="Profile"></div>` : '<div class="modern-photo-placeholder"></div>'}
-                <h1>${h(data.fullname) || 'AD SOYAD'}</h1>
-                <div class="modern-title">${h(data.title)}</div>
-                
-                <div class="sidebar-section">
-                    <h4>${currentLang === 'tr' ? 'İLETİŞİM' : 'CONTACT'}</h4>
-                    <ul class="contact-list">
-                        ${data.email ? `<li><span class="contact-icon">✉</span>${h(data.email)}</li>` : ''}
-                        ${data.phone ? `<li><span class="contact-icon">☎</span>${h(data.phone)}</li>` : ''}
-                        ${data.address ? `<li><span class="contact-icon">⌂</span>${h(data.address)}</li>` : ''}
-                        ${data.linkedin ? `<li><span class="contact-icon">in</span>${h(data.linkedin)}</li>` : ''}
-                    </ul>
-                </div>
-                
-                ${data.license ? `
-                <div class="sidebar-section">
-                    <h4>${labels.lic.toUpperCase()}</h4>
-                    <p>${h(data.license)}</p>
-                </div>` : ''}
-            </aside>
-            <main class="modern-main">
-                ${data.summary ? `
-                <div class="modern-section">
-                    <h2 class="modern-section-title">${labels.prof}</h2>
-                    <p class="summary-text">${h(data.summary, true)}</p>
-                </div>` : ''}
-                
-                ${data.experiences.length > 0 ? `
-                <div class="modern-section">
-                    <h2 class="modern-section-title">${labels.exp}</h2>
-                    ${data.experiences.map(exp => {
-                        const dateStr = `${formatCvDate(exp.startDate)} — ${exp.present ? formatCvDate('present') : formatCvDate(exp.endDate)}`;
-                        return `
-                        <div class="modern-entry">
-                            <div class="entry-header">
-                                <strong>${h(exp.title)}</strong>
-                                <span class="entry-date">${h(dateStr)}</span>
-                            </div>
-                            <div class="entry-company">${h(exp.company)}</div>
-                            <p class="entry-desc">${h(exp.desc, true)}</p>
-                        </div>
-                    `;}).join('')}
-                </div>` : ''}
-                
-                ${data.education.length > 0 ? `
-                <div class="modern-section">
-                    <h2 class="modern-section-title">${labels.edu}</h2>
-                    ${data.education.map(edu => {
-                        const dateStr = `${formatCvDate(edu.startDate)} — ${formatCvDate(edu.endDate)}`;
-                        return `
-                        <div class="modern-entry">
-                            <div class="entry-header">
-                                <strong>${h(edu.degree)}</strong>
-                                <span class="entry-date">${h(dateStr)}</span>
-                            </div>
-                            <div class="entry-company">${h(edu.school)}</div>
-                        </div>
-                    `;}).join('')}
-                </div>` : ''}
-                
-                ${visible.certs && data.certificates.length > 0 ? `
-                <div class="modern-section">
-                    <h2 class="modern-section-title">${h(titles.certs)}</h2>
-                    ${data.certificates.map(cert => `
-                        <div class="modern-entry compact">
-                            <div class="entry-header">
-                                <strong>${h(cert.name)}</strong>
-                                <span class="entry-date">${h(cert.date)}</span>
-                            </div>
-                            <div class="entry-company">${h(cert.issuer)}</div>
-                        </div>
-                    `).join('')}
-                </div>` : ''}
-                
-                ${visible.refs && data.references.length > 0 ? `
-                <div class="modern-section">
-                    <h2 class="modern-section-title">${h(titles.refs)}</h2>
-                    ${data.references.map(ref => `
-                        <div class="modern-entry compact">
-                            <strong>${h(ref.name)}</strong> - ${h(ref.title)}<br>
-                            <span class="ref-contact">${h(ref.contact)}</span>
-                        </div>
-                    `).join('')}
-                </div>` : ''}
-                
-                ${data.customSections.length > 0 ? data.customSections.map(sec => `
-                <div class="modern-section">
-                    <h2 class="modern-section-title">${h(sec.title)}</h2>
-                    <p>${h(sec.content, true)}</p>
-                </div>
-                `).join('') : ''}
-            </main>
-        </div>`;
     } else {
         html = `
         <header>
+            ${data.photo ? `<div class="cv-photo"><img src="${data.photo}" alt="Profile Photo"></div>` : ''}
             <h1>${h(data.fullname) || 'ADINIZ SOYADINIZ'}</h1>
             <div class="subtitle">${h(data.title)}</div>
             <div class="contact-info">

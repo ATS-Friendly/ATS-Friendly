@@ -1061,8 +1061,6 @@ body {
     #editor-view.show-edit .editor-panel-preview { display: none !important; }
     
     .editor-panel-form, .editor-panel-preview { width: 100%; }
-    
-    .mobile-fab-container, .fab-overlay { display: none !important; }
 }
 
 .editor-layout {
@@ -1399,6 +1397,14 @@ body {
         grid-template-columns: 1fr;
         gap: 12px;
     }
+    
+    .date-picker-month {
+        max-width: 100% !important;
+    }
+    
+    .flatpickr-calendar {
+        max-width: 90vw !important;
+    }
 }
 .input-group {
     display: flex;
@@ -1690,15 +1696,12 @@ input[type=range] {
 
 /* Screen preview: A4 dimensions in pixels for consistency */
 .page { 
-    width: 794px;          /* A4 width = 210mm */
-    /* NO min-height on screen - let content flow naturally */
-    /* min-height only enforced in @media print */
+    width: 794px;
     padding: var(--cv-padding); 
     position: relative; 
     margin: 0;
     background: white;
     overflow: visible;
-    height: 1024px;
 }
 
 @media print {
@@ -1733,6 +1736,22 @@ input[type=range] {
     margin-bottom: 30px; 
     padding-bottom: 25px; 
 }
+
+.cv-photo {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    overflow: hidden;
+    margin: 0 auto 20px auto;
+    border: 4px solid var(--cv-accent-color);
+}
+
+.cv-photo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
 h1 { 
     text-transform: uppercase; 
     letter-spacing: 3px; 
@@ -1752,24 +1771,25 @@ h1 {
     position: relative; 
     border: 1px solid transparent;
     padding: 4px;
-    margin-bottom: var(--cv-section-gap);
+    margin-bottom: 20px;
 }
 .section-header { 
-    margin-bottom: 18px; 
-    padding-bottom: 6px; 
+    margin-bottom: 15px; 
+    padding-bottom: 8px; 
 }
 .section-title { 
-    font-size: 1.1em; 
+    font-size: 1.05em; 
     text-transform: uppercase; 
-    font-weight: 800; 
+    font-weight: 700; 
     font-family: var(--font-cv);
     color: var(--cv-accent-color);
+    letter-spacing: 1.5px;
 }
-.entry { display: flex; margin-bottom: 15px; }
-.left-col { width: 170px; flex-shrink: 0; font-size: 0.9em; font-weight: 700; color: #636e72; padding-right: 15px; }
+.entry { display: flex; margin-bottom: 18px; }
+.left-col { width: 170px; flex-shrink: 0; font-size: 0.9em; font-weight: 600; color: #636e72; padding-right: 15px; }
 .right-col { width: 100%; word-break: break-word; }
-.entry h3 { margin: 0 0 4px 0; font-size: 1.05em; font-weight: 700; }
-.entry p { margin: 0; font-size: 1em; color: #444; }
+.entry h3 { margin: 0 0 6px 0; font-size: 1.05em; font-weight: 700; line-height: 1.3; }
+.entry p { margin: 0; font-size: 0.95em; color: #444; line-height: 1.6; }
 
 body.tpl-compact .contact-info { display: none; }
 body.tpl-compact .address-line,
@@ -1808,253 +1828,6 @@ body.tpl-compact .entry .right-col { padding-right: 180px; }
 .elegant-license strong {
     color: var(--cv-accent-color);
     font-weight: 700;
-}
-
-body.tpl-modern #cv-root {
-    background: white;
-    padding: 0 !important;
-    display: block;
-}
-
-body.tpl-modern .page {
-    padding: 0 !important;
-}
-
-body.tpl-modern .modern-layout {
-    display: grid;
-    grid-template-columns: 218px 1fr;
-    /* NO min-height on screen - causes iOS Safari pagination bug */
-    /* min-height only enforced in @media print */
-}
-
-@media screen and (max-width: 1024px) {
-    body.tpl-modern .modern-layout {
-        grid-template-columns: 180px 1fr;
-    }
-    
-    body.tpl-modern .modern-sidebar {
-        padding: 25px 15px;
-    }
-    
-    body.tpl-modern .modern-main {
-        padding: 25px 20px;
-    }
-    
-    body.tpl-modern .modern-photo {
-        width: 100px;
-        height: 100px;
-    }
-    
-    body.tpl-modern .modern-photo-placeholder {
-        width: 100px;
-        height: 100px;
-    }
-    
-    body.tpl-modern .modern-sidebar h1 {
-        font-size: 1.2rem;
-    }
-    
-    body.tpl-modern .modern-title {
-        font-size: 0.75rem;
-    }
-    
-    body.tpl-modern .sidebar-section h4 {
-        font-size: 0.65rem;
-    }
-    
-    body.tpl-modern .contact-list li {
-        font-size: 0.7rem;
-    }
-}
-
-body.tpl-modern .modern-sidebar {
-    background: linear-gradient(180deg, #1a1a2e 0%, #16213e 100%);
-    color: #fff;
-    padding: 35px 25px;
-    text-align: center;
-}
-
-body.tpl-modern .modern-photo {
-    width: 130px;
-    height: 130px;
-    border-radius: 50%;
-    overflow: hidden;
-    margin: 0 auto 20px auto;
-    border: 4px solid rgba(255,255,255,0.2);
-}
-
-body.tpl-modern .modern-photo img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-
-body.tpl-modern .modern-photo-placeholder {
-    width: 130px;
-    height: 130px;
-    border-radius: 50%;
-    margin: 0 auto 20px auto;
-    background: rgba(255,255,255,0.1);
-    border: 4px dashed rgba(255,255,255,0.2);
-}
-
-body.tpl-modern .modern-sidebar h1 {
-    color: #fff;
-    font-size: 1.5rem;
-    margin: 0 0 5px 0;
-    font-weight: 700;
-    letter-spacing: 1px;
-}
-
-body.tpl-modern .modern-title {
-    color: var(--cv-accent-color, #4fc3f7);
-    font-size: 0.85rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-    margin-bottom: 30px;
-    padding-bottom: 15px;
-}
-
-body.tpl-modern .sidebar-section {
-    text-align: left;
-    margin-bottom: 25px;
-}
-
-body.tpl-modern .sidebar-section h4 {
-    color: var(--cv-accent-color, #4fc3f7);
-    font-size: 0.7rem;
-    font-weight: 700;
-    letter-spacing: 2px;
-    margin: 0 0 12px 0;
-    padding-bottom: 8px;
-}
-
-body.tpl-modern .sidebar-section p {
-    margin: 0;
-    font-size: 0.85rem;
-    color: rgba(255,255,255,0.85);
-}
-
-body.tpl-modern .contact-list {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-}
-
-body.tpl-modern .contact-list li {
-    display: flex;
-    align-items: flex-start;
-    gap: 10px;
-    margin-bottom: 10px;
-    font-size: 0.8rem;
-    color: rgba(255,255,255,0.85);
-    word-break: break-word;
-}
-
-body.tpl-modern .contact-icon {
-    width: 20px;
-    height: 20px;
-    background: var(--cv-accent-color, #4fc3f7);
-    color: #1a1a2e;
-    border-radius: 4px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 0.7rem;
-    font-weight: 700;
-    flex-shrink: 0;
-}
-
-body.tpl-modern .modern-main {
-    padding: 35px 40px;
-    background: #fff;
-    height: 1024px;
-}
-
-body.tpl-modern .modern-section {
-    margin-bottom: 25px;
-}
-
-body.tpl-modern .modern-section-title {
-    font-size: 0.85rem;
-    font-weight: 700;
-    color: #1a1a2e;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    margin: 0 0 15px 0;
-    padding-bottom: 8px;
-    display: inline-block;
-}
-
-body.tpl-modern .summary-text {
-    font-size: 0.9rem;
-    line-height: 1.6;
-    color: #444;
-    margin: 0;
-}
-
-body.tpl-modern .modern-entry {
-    margin-bottom: 18px;
-    padding-left: 15px;
-    border-left: 3px solid #eee;
-}
-
-body.tpl-modern .modern-entry.compact {
-    margin-bottom: 12px;
-}
-
-body.tpl-modern .entry-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: baseline;
-    flex-wrap: wrap;
-    gap: 10px;
-}
-
-body.tpl-modern .entry-header strong {
-    font-size: 0.95rem;
-    color: #1a1a2e;
-}
-
-body.tpl-modern .entry-date {
-    font-size: 0.8rem;
-    color: var(--cv-accent-color, #4fc3f7);
-    font-weight: 600;
-}
-
-body.tpl-modern .entry-company {
-    font-size: 0.85rem;
-    color: #666;
-    margin-top: 2px;
-}
-
-body.tpl-modern .entry-desc {
-    font-size: 0.85rem;
-    color: #555;
-    margin: 8px 0 0 0;
-    line-height: 1.5;
-}
-
-body.tpl-modern .ref-contact {
-    font-size: 0.8rem;
-    color: #888;
-}
-
-@media print {
-    body.tpl-modern .modern-layout {
-        display: grid !important;
-        grid-template-columns: 220px 1fr !important;
-    }
-    body.tpl-modern .modern-sidebar {
-        -webkit-print-color-adjust: exact !important;
-        print-color-adjust: exact !important;
-        background: linear-gradient(180deg, #1a1a2e 0%, #16213e 100%) !important;
-    }
-    body.tpl-modern .contact-icon {
-        -webkit-print-color-adjust: exact !important;
-        print-color-adjust: exact !important;
-    }
 }
 
 body.tpl-elegant #cv-root {
@@ -2170,10 +1943,10 @@ body.tpl-elegant .section-title {
     #cv-root {
         display: block !important;
         visibility: visible !important;
-        width: auto !important;         /* A4 width */
-        min-width: auto !important;
+        width: 794px !important;
+        min-width: 794px !important;
         max-width: 794px !important;
-        height: 500px !important;         /* Natural content height */
+        height: auto !important;
         margin: 0 !important;
         padding: 0 !important;
         background: white !important;
@@ -2186,8 +1959,8 @@ body.tpl-elegant .section-title {
 
     /* Page wrapper - let content determine height naturally */
     .page {
-        width: auto !important;         /* A4 width */
-        height: 500px !important;         /* Natural content height */
+        width: 794px !important;
+        height: auto !important;
         background: white !important;
         box-sizing: border-box !important;
         overflow: visible !important;
@@ -2195,7 +1968,7 @@ body.tpl-elegant .section-title {
         margin: 0 !important;
         padding: 0 !important;
         transform: none !important;
-        break-after: auto !important;    /* Only break when needed */
+        break-after: auto !important;
     }
     
     /* Only force page break between actual multiple pages */
@@ -2203,15 +1976,10 @@ body.tpl-elegant .section-title {
         break-after: page !important;    /* iOS Safari safe: only non-last pages */
     }
 
-    /* Template-specific padding (except modern) */
-    body:not(.tpl-modern) #cv-root {
-        padding: 75px 95px !important;   /* 20mm top/bottom, 25mm left/right */
+    /* Template padding - Industry standard 15-20mm margins */
+    #cv-root {
+        padding: 60px 75px !important;
         box-sizing: border-box !important;
-    }
-
-    /* Modern template: no padding (uses grid layout) */
-    body.tpl-modern #cv-root {
-        padding: 0 !important;
     }
 
     /* Preserve colors in print */
@@ -2220,33 +1988,16 @@ body.tpl-elegant .section-title {
         print-color-adjust: exact !important;
     }
 
-    /* Modern template sidebar - natural height based on content */
-    body.tpl-modern .modern-sidebar {
-        -webkit-print-color-adjust: exact !important;
-        print-color-adjust: exact !important;
-        background: linear-gradient(180deg, #1a1a2e 0%, #16213e 100%) !important;
-        height: 2200px !important;          /* Natural content height */
-        overflow: visible !important;     /* Allow multi-page content */
-    }
-
-    /* Modern template layout - natural height based on content */
-    body.tpl-modern .modern-layout {
-        display: grid !important;
-        grid-template-columns: 220px 1fr !important;
-        height: 2200px !important;          /* Natural content height */
-        overflow: visible !important;     /* Allow multi-page content */
-    }
-
     /* Prevent orphaned headers and control section breaks */
-    .section, .modern-section {
+    .section {
         break-inside: auto !important;        /* Allow breaks within sections if needed */
         page-break-inside: auto !important;   /* Fallback for older browsers */
     }
-    .section-header, .modern-section-title {
+    .section-header {
         break-after: avoid !important;        /* Never break after headers */
         page-break-after: avoid !important;   /* Fallback for older browsers */
     }
-    .entry, .modern-entry {
+    .entry {
         break-inside: avoid !important;       /* Keep entries together */
         page-break-inside: avoid !important;  /* Fallback for older browsers */
     }
