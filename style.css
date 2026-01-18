@@ -1691,7 +1691,8 @@ input[type=range] {
 /* Screen preview: A4 dimensions in pixels for consistency */
 .page { 
     width: 794px;          /* A4 width = 210mm */
-    min-height: 1123px;    /* A4 height = 297mm */
+    /* NO min-height on screen - let content flow naturally */
+    /* min-height only enforced in @media print */
     padding: var(--cv-padding); 
     position: relative; 
     margin: 0;
@@ -1821,7 +1822,8 @@ body.tpl-modern .page {
 body.tpl-modern .modern-layout {
     display: grid;
     grid-template-columns: 218px 1fr;
-    min-height: 1123px;    /* A4 height in pixels */
+    /* NO min-height on screen - causes iOS Safari pagination bug */
+    /* min-height only enforced in @media print */
 }
 
 @media screen and (max-width: 1024px) {
@@ -2169,8 +2171,7 @@ body.tpl-elegant .section-title {
         width: 794px !important;         /* A4 width */
         min-width: 794px !important;
         max-width: 794px !important;
-        height: auto !important;
-        min-height: 1123px !important;   /* A4 height = 297mm */
+        height: auto !important;         /* Natural content height */
         margin: 0 !important;
         padding: 0 !important;
         background: white !important;
@@ -2181,12 +2182,10 @@ body.tpl-elegant .section-title {
         box-sizing: border-box !important;
     }
 
-    /* Page wrapper - enforce A4 dimensions with proper page breaks */
+    /* Page wrapper - let content determine height naturally */
     .page {
         width: 794px !important;         /* A4 width */
-        height: auto !important;
-        min-height: 1123px !important;   /* A4 height */
-        max-height: none !important;
+        height: auto !important;         /* Natural content height */
         background: white !important;
         box-sizing: border-box !important;
         overflow: visible !important;
@@ -2194,7 +2193,7 @@ body.tpl-elegant .section-title {
         margin: 0 !important;
         padding: 0 !important;
         transform: none !important;
-        break-after: auto !important;    /* Modern standard - only break when needed */
+        break-after: auto !important;    /* Only break when needed */
     }
     
     /* Only force page break between actual multiple pages */
@@ -2219,20 +2218,20 @@ body.tpl-elegant .section-title {
         print-color-adjust: exact !important;
     }
 
-    /* Modern template sidebar - must support multi-page flow */
+    /* Modern template sidebar - natural height based on content */
     body.tpl-modern .modern-sidebar {
         -webkit-print-color-adjust: exact !important;
         print-color-adjust: exact !important;
         background: linear-gradient(180deg, #1a1a2e 0%, #16213e 100%) !important;
-        min-height: 1123px !important;   /* Minimum A4 height, can grow */
+        height: auto !important;          /* Natural content height */
         overflow: visible !important;     /* Allow multi-page content */
     }
 
-    /* Modern template layout - must support multi-page flow */
+    /* Modern template layout - natural height based on content */
     body.tpl-modern .modern-layout {
         display: grid !important;
         grid-template-columns: 220px 1fr !important;
-        min-height: 1123px !important;   /* Minimum A4 height, can grow */
+        height: auto !important;          /* Natural content height */
         overflow: visible !important;     /* Allow multi-page content */
     }
 
