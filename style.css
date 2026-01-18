@@ -1969,6 +1969,7 @@ body.tpl-modern .contact-icon {
 body.tpl-modern .modern-main {
     padding: 35px 40px;
     background: #fff;
+    height: 1024px;
 }
 
 body.tpl-modern .modern-section {
