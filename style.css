@@ -1183,6 +1183,8 @@ body {
         align-items: flex-start;
         background: #f8f9fd;
         position: relative;
+        overflow-y: visible;
+        overflow-x: hidden;
     }
 }
 
@@ -1379,9 +1381,29 @@ body {
     grid-template-columns: 1fr 1fr;
     gap: 12px;
 }
+
+.date-picker-month {
+    min-width: 0 !important;
+    width: 100% !important;
+    flex-shrink: 1 !important;
+}
+
+.date-end-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+@media screen and (max-width: 768px) {
+    .input-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+}
 .input-group {
     display: flex;
     flex-direction: column;
+    min-width: 0;
 }
 .input-group.full-width { grid-column: 1 / -1; }
 .input-group label {
@@ -1399,6 +1421,7 @@ body {
     background: #f8f9fa;
     width: 100%;
     box-sizing: border-box;
+    min-width: 0;
 }
 
 @media screen and (min-width: 1025px) {
@@ -1648,7 +1671,7 @@ input[type=range] {
     transition: transform 0.2s;
     margin: 0; 
     box-shadow: 0 5px 20px rgba(0,0,0,0.1);
-    overflow: hidden;
+    overflow: visible;
 }
 
 @media screen and (min-width: 1025px) {
@@ -1661,6 +1684,7 @@ input[type=range] {
     #cv-scale-container {
         display: block;
         margin: 0 !important;
+        overflow: visible;
     }
 }
 
@@ -1671,6 +1695,13 @@ input[type=range] {
     position: relative; 
     margin: 0;
     background: white;
+    overflow: visible;
+}
+
+@media print {
+    .page {
+        overflow: hidden !important;
+    }
 }
 
 .cv-content { 
@@ -2343,90 +2374,3 @@ body.tpl-elegant .section-title {
     border-color: rgba(255, 0, 0, 0.1);
 }
 
-/* --- MOBİL İÇİN KESİN VE NİHAİ ÇÖZÜM --- */
-@media screen and (max-width: 768px) {
-    
-    /* 1. Tüm Arka Planı Beyazlat ve Kaymayı Önle */
-    body, html {
-        width: 100% !important;
-        overflow-x: hidden !important; /* Sağa taşmayı engelle */
-        background-color: white !important;
-        margin: 0 !important;
-    }
-
-    /* 2. Ana Taşıyıcıyı Ekrana Sığdır */
-    .editor-panel-preview {
-        width: 100% !important;
-        padding: 0 !important;
-        margin: 0 !important;
-        overflow: hidden !important;
-        background: white !important;
-        display: block !important;
-    }
-
-    /* 3. GİZLİ SUÇLUYDU: Ara Katmanı (Scale Container) Düzenle */
-    #cv-scale-container {
-        width: 90% !important; /* Genişliği 210mm değil, %100 yap */
-        min-width: 0 !important; /* Sabit genişliği kır */
-        margin: 0 !important;
-        padding: 0 !important;
-        transform: none !important; /* JS buraya scale veriyorsa iptal et */
-        display: flex !important;
-        justify-content: center !important; /* Kağıdı ortala */
-        background: white !important;
-    }
-
-    /* 4. A4 Kağıdının Kendisini Küçült (Zoom Out) */
-    #cv-root {
-        /* Fiziksel boyutunu koru (Yazılar bozulmasın) */
-        width: 200mm !important;
-        min-width: 200mm !important;
-        height: auto !important;
-        min-height: 200mm !important;
-        
-        /* Küçültme İşlemi: */
-        transform: scale(0.45) !important; /* Ekrana sığacak kadar küçült */
-        transform-origin: top center !important; /* Yukarıdan ve ortadan hizala */
-        
-        /* Kenar boşluklarını temizle */
-        margin-top: 10px !important;
-        margin-bottom: -140% !important; /* Alt boşluğu kapat */
-        box-shadow: none !important;
-        border: none !important;
-    }
-}
-
-@media print {
-    @page {
-        margin: 0;
-        size: A4;
-    }
-
-    /* En dıştaki tüm kapları A4 sınırına zorla */
-    html, body, .editor-panel-preview {
-        width: 210mm !important;
-        overflow: hidden !important;
-    }
-
-    /* İŞTE ASIL SORUNLU KUTU BURASIYDI: */
-    #cv-scale-container {
-        display: block !important;
-        /* Genişliği 210mm değil, %100 yapıyoruz ki dışarı taşmasın */
-        width: 100% !important;
-        min-width: 0 !important; 
-        max-width: 210mm !important;
-        margin: 0 !important;
-        padding: 0 !important;
-        overflow: hidden !important; /* İçindeki kağıt taşarsa bile gösterme */
-        transform: none !important;
-    }
-
-    /* Asıl kağıt burada 210mm kalabilir */
-    #cv-root {
-        width: 210mm !important;
-        min-width: 210mm !important;
-        margin: 0 auto !important;
-        box-shadow: none !important;
-        border: none !important;
-    }
-}
