@@ -981,7 +981,12 @@ window.addFormEducation = (data = null) => {
             </div>
             <div class="input-group">
                 <label data-i18n="lbl_date_end">${t.lbl_date_end}</label>
-                <input type="text" class="form-input edu-date-end date-picker-month" value="${(data?.endDate && data.endDate !== 'undefined') ? data.endDate : ''}" oninput="generateCVFromForm()">
+                <div class="date-end-wrapper">
+                    <input type="text" class="form-input edu-date-end date-picker-month" value="${(data?.endDate && data.endDate !== 'undefined') ? data.endDate : ''}" oninput="generateCVFromForm()" ${data?.present ? 'disabled' : ''}>
+                    <label class="present-label">
+                        <input type="checkbox" class="edu-present" onchange="toggleDateEnd(this)" ${data?.present ? 'checked' : ''}> <span data-i18n="lbl_present">${t.lbl_present}</span>
+                    </label>
+                </div>
             </div>
         </div>
     `;
@@ -1119,7 +1124,8 @@ window.generateCVFromForm = (triggerSave = true) => {
             school: item.querySelector('.edu-school').value,
             degree: item.querySelector('.edu-degree').value,
             startDate: item.querySelector('.edu-date-start').value,
-            endDate: item.querySelector('.edu-date-end').value
+            endDate: item.querySelector('.edu-date-end').value,
+            present: item.querySelector('.edu-present').checked
         });
     });
 
