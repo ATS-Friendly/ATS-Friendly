@@ -57,7 +57,7 @@ const formatCvDate = (val) => {
 };
 
 window.toggleDateEnd = (checkbox) => {
-    const input = checkbox.closest('.date-end-wrapper').querySelector('input[type="month"]');
+    const input = checkbox.closest('.date-end-wrapper').querySelector('input');
     input.disabled = checkbox.checked;
     if (checkbox.checked) input.value = '';
     generateCVFromForm();
@@ -1407,9 +1407,6 @@ window.generateCVFromForm = (triggerSave = true) => {
                 ${data.linkedin ? `<span>${h(data.linkedin)}</span>` : ''}
             </div>
             <div class="compact-separator"></div>
-            <div class="personal-details">
-                <div class="detail-item"><span class="lbl">${labels.lic}</span><span class="dots"></span><span class="val">${h(data.license)}</span></div>
-            </div>
         </header>
         <div id="main-content">
              <div class="section">

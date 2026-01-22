@@ -3,6 +3,7 @@ const { GoogleGenerativeAI } = require("@google/generative-ai");
 const { defineSecret } = require('firebase-functions/params');
 
 // Securely store your API key in Firebase Secrets
+// Updated: Extended AI extraction for certificates, references, skills, languages
 const GEMINI_API_KEY = defineSecret('GEMINI_API_KEY');
 
 exports.parseResumeWithAI = onCall({ secrets: [GEMINI_API_KEY] }, async (request) => {
