@@ -153,6 +153,20 @@ window.handleCvUpload = async (event) => {
             parsedData.education.forEach(edu => window.addFormEducation(edu));
             window.initDatePicker();
         }
+        if (parsedData.certificates && parsedData.certificates.length > 0) {
+            document.getElementById('form-certificates-list').innerHTML = '';
+            parsedData.certificates.forEach(cert => window.addFormCertificate(cert));
+        }
+        if (parsedData.references && parsedData.references.length > 0) {
+            document.getElementById('form-references-list').innerHTML = '';
+            parsedData.references.forEach(ref => window.addFormReference(ref));
+        }
+        if (parsedData.skills) {
+            window.addFormCustomSection({ title: translations[currentLang].form_skills || 'Skills', content: parsedData.skills });
+        }
+        if (parsedData.languages) {
+            window.addFormCustomSection({ title: translations[currentLang].form_languages || 'Languages', content: parsedData.languages });
+        }
 
         window.generateCVFromForm();
         triggerDebounceSave();
@@ -275,6 +289,8 @@ const translations = {
         lbl_section_content: "İçerik / Açıklama",
         form_certificates: "Sertifikalar",
         form_references: "Referanslar",
+        form_skills: "Beceriler",
+        form_languages: "Diller",
         btn_add_cert: "Sertifika Ekle",
         btn_add_ref: "Referans Ekle",
         btn_import_cv: "CV'den Aktar",
@@ -415,6 +431,8 @@ const translations = {
         lbl_section_content: "Content / Description",
         form_certificates: "Certificates",
         form_references: "References",
+        form_skills: "Skills",
+        form_languages: "Languages",
         btn_add_cert: "Add Certificate",
         btn_add_ref: "Add Reference",
         btn_import_cv: "Import from CV",

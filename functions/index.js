@@ -23,10 +23,18 @@ exports.parseResumeWithAI = onCall({ secrets: [GEMINI_API_KEY] }, async (request
         const prompt = `
             Extract the following information from the resume text provided below. 
             Return the data STRICTLY as a JSON object with these keys: 
-            fullname, title, email, phone, address, linkedin, summary, experiences (array of {title, company, date, desc}), education (array of {school, degree, date}).
+            fullname, title, email, phone, address, linkedin, summary, 
+            experiences (array of {title, company, startDate, endDate, desc, present}), 
+            education (array of {school, degree, startDate, endDate, present}),
+            certificates (array of {name, issuer, date}),
+            references (array of {name, title, contact}),
+            skills (optional string listing skills),
+            languages (optional string listing languages).
             
             If a field is not found, return an empty string or empty array. 
             Translate any non-English headers if necessary to match the keys.
+            For date fields, use "YYYY-MM" format (e.g., "2023-05" for May 2023). If only year is available, use "YYYY-01".
+            For the 'present' flag in experiences and education, set to true if the end date is "present", "current", "ongoing" or if the position/education is marked as ongoing.
             Do not add any markdown formatting or extra text - return ONLY the JSON object.
             
             RESUME TEXT:
