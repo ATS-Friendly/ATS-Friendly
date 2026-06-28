@@ -31,8 +31,11 @@ let currentLayout = {
 let profilePhotoBase64 = null;
 const appId = "mono-cv-app";
 const LOCAL_CV_KEY = "ats-friendly-cv-backup";
+const LOCAL_CV_PHOTO_KEY = "ats-friendly-cv-photo";
 const CV_BACKUP_VERSION = 1;
 const CV_EMBED_MARKER = "ATSFRIENDLY";
+let previewDebounce = null;
+let lastSavedPhotoRef = null;
 
 const escapeHTML = (str) => {
     if (!str) return "";
@@ -1189,6 +1192,23 @@ window.removeItemAndRefresh = (btn) => {
 };
 
 window.generateCVFromForm = (triggerSave = true) => {
+    if (!triggerSave) {
+        if (previewDebounce) {
+            clearTimeout(previewDebounce);
+            previewDebounce = null;
+        }
+        renderCvPreview(false);
+        return;
+    }
+
+    if (previewDebounce) clearTimeout(previewDebounce);
+    previewDebounce = setTimeout(() => {
+        previewDebounce = null;
+        renderCvPreview(true);
+    }, 100);
+};
+
+function renderCvPreview(triggerSave = true) {
     const data = collectFormData();
 
     const titles = {
@@ -1496,7 +1516,7 @@ window.generateCVFromForm = (triggerSave = true) => {
         </div>`;
     }
 
-    document.getElementById('cv-root').innerHTML = html + createCvEmbedHtml(data);
+    document.getElementById('cv-root').innerHTML = html;
     
     if(window.innerWidth <= 1024) {
         setTimeout(window.resizePreview, 10);
@@ -1506,6 +1526,17 @@ window.generateCVFromForm = (triggerSave = true) => {
         triggerDebounceSave(data);
     }
 };
+
+function updateCvEmbedForPrint() {
+    const cvRoot = document.getElementById('cv-root');
+    if (!cvRoot) return;
+    cvRoot.querySelector('.cv-data-embed')?.remove();
+    cvRoot.insertAdjacentHTML('beforeend', createCvEmbedHtml(collectFormData()));
+}
+
+function removeCvEmbedFromPreview() {
+    document.querySelector('.cv-data-embed')?.remove();
+}
 
 function collectFormData() {
     const data = {
@@ -1664,7 +1695,17 @@ function applyFullCvBackup(data) {
 
 function saveLocalCvBackup(formData) {
     try {
-        localStorage.setItem(LOCAL_CV_KEY, JSON.stringify(buildCvBackup(formData)));
+        const { photo, ...formDataWithoutPhoto } = formData;
+        localStorage.setItem(LOCAL_CV_KEY, JSON.stringify(buildCvBackup({ ...formDataWithoutPhoto, photo: null })));
+        if (photo) {
+            if (photo !== lastSavedPhotoRef) {
+                localStorage.setItem(LOCAL_CV_PHOTO_KEY, photo);
+                lastSavedPhotoRef = photo;
+            }
+        } else {
+            localStorage.removeItem(LOCAL_CV_PHOTO_KEY);
+            lastSavedPhotoRef = null;
+        }
     } catch (e) {
         console.warn("Local CV backup failed:", e);
     }
@@ -1673,7 +1714,11 @@ function saveLocalCvBackup(formData) {
 function loadLocalCvBackup() {
     try {
         const raw = localStorage.getItem(LOCAL_CV_KEY);
-        return raw ? JSON.parse(raw) : null;
+        if (!raw) return null;
+        const backup = JSON.parse(raw);
+        const photo = localStorage.getItem(LOCAL_CV_PHOTO_KEY);
+        if (backup?.formData && photo) backup.formData.photo = photo;
+        return backup;
     } catch {
         return null;
     }
@@ -1916,17 +1961,18 @@ window.initDatePicker();
 let originalViewport = null;
 
 window.addEventListener('beforeprint', () => {
-    if (window.generateCVFromForm) window.generateCVFromForm(false);
-    
-    
+    if (previewDebounce) {
+        clearTimeout(previewDebounce);
+        previewDebounce = null;
+    }
+    renderCvPreview(false);
+    updateCvEmbedForPrint();
     document.body.classList.add('printing');
-    
-    });
+});
 
 window.addEventListener('afterprint', () => {
-        document.body.classList.remove('printing');
-    
-    
+    document.body.classList.remove('printing');
+    removeCvEmbedFromPreview();
     if (window.resizePreview) window.resizePreview();
 });
 
