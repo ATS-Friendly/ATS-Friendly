@@ -33,7 +33,17 @@ const appId = "mono-cv-app";
 const LOCAL_CV_KEY = "ats-friendly-cv-backup";
 const LOCAL_CV_PHOTO_KEY = "ats-friendly-cv-photo";
 const CV_BACKUP_VERSION = 1;
+const TEMPLATE_CLASSES = ['tpl-classic', 'tpl-compact', 'tpl-modern', 'tpl-elegant'];
 let lastSavedPhotoRef = null;
+
+function getActiveTemplate() {
+    return TEMPLATE_CLASSES.find(c => document.body.classList.contains(c)) || 'tpl-classic';
+}
+
+function normalizeTemplate(value) {
+    if (!value) return '';
+    return TEMPLATE_CLASSES.find(c => value.includes(c)) || '';
+}
 
 const escapeHTML = (str) => {
     if (!str) return "";
@@ -939,17 +949,15 @@ onAuthStateChanged(auth, async (user) => {
 
 window.selectTemplate = (tpl) => {
     window.showView('editor-view');
-    if (isGuest) {
+    if (isGuest && !formHasContent(collectFormData())) {
         const localBackup = loadLocalCvBackup();
         if (localBackup && isValidCvBackup(localBackup)) {
             applyFullCvBackup(localBackup);
-        } else {
-            document.body.className = tpl;
         }
-    } else {
-        document.body.className = tpl;
     }
-    generateCVFromForm();
+    document.body.className = tpl;
+    generateCVFromForm(false);
+    saveToCloud(collectFormData());
 };
 
 window.backToTemplates = () => {
@@ -1573,7 +1581,7 @@ function buildCvBackup(formData) {
         exportedAt: new Date().toISOString(),
         formData,
         sectionSettings: getSectionSettings(),
-        template: document.body.className,
+        template: getActiveTemplate(),
         theme: currentTheme,
         layout: currentLayout
     };
@@ -1609,7 +1617,8 @@ function applyFullCvBackup(data) {
             document.getElementById('form-references-block').parentElement.style.opacity = ss.visible.refs ? '1' : '0.5';
         }
     }
-    if (data.template) document.body.className = data.template;
+    const tpl = normalizeTemplate(data.template);
+    if (tpl) document.body.className = tpl;
     if (data.theme) {
         currentTheme = data.theme;
         window.applyColor(currentTheme.color);
@@ -1771,7 +1780,7 @@ async function saveToCloud(formData = null) {
         await setDoc(docRef, {
             formData: data,
             sectionSettings: sectionSettings,
-            template: document.body.className,
+            template: getActiveTemplate(),
             theme: currentTheme,
             layout: currentLayout,
             updatedAt: new Date().toISOString()
