@@ -33,8 +33,6 @@ const appId = "mono-cv-app";
 const LOCAL_CV_KEY = "ats-friendly-cv-backup";
 const LOCAL_CV_PHOTO_KEY = "ats-friendly-cv-photo";
 const CV_BACKUP_VERSION = 1;
-const CV_EMBED_MARKER = "ATSFRIENDLY";
-let previewDebounce = null;
 let lastSavedPhotoRef = null;
 
 const escapeHTML = (str) => {
@@ -109,66 +107,29 @@ window.removePhoto = () => {
 };
 
 window.handleCvUpload = async (event) => {
-    const file = event.target.files[0];
-    if (!file) return;
-    event.target.value = '';
-    await importCvFromPdf(file);
-};
-
-async function extractTextFromPdf(file) {
-    const arrayBuffer = await file.arrayBuffer();
-    const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
-    let fullText = "";
-
-    for (let i = 1; i <= pdf.numPages; i++) {
-        const page = await pdf.getPage(i);
-        const content = await page.getTextContent();
-        const pageText = content.items.map(item => item.str).join(" ");
-        fullText += pageText + "\n";
+    const t = translations[currentLang];
+    
+    if (isGuest) {
+        alert(t.msg_guest_import_warning);
+        event.target.value = '';
+        return;
     }
 
-    return fullText;
-}
+    const file = event.target.files[0];
+    if (!file) return;
 
-async function importCvFromPdf(file) {
-    const t = translations[currentLang];
     const toast = document.getElementById('toast');
-
+    
     toast.innerText = t.msg_importing;
     toast.classList.add('show');
 
     try {
         const fullText = await extractTextFromPdf(file);
-        const embedded = extractEmbeddedCvFromPdfText(fullText);
-
-        if (embedded) {
-            if (formHasContent(collectFormData()) && !confirm(t.confirm_import_backup)) {
-                toast.classList.remove('show');
-                return;
-            }
-            applyFullCvBackup(embedded);
-            generateCVFromForm();
-            triggerDebounceSave();
-            toast.innerText = t.msg_import_pdf_embed_success;
-            setTimeout(() => toast.classList.remove('show'), 3000);
-            return;
-        }
-
-        if (isGuest) {
-            toast.classList.remove('show');
-            alert(t.msg_import_pdf_no_embed + "\n\n" + t.msg_guest_import_warning);
-            return;
-        }
 
         const parseResume = httpsCallable(functions, 'parseResumeWithAI');
         const result = await parseResume({ text: fullText });
         const parsedData = result.data;
-
-        if (formHasContent(collectFormData()) && !confirm(t.confirm_import_backup)) {
-            toast.classList.remove('show');
-            return;
-        }
-
+        
         if (parsedData.fullname) document.getElementById('inp-fullname').value = parsedData.fullname;
         if (parsedData.title) document.getElementById('inp-title').value = parsedData.title;
         if (parsedData.email) document.getElementById('inp-email').value = parsedData.email;
@@ -202,16 +163,34 @@ async function importCvFromPdf(file) {
             window.addFormCustomSection({ title: translations[currentLang].form_languages || 'Languages', content: parsedData.languages });
         }
 
-        generateCVFromForm();
+        window.generateCVFromForm();
         triggerDebounceSave();
 
         toast.innerText = t.msg_import_success;
         setTimeout(() => toast.classList.remove('show'), 3000);
+        
     } catch (error) {
-        console.error("CV PDF import error:", error);
+        console.error("AI CV Parsing Error:", error);
         toast.innerText = t.msg_import_error;
         setTimeout(() => toast.classList.remove('show'), 3000);
     }
+
+    event.target.value = '';
+};
+
+async function extractTextFromPdf(file) {
+    const arrayBuffer = await file.arrayBuffer();
+    const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+    let fullText = "";
+
+    for (let i = 1; i <= pdf.numPages; i++) {
+        const page = await pdf.getPage(i);
+        const content = await page.getTextContent();
+        const pageText = content.items.map(item => item.str).join(" ");
+        fullText += pageText + "\n";
+    }
+
+    return fullText;
 }
 
 
@@ -328,12 +307,10 @@ const translations = {
         btn_add_ref: "Referans Ekle",
         btn_import_cv: "CV'den Aktar",
         btn_export_cv: "CV Yedekle (İndir)",
-        btn_import_backup: "CV Yedeğini Yükle (.json / .pdf)",
+        btn_import_backup: "CV Yedeğini Yükle",
         msg_export_backup_success: "CV yedeği indirildi!",
         msg_import_backup_success: "CV yedeği başarıyla yüklendi!",
         msg_import_backup_error: "Geçersiz yedek dosyası. Lütfen bu siteden indirdiğiniz .json dosyasını kullanın.",
-        msg_import_pdf_embed_success: "CV, siteden indirdiğiniz PDF'den tam olarak geri yüklendi!",
-        msg_import_pdf_no_embed: "Bu PDF bu siteden indirilmemiş veya eski bir sürüm. JSON yedeği kullanın veya giriş yaparak AI ile aktarın.",
         confirm_import_backup: "Mevcut CV içeriğiniz yedek dosyasıyla değiştirilecek. Devam etmek istiyor musunuz?",
         lbl_date_start: "Başlangıç",
         lbl_date_end: "Bitiş",
@@ -480,12 +457,10 @@ const translations = {
         btn_add_ref: "Add Reference",
         btn_import_cv: "Import from CV",
         btn_export_cv: "Backup CV (Download)",
-        btn_import_backup: "Restore CV Backup (.json / .pdf)",
+        btn_import_backup: "Restore CV Backup",
         msg_export_backup_success: "CV backup downloaded!",
         msg_import_backup_success: "CV backup restored successfully!",
         msg_import_backup_error: "Invalid backup file. Please use a .json file exported from this site.",
-        msg_import_pdf_embed_success: "CV fully restored from your site PDF!",
-        msg_import_pdf_no_embed: "This PDF was not downloaded from this site (or is an older version). Use a JSON backup, or log in to import via AI.",
         confirm_import_backup: "Your current CV will be replaced with the backup. Do you want to continue?",
         lbl_date_start: "Start Date",
         lbl_date_end: "End Date",
@@ -1192,20 +1167,7 @@ window.removeItemAndRefresh = (btn) => {
 };
 
 window.generateCVFromForm = (triggerSave = true) => {
-    if (!triggerSave) {
-        if (previewDebounce) {
-            clearTimeout(previewDebounce);
-            previewDebounce = null;
-        }
-        renderCvPreview(false);
-        return;
-    }
-
-    if (previewDebounce) clearTimeout(previewDebounce);
-    previewDebounce = setTimeout(() => {
-        previewDebounce = null;
-        renderCvPreview(true);
-    }, 100);
+    renderCvPreview(triggerSave);
 };
 
 function renderCvPreview(triggerSave = true) {
@@ -1527,17 +1489,6 @@ function renderCvPreview(triggerSave = true) {
     }
 };
 
-function updateCvEmbedForPrint() {
-    const cvRoot = document.getElementById('cv-root');
-    if (!cvRoot) return;
-    cvRoot.querySelector('.cv-data-embed')?.remove();
-    cvRoot.insertAdjacentHTML('beforeend', createCvEmbedHtml(collectFormData()));
-}
-
-function removeCvEmbedFromPreview() {
-    document.querySelector('.cv-data-embed')?.remove();
-}
-
 function collectFormData() {
     const data = {
         fullname: document.getElementById('inp-fullname').value,
@@ -1626,32 +1577,6 @@ function buildCvBackup(formData) {
         theme: currentTheme,
         layout: currentLayout
     };
-}
-
-function buildCvBackupForPdfEmbed(formData) {
-    return buildCvBackup({ ...formData, photo: null });
-}
-
-function encodeCvBackupForEmbed(backup) {
-    return btoa(unescape(encodeURIComponent(JSON.stringify(backup))));
-}
-
-function createCvEmbedHtml(formData) {
-    const payload = encodeCvBackupForEmbed(buildCvBackupForPdfEmbed(formData));
-    return `<div class="cv-data-embed" aria-hidden="true">${CV_EMBED_MARKER}::v${CV_BACKUP_VERSION}::${payload}</div>`;
-}
-
-function extractEmbeddedCvFromPdfText(text) {
-    const match = text.match(new RegExp(`${CV_EMBED_MARKER}::v(\\d+)::([A-Za-z0-9+/=\\s]+)`));
-    if (!match) return null;
-
-    try {
-        const payload = match[2].replace(/\s+/g, '');
-        const parsed = JSON.parse(decodeURIComponent(escape(atob(payload))));
-        return isValidCvBackup(parsed) ? parsed : null;
-    } catch {
-        return null;
-    }
 }
 
 function isValidCvBackup(data) {
@@ -1753,11 +1678,6 @@ window.importCvBackup = async (event) => {
     const file = event.target.files[0];
     if (!file) return;
     event.target.value = '';
-
-    if (file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf')) {
-        await importCvFromPdf(file);
-        return;
-    }
 
     try {
         const parsed = JSON.parse(await file.text());
@@ -1961,18 +1881,12 @@ window.initDatePicker();
 let originalViewport = null;
 
 window.addEventListener('beforeprint', () => {
-    if (previewDebounce) {
-        clearTimeout(previewDebounce);
-        previewDebounce = null;
-    }
     renderCvPreview(false);
-    updateCvEmbedForPrint();
     document.body.classList.add('printing');
 });
 
 window.addEventListener('afterprint', () => {
     document.body.classList.remove('printing');
-    removeCvEmbedFromPreview();
     if (window.resizePreview) window.resizePreview();
 });
 
