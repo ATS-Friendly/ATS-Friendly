@@ -272,6 +272,8 @@ const translations = {
         btn_choose_photo: "Fotoğraf Seç",
         btn_remove_photo: "Kaldır",
         btn_add_job: "İş Ekle",
+        btn_move_up: "Yukarı taşı",
+        btn_move_down: "Aşağı taşı",
         btn_add_edu: "Okul Ekle",
         btn_add_custom: "Bölüm Ekle",
         lbl_job_title: "Pozisyon Adı",
@@ -414,6 +416,8 @@ const translations = {
         btn_choose_photo: "Choose Photo",
         btn_remove_photo: "Remove",
         btn_add_job: "Add Job",
+        btn_move_up: "Move up",
+        btn_move_down: "Move down",
         btn_add_edu: "Add Education",
         btn_add_custom: "Add Section",
         lbl_job_title: "Job Title",
@@ -940,7 +944,11 @@ window.addFormExperience = (data = null) => {
     const t = translations[currentLang];
     
     div.innerHTML = `
-        <button class="remove-dynamic-btn" onclick="removeItemAndRefresh(this)" aria-label="Remove item">×</button>
+        <div class="dynamic-item-actions">
+            <button type="button" class="move-dynamic-btn move-up-btn" onclick="moveExperienceItem(this, 'up')" aria-label="${t.btn_move_up}" title="${t.btn_move_up}">↑</button>
+            <button type="button" class="move-dynamic-btn move-down-btn" onclick="moveExperienceItem(this, 'down')" aria-label="${t.btn_move_down}" title="${t.btn_move_down}">↓</button>
+            <button type="button" class="remove-dynamic-btn" onclick="removeItemAndRefresh(this)" aria-label="Remove item">×</button>
+        </div>
         <div class="input-grid">
             <div class="input-group">
                 <label data-i18n="lbl_job_title">${t.lbl_job_title}</label>
@@ -970,10 +978,37 @@ window.addFormExperience = (data = null) => {
         </div>
     `;
     container.appendChild(div);
+    updateExperienceMoveButtons();
     if (!data) {
         generateCVFromForm();
         window.initDatePicker();
     }
+};
+
+window.moveExperienceItem = (btn, direction) => {
+    const item = btn.closest('.dynamic-item');
+    const container = document.getElementById('form-experiences-list');
+    if (!item || !container) return;
+
+    if (direction === 'up') {
+        const prev = item.previousElementSibling;
+        if (prev) container.insertBefore(item, prev);
+    } else {
+        const next = item.nextElementSibling;
+        if (next) container.insertBefore(next, item);
+    }
+    updateExperienceMoveButtons();
+    generateCVFromForm();
+};
+
+window.updateExperienceMoveButtons = () => {
+    const items = document.querySelectorAll('#form-experiences-list .dynamic-item');
+    items.forEach((item, index) => {
+        const upBtn = item.querySelector('.move-up-btn');
+        const downBtn = item.querySelector('.move-down-btn');
+        if (upBtn) upBtn.disabled = index === 0;
+        if (downBtn) downBtn.disabled = index === items.length - 1;
+    });
 };
 
 window.addFormEducation = (data = null) => {
@@ -1104,7 +1139,10 @@ window.toggleSection = (id) => {
 };
 
 window.removeItemAndRefresh = (btn) => {
-    btn.parentElement.remove();
+    const item = btn.closest('.dynamic-item');
+    const isExperience = item?.parentElement?.id === 'form-experiences-list';
+    item.remove();
+    if (isExperience) updateExperienceMoveButtons();
     generateCVFromForm();
 };
 
@@ -1508,6 +1546,7 @@ function loadUserDataIntoForm(data) {
     expList.innerHTML = '';
     if (data.experiences) {
         data.experiences.forEach(exp => addFormExperience(exp));
+        updateExperienceMoveButtons();
     }
 
     const eduList = document.getElementById('form-education-list');
