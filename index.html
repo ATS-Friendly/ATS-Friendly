@@ -474,6 +474,12 @@
                     <button class="nav-item" onclick="window.print()">
                         <span class="icon">🖨️</span> <span data-i18n="btn_download_pdf">PDF İndir</span>
                     </button>
+                    <button class="nav-item" onclick="exportCvBackup()">
+                        <span class="icon">💾</span> <span data-i18n="btn_export_cv">CV Yedekle (İndir)</span>
+                    </button>
+                    <button class="nav-item" onclick="document.getElementById('cv-backup-input').click()">
+                        <span class="icon">📂</span> <span data-i18n="btn_import_backup">CV Yedeğini Yükle</span>
+                    </button>
                     <button class="nav-item danger" onclick="resetAll()">
                         <span class="icon">🗑️</span> <span data-i18n="btn_reset">Sıfırla / Temizle</span>
                     </button>
@@ -494,7 +500,11 @@
                     <button class="btn-import-cv" onclick="document.getElementById('cv-upload-input').click()" style="display: none;">
                         <span class="icon">📄</span> <span data-i18n="btn_import_cv">CV'den Aktar</span>
                     </button>
+                    <button class="btn-import-cv" onclick="document.getElementById('cv-backup-input').click()">
+                        <span class="icon">📂</span> <span data-i18n="btn_import_backup">CV Yedeğini Yükle</span>
+                    </button>
                     <input type="file" id="cv-upload-input" style="display:none" accept=".pdf" onchange="handleCvUpload(event)">
+                    <input type="file" id="cv-backup-input" style="display:none" accept=".json,application/json" onchange="importCvBackup(event)">
                 </div>
                 
                 <div class="form-body">
@@ -617,6 +627,12 @@
         <div id="fab-overlay" class="fab-overlay" onclick="toggleFabMenu()"></div>
         <div class="mobile-fab-container">
             <div class="fab-menu-items" id="fab-items">
+                <button class="fab-item" onclick="exportCvBackup()">
+                    <span class="fab-label">Yedekle</span> 💾
+                </button>
+                <button class="fab-item" onclick="document.getElementById('cv-backup-input').click()">
+                    <span class="fab-label">Yedeği Yükle</span> 📂
+                </button>
                 <button class="fab-item danger" onclick="resetAll()">
                     <span class="fab-label">Temizle</span> 🗑️
                 </button>

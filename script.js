@@ -30,6 +30,8 @@ let currentLayout = {
 };
 let profilePhotoBase64 = null;
 const appId = "mono-cv-app";
+const LOCAL_CV_KEY = "ats-friendly-cv-backup";
+const CV_BACKUP_VERSION = 1;
 
 const escapeHTML = (str) => {
     if (!str) return "";
@@ -296,6 +298,12 @@ const translations = {
         btn_add_cert: "Sertifika Ekle",
         btn_add_ref: "Referans Ekle",
         btn_import_cv: "CV'den Aktar",
+        btn_export_cv: "CV Yedekle (İndir)",
+        btn_import_backup: "CV Yedeğini Yükle",
+        msg_export_backup_success: "CV yedeği indirildi!",
+        msg_import_backup_success: "CV yedeği başarıyla yüklendi!",
+        msg_import_backup_error: "Geçersiz yedek dosyası. Lütfen bu siteden indirdiğiniz .json dosyasını kullanın.",
+        confirm_import_backup: "Mevcut CV içeriğiniz yedek dosyasıyla değiştirilecek. Devam etmek istiyor musunuz?",
         lbl_date_start: "Başlangıç",
         lbl_date_end: "Bitiş",
         lbl_present: "Devam Ediyor",
@@ -440,6 +448,12 @@ const translations = {
         btn_add_cert: "Add Certificate",
         btn_add_ref: "Add Reference",
         btn_import_cv: "Import from CV",
+        btn_export_cv: "Backup CV (Download)",
+        btn_import_backup: "Restore CV Backup",
+        msg_export_backup_success: "CV backup downloaded!",
+        msg_import_backup_success: "CV backup restored successfully!",
+        msg_import_backup_error: "Invalid backup file. Please use a .json file exported from this site.",
+        confirm_import_backup: "Your current CV will be replaced with the backup. Do you want to continue?",
         lbl_date_start: "Start Date",
         lbl_date_end: "End Date",
         lbl_present: "Present",
@@ -883,35 +897,24 @@ onAuthStateChanged(auth, async (user) => {
         const snap = await getDoc(docRef);
         
         if (snap.exists()) {
-            const data = snap.data();
-            if (data.formData) loadUserDataIntoForm(data.formData);
-            if (data.sectionSettings) {
-                const ss = data.sectionSettings;
-                if (ss.titles) {
-                    document.getElementById('title-certificates').value = ss.titles.certs || 'Sertifikalar';
-                    document.getElementById('title-references').value = ss.titles.refs || 'Referanslar';
-                }
-                if (ss.visible) {
-                    document.getElementById('form-certificates-block').style.display = ss.visible.certs ? 'block' : 'none';
-                    document.getElementById('form-references-block').style.display = ss.visible.refs ? 'block' : 'none';
-                    document.getElementById('form-certificates-block').parentElement.style.opacity = ss.visible.certs ? '1' : '0.5';
-                    document.getElementById('form-references-block').parentElement.style.opacity = ss.visible.refs ? '1' : '0.5';
-                }
+            applyFullCvBackup(snap.data());
+        } else {
+            const localBackup = loadLocalCvBackup();
+            if (localBackup && isValidCvBackup(localBackup)) {
+                applyFullCvBackup(localBackup);
+                saveToCloud(localBackup.formData);
             }
-            document.body.className = data.template || '';
-            if (data.theme) {
-                currentTheme = data.theme;
-                window.applyColor(currentTheme.color);
-                window.applyFont(currentTheme.font);
-            }
-            if (data.layout) applySavedLayout(data.layout);
+        }
+
+        if (document.getElementById('editor-view')?.classList.contains('active') && formHasContent(collectFormData())) {
+            generateCVFromForm(false);
         }
         
         updateStatus('online');
 
         const currentView = document.querySelector('.view-section.active');
         if (currentView && currentView.id === 'auth-view') {
-            if (snap.exists()) {
+            if (formHasContent(collectFormData())) {
                 window.showView('editor-view');
                 generateCVFromForm(false);
             } else {
@@ -927,8 +930,17 @@ onAuthStateChanged(auth, async (user) => {
 });
 
 window.selectTemplate = (tpl) => {
-    document.body.className = tpl;
     window.showView('editor-view');
+    if (isGuest) {
+        const localBackup = loadLocalCvBackup();
+        if (localBackup && isValidCvBackup(localBackup)) {
+            applyFullCvBackup(localBackup);
+        } else {
+            document.body.className = tpl;
+        }
+    } else {
+        document.body.className = tpl;
+    }
     generateCVFromForm();
 };
 
@@ -1147,66 +1159,7 @@ window.removeItemAndRefresh = (btn) => {
 };
 
 window.generateCVFromForm = (triggerSave = true) => {
-    const data = {
-        fullname: document.getElementById('inp-fullname').value,
-        title: document.getElementById('inp-title').value,
-        email: document.getElementById('inp-email').value,
-        phone: document.getElementById('inp-phone').value,
-        linkedin: document.getElementById('inp-linkedin').value,
-        address: document.getElementById('inp-address').value,
-        license: document.getElementById('inp-license').value,
-        summary: document.getElementById('inp-summary').value,
-        photo: profilePhotoBase64,
-        experiences: [],
-        education: [],
-        certificates: [],
-        references: [],
-        customSections: []
-    };
-
-    document.querySelectorAll('#form-experiences-list .dynamic-item').forEach(item => {
-        data.experiences.push({
-            title: item.querySelector('.job-title').value,
-            company: item.querySelector('.job-company').value,
-            startDate: item.querySelector('.job-date-start').value,
-            endDate: item.querySelector('.job-date-end').value,
-            present: item.querySelector('.job-present').checked,
-            desc: item.querySelector('.job-desc').value
-        });
-    });
-
-    document.querySelectorAll('#form-education-list .dynamic-item').forEach(item => {
-        data.education.push({
-            school: item.querySelector('.edu-school').value,
-            degree: item.querySelector('.edu-degree').value,
-            startDate: item.querySelector('.edu-date-start').value,
-            endDate: item.querySelector('.edu-date-end').value,
-            present: item.querySelector('.edu-present').checked
-        });
-    });
-
-    document.querySelectorAll('#form-certificates-list .dynamic-item').forEach(item => {
-        data.certificates.push({
-            name: item.querySelector('.cert-name').value,
-            issuer: item.querySelector('.cert-issuer').value,
-            date: item.querySelector('.cert-date').value
-        });
-    });
-
-    document.querySelectorAll('#form-references-list .dynamic-item').forEach(item => {
-        data.references.push({
-            name: item.querySelector('.ref-name').value,
-            title: item.querySelector('.ref-title').value,
-            contact: item.querySelector('.ref-contact').value
-        });
-    });
-
-    document.querySelectorAll('#form-custom-list .dynamic-item').forEach(item => {
-        data.customSections.push({
-            title: item.querySelector('.custom-title').value,
-            content: item.querySelector('.custom-content').value
-        });
-    });
+    const data = collectFormData();
 
     const titles = {
         certs: document.getElementById('title-certificates').value,
@@ -1524,6 +1477,197 @@ window.generateCVFromForm = (triggerSave = true) => {
     }
 };
 
+function collectFormData() {
+    const data = {
+        fullname: document.getElementById('inp-fullname').value,
+        title: document.getElementById('inp-title').value,
+        email: document.getElementById('inp-email').value,
+        phone: document.getElementById('inp-phone').value,
+        linkedin: document.getElementById('inp-linkedin').value,
+        address: document.getElementById('inp-address').value,
+        license: document.getElementById('inp-license').value,
+        summary: document.getElementById('inp-summary').value,
+        photo: profilePhotoBase64,
+        experiences: [],
+        education: [],
+        certificates: [],
+        references: [],
+        customSections: []
+    };
+
+    document.querySelectorAll('#form-experiences-list .dynamic-item').forEach(item => {
+        data.experiences.push({
+            title: item.querySelector('.job-title').value,
+            company: item.querySelector('.job-company').value,
+            startDate: item.querySelector('.job-date-start').value,
+            endDate: item.querySelector('.job-date-end').value,
+            present: item.querySelector('.job-present').checked,
+            desc: item.querySelector('.job-desc').value
+        });
+    });
+
+    document.querySelectorAll('#form-education-list .dynamic-item').forEach(item => {
+        data.education.push({
+            school: item.querySelector('.edu-school').value,
+            degree: item.querySelector('.edu-degree').value,
+            startDate: item.querySelector('.edu-date-start').value,
+            endDate: item.querySelector('.edu-date-end').value,
+            present: item.querySelector('.edu-present').checked
+        });
+    });
+
+    document.querySelectorAll('#form-certificates-list .dynamic-item').forEach(item => {
+        data.certificates.push({
+            name: item.querySelector('.cert-name').value,
+            issuer: item.querySelector('.cert-issuer').value,
+            date: item.querySelector('.cert-date').value
+        });
+    });
+
+    document.querySelectorAll('#form-references-list .dynamic-item').forEach(item => {
+        data.references.push({
+            name: item.querySelector('.ref-name').value,
+            title: item.querySelector('.ref-title').value,
+            contact: item.querySelector('.ref-contact').value
+        });
+    });
+
+    document.querySelectorAll('#form-custom-list .dynamic-item').forEach(item => {
+        data.customSections.push({
+            title: item.querySelector('.custom-title').value,
+            content: item.querySelector('.custom-content').value
+        });
+    });
+
+    return data;
+}
+
+function getSectionSettings() {
+    return {
+        titles: {
+            certs: document.getElementById('title-certificates').value,
+            refs: document.getElementById('title-references').value
+        },
+        visible: {
+            certs: document.getElementById('form-certificates-block').style.display !== 'none',
+            refs: document.getElementById('form-references-block').style.display !== 'none'
+        }
+    };
+}
+
+function buildCvBackup(formData) {
+    return {
+        version: CV_BACKUP_VERSION,
+        exportedAt: new Date().toISOString(),
+        formData,
+        sectionSettings: getSectionSettings(),
+        template: document.body.className,
+        theme: currentTheme,
+        layout: currentLayout
+    };
+}
+
+function isValidCvBackup(data) {
+    return data && typeof data === 'object' && data.formData && typeof data.formData === 'object';
+}
+
+function formHasContent(formData) {
+    if (!formData) return false;
+    return Boolean(
+        formData.fullname?.trim() ||
+        formData.title?.trim() ||
+        formData.summary?.trim() ||
+        formData.experiences?.length ||
+        formData.education?.length
+    );
+}
+
+function applyFullCvBackup(data) {
+    if (data.formData) loadUserDataIntoForm(data.formData);
+    if (data.sectionSettings) {
+        const ss = data.sectionSettings;
+        if (ss.titles) {
+            document.getElementById('title-certificates').value = ss.titles.certs || translations[currentLang].form_certificates;
+            document.getElementById('title-references').value = ss.titles.refs || translations[currentLang].form_references;
+        }
+        if (ss.visible) {
+            document.getElementById('form-certificates-block').style.display = ss.visible.certs ? 'block' : 'none';
+            document.getElementById('form-references-block').style.display = ss.visible.refs ? 'block' : 'none';
+            document.getElementById('form-certificates-block').parentElement.style.opacity = ss.visible.certs ? '1' : '0.5';
+            document.getElementById('form-references-block').parentElement.style.opacity = ss.visible.refs ? '1' : '0.5';
+        }
+    }
+    if (data.template) document.body.className = data.template;
+    if (data.theme) {
+        currentTheme = data.theme;
+        window.applyColor(currentTheme.color);
+        window.applyFont(currentTheme.font);
+    }
+    if (data.layout) applySavedLayout(data.layout);
+}
+
+function saveLocalCvBackup(formData) {
+    try {
+        localStorage.setItem(LOCAL_CV_KEY, JSON.stringify(buildCvBackup(formData)));
+    } catch (e) {
+        console.warn("Local CV backup failed:", e);
+    }
+}
+
+function loadLocalCvBackup() {
+    try {
+        const raw = localStorage.getItem(LOCAL_CV_KEY);
+        return raw ? JSON.parse(raw) : null;
+    } catch {
+        return null;
+    }
+}
+
+function showToast(message) {
+    const t = document.getElementById('toast');
+    if (!t) return;
+    t.innerText = message;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+window.exportCvBackup = () => {
+    const backup = buildCvBackup(collectFormData());
+    const safeName = (backup.formData.fullname || 'cv')
+        .replace(/[^\w\s\u00C0-\u024F-]/g, '')
+        .trim()
+        .replace(/\s+/g, '-') || 'cv';
+    const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `${safeName}-cv-backup.json`;
+    link.click();
+    URL.revokeObjectURL(url);
+    showToast(translations[currentLang].msg_export_backup_success);
+};
+
+window.importCvBackup = async (event) => {
+    const t = translations[currentLang];
+    const file = event.target.files[0];
+    if (!file) return;
+    event.target.value = '';
+
+    try {
+        const parsed = JSON.parse(await file.text());
+        if (!isValidCvBackup(parsed)) throw new Error('invalid backup');
+
+        if (formHasContent(collectFormData()) && !confirm(t.confirm_import_backup)) return;
+
+        applyFullCvBackup(parsed);
+        generateCVFromForm();
+        showToast(t.msg_import_backup_success);
+    } catch (e) {
+        console.error("CV backup import failed:", e);
+        showToast(t.msg_import_backup_error);
+    }
+};
+
 function loadUserDataIntoForm(data) {
     document.getElementById('inp-fullname').value = data.fullname || '';
     document.getElementById('inp-title').value = data.title || '';
@@ -1584,33 +1728,27 @@ function triggerDebounceSave(data = null) {
 }
 
 async function saveToCloud(formData = null) {
+    const data = formData || collectFormData();
+    saveLocalCvBackup(data);
+
     if (!currentUser) {
         if (isGuest && document.getElementById('editor-view').classList.contains('active')) {
-            updateStatus('online'); 
+            updateStatus('online');
         }
         return;
     }
     isSyncing = true;
     const docRef = doc(db, 'artifacts', appId, 'users', currentUser.uid, 'data', 'cvContent');
-    const sectionSettings = {
-        titles: {
-            certs: document.getElementById('title-certificates').value,
-            refs: document.getElementById('title-references').value
-        },
-        visible: {
-            certs: document.getElementById('form-certificates-block').style.display !== 'none',
-            refs: document.getElementById('form-references-block').style.display !== 'none'
-        }
-    };
+    const sectionSettings = getSectionSettings();
 
     try {
-        await setDoc(docRef, { 
-            formData: formData, 
+        await setDoc(docRef, {
+            formData: data,
             sectionSettings: sectionSettings,
             template: document.body.className,
             theme: currentTheme,
             layout: currentLayout,
-            updatedAt: new Date().toISOString() 
+            updatedAt: new Date().toISOString()
         }, { merge: true });
         
         updateStatus('online');
